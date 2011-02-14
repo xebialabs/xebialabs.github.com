@@ -1,7 +1,8 @@
----
+Opening file ./src/markdown/systemadminmanual/systemadminmanual.markdown
+----
 layout: default
 title: Deployit System Administration Manual
----
+----
 
 # Preface #
 
@@ -19,20 +20,45 @@ To install the Deployit server, the following prerequisites **must** be met:
 
 * **Operating system**: Windows or Unix-family operating system running Java.
 * **Java Runtime Environment**: JDK 1.6 (Sun/IBM or Apple)
-* **RAM**: At least 2GB of internal memory, of which 1 GB should be allocated to the JVM.
-* **Harddisk space**: Sufficient harddisk space to store the Deployit repository. xxx JvE, VP: how much? xxx
+* **RAM**: At least 2GB of RAM available for Deployit.
+* **Harddisk space**: Sufficient harddisk space to store the Deployit repository. This depends on your usage of Deployit. See section **Determining Harddisk Space Requirements**.
 
 Depending on the intended usage of Deployit, the following may also be required:
 
 * **Database**: Deployit's Jackrabbit repository supports a number of different databases. For more information see [Jackrabbit's persistence manager FAQ](http://wiki.apache.org/jackrabbit/PersistenceManagerFAQ).
 * **LDAP**: To enable group based security, an LDAP x.509 compliant registry is needed.
 
-### Middleware Server Requirements ###
+**Determining Harddisk Space Requirements**
 
-The middleware servers that Deployit interacts with must meet the following requirements:
+The amount of diskspace Deployit uses is dependent on how the product is used in your environment. It is most influenced by:
 
-* **Operating system**: The target systems should run a Unix compatible operating system.
-* **SSH Access**: The target systems should be accessible by SSH, i.e. they should run an SSH2 server. [^1]
+* the size and storage mechanism used for artifacts
+* the number of packages in the system
+* the number of deployments performed (more specifically, the amount of logging information stored)
+
+To obtain an estimate, do the following:
+
+* Install and configure Deployit for your environment as described in this document. Make sure you correctly set up the database-based or file-based repository.
+* Estimate the number of packages to be imported (either the total number or the number per unit of time) (`NumPackages`)
+* Estimate the number of deployments to be performed (either the total number or the number per unit of time) (`NumDeployments`)
+* Record the amount of diskspace used by Deployit (`InitialSize`).
+* Import a few packages using the GUI or CLI.
+* Record the amount of displace used by Deployit (`SizeAfterImport`).
+* Perform a few deployments.
+* Record the amount of displace used by Deployit (`SizeAfterDeployments`).
+
+The needed amount of diskspace in total is equal to:
+
+	Space Needed = ((SizeAfterImport - InitialSize) * NumPackages) +
+		((SizeAfterDeployments - SizeAfterImport) * NumDeployments)
+
+If `NumPackages` and `NumDeployments` are expressed per timeunit (e.g. the number of packages to be imported per month), then the end result represents the space needed per month as well.
+
+### Unix Middleware Server Requirements ###
+
+Unix-based middleware servers that Deployit interacts with must meet the following requirements:
+
+* **SSH Access**: The target systems should be accessible by SSH, i.e. they should run an SSH2 server. [^1][^2]
 * **Credentials**: Deployit should be able to log in to the target systems using a login/password combination that allows it to perform at least the following Unix commands:
     * `cp`
     * `ls`
@@ -43,17 +69,15 @@ The middleware servers that Deployit interacts with must meet the following requ
 
 	If the login user cannot perform these actions, a `sudo` user may be selected that can execute these commands.
 
-**Note**: Care should be taken that users specified in the connection settings for a host have limited rights. It should be assumed that a user with write permissions on infrastructure that runs on a host is able to execute arbitrary commands on that host, using the connection settings for that host.
+[^1]: The SSH daemon on AIX is known to hang with certain types of SSH traffic. 
+[^2]: For security, the SSH account that is used to access a host should have limited rights. 
 
-[1]: The SSH daemon on AIX is known to hang with certain types of SSH traffic. 
+### Windows Middleware Server Requirements ###
 
-### Middleware Requirements ###
+Windows-based middleware servers that Deployit interacts with must meet the following requirements:
 
-The target middleware needs to be set up so that the administrative interfaces of the target middleware can be accessed by running it on the machine on which the administrative server of the software is installed. Deployit does not support a setup in which the administrative client is installed on a different machine.
-
-For WebSphere Application Server this means that Deployit will use SSH to log in to the machine on which the "deployment manager" is running, upload any Python files and other files needed to a temporary directory and then invoke the `wsadmin.sh` command. Afterwards any temporary files will be removed.
-
-For WebLogic Server this means that Deployit will use SSH to log in to the machine on which the "admin server" is running, upload any Python files and other files needed to a temporary directory and then invoke the `wlst.sh` command. Afterwards any temporary files will be removed.
+* **CIFS/Telnet**: The target system should be accessible using Windows Telnet server running in _stream mode_. [^2]
+* **Directory shares**: The account used to access a target system should have access to the host's administrative shares such as **C$**.
 
 ### Client Requirements ###
 
@@ -63,7 +87,7 @@ The clients that access Deployit must meet the following requirements:
     * IE 7.0 or up
     * Firefox 3.0 or up
     * Safari 3.0 or up
-* **Flash Player**: A flash player is required, versions 9.0, 10.0 and up are supported.
+* **Flash Player**: A flash player is required, versions 9.0 and up are supported.
 
 ## Installation Procedure ##
 
@@ -75,6 +99,18 @@ Follow these steps to install the Deployit server application:
 2. **Create an installation directory**.
 3. **Copy the Deployit release distribution to the directory**.
 3. **Unzip the release into the created directory**.
+
+### Deployit Directory Structure ###
+
+Once the Deployit installation file is extracted, the following directory structure exists in the Deployit installation directory (in the remainder of the document this directory will be referred to as DEPLOYIT_HOME):
+
+* **bin**: contains the server binaries
+* **cli**: contains the client application, including binaries and libraries
+* **doc**: contains the documentation
+* **importablePackages**: default location for importable packages
+* **lib**: contains server libraries
+* **plugins**: contains the Deployit middleware plugins
+* **recovery.dat**: stores tasks that are in progress for recovery purposes
 
 ### Running the Setup Wizard ###
 
@@ -111,7 +147,6 @@ Answer **no** to start over with an empty configuration.
 
 Using simple setup, the Setup Wizard will assume default values for all configuration parameters. Specifically, the following defaults will be used:
 
-* Users must log in to use Deployit.
 * The server will **not** use secure communication between the Deployit GUI and the Deployit server.
 * The server will listen on Deployit's standard HTTP port (4516).
 * The server will use a minimum of 3 and a maximum of 24 threads.
@@ -227,7 +262,7 @@ The Setup Wizard shows the following question:
 	Where would you like Deployit to import packages from?
 	[importablePackages]: 
 
-Enter the filesystem path to a directory where Deployit will import packages. The Setup Wizard assumes that this directory exists once the Deployit server starts and will not create it.
+Enter the filesystem path to a directory from which Deployit will import packages. The Setup Wizard assumes that this directory exists once the Deployit server starts and will not create it.
 
 #### Finishing the Setup Process ####
 
@@ -240,6 +275,7 @@ Once you have completed configuration of the setup process, the Setup Wizard dis
 		SSL will be disabled
 		HTTP port is 4516
 		HTTP server will use a minimum of 3 and a maximum of 24 threads
+		JCR repository home is at repository
 		JCR repository will be initialized.
 		Task recovery file will deleted
 		Application import location is importablePackages
@@ -256,17 +292,29 @@ If the Setup Wizard is successfully completed, it will display the following mes
 	Note: If your Deployit server is running please restart it.
 	Finished setup.
 
+### Changing the Admin Password ###
+
+By default, Deployit is installed with a special user with administrative permissions. This user has the username `admin` and password `admin`. As the last step in the installation, the admin password should be changed to something more secure. Issue the following commands to do this:
+
+	adminUser = security.read('admin')
+	adminUser.password = 'newpassword'
+	security.modifyUser(devUser)
+
+	# Test whether the change is successful
+	security.logout()
+	security.login('admin', 'newpassword')
+	
 ## High Availability Setup ##
 
 Deployit can be configured to ensure maximum uptime of the application. In such a high availability setup, two instances of Deployit are running in an _active/passive_ configuration. At any one time, only one Deployit instance is active but as soon as a failure is detected, the passive Deployit instance is activated and the failed instance is taken down for repair. 
 
 The easiest way to achieve such a configuration is by using the same configuration for each Deployit instance.
 
-**Warning**: unpredictable results may occur when running two Deployit instances _at the same time_. 
+**Warning**: unpredictable results may occur when running two Deployit instances against the same repository _at the same time_. 
 
 When switching from one Deployit instance to another, any running tasks will be recovered by the new instance (see **Task Recovery**). 
 
-To configure such a setup, a router with _active/passive_ support must be used. xxx verify this xxx
+To configure such a setup, a router with _active/passive_ support must be used.
 
 # Configuring Deployit #
 
@@ -282,61 +330,29 @@ Deployit supports a fine-grained access control scheme to ensure the security of
 
 A (security) principal is an entity that can be authenticated and that can be assigned rights over resources in Deployit. Out of the box, Deployit supports only users as principals -- users are authenticated by means of a username and password and rights within Deployit are assigned to the user itself. When using an **LDAP** repository, groups in LDAP are also treated as principals.
 
-There is one special user, `admin`, who has special rights in Deployit. xxx what are these special rights? xxx
+There is one special user, `admin`, who has special rights in Deployit. This user is allowed to grant and revoke security permissions.
 
 **Permissions**
 
-Permissions in Deployit are rights to execute particular actions. They are independent of the resources on which the action is executed.
+Permissions in Deployit are rights to execute particular actions on certain CIs. In addition, the permissions also allow the user to make changes to the repository that are necessary to carry out the granted actions. If granting the permission without specifying the target CI(s), broad repository access is allowed. See the list below.
 
 Deployit supports the following permissions:
 
-* **import#initial**. The right to import a package for which the application does not yet exist in the repository and for which a new application will be created.
-* **import#upgrade**. The right to import a package for which the application already exists in the repository.
-* **deployment#initial**. The right to perform an initial deployment of a package to an environment.
-* **deployment#upgrade**. The right to perform an upgrade of a package on an environment.
-xxx are there more? repo editing? undeployment? xxx
-
-**Privileges**
-
-Privileges in Deployit are access rights to resources in the repository. They are independent of the actions being executed on the resources. Privileges are also _hierarchical_. This means that privileges defined on a particular node in the repository also apply to the nodes for which this node is a parent (unless the privileges are explicitly revoked for the child nodes). The available privileges are defined as part of the JCR standard.
-
-Deployit supports the following privileges:
-
-* **READ**. The right to read the resource it is attached to, or any of it's children.
-* **WRITE**. The right to write the resource it is attached to, or any of it's children.
-* **ALL**. All rights to the resource it is attached to, or any of it's children.
-
-xxx is ALL the same as READ + WRITE??? xxx
+* **read**. The right to see particular CIs.
+* **login**. The right to log into the Deployit application. The user has no access to nodes in the repository.
+* **import#initial**. The right to import a package for which the application does not yet exist in the repository and for which a new application will be created. This implies read and write access to the **Applications** node. The permission can also be given for specific _Application_ CIs.
+* **import#upgrade**. The right to import a package for which the application already exists in the repository. This implies read and write access to the **Applications** node. The permission can also be given for specific _Application_ CIs.
+* **deploy#initial**. The right to perform an initial deployment of a package to an environment. This implies read and write access to the **Environments** and **Infrastructure** nodes. The permission can also be given for specific _Environment_ CIs.
+* **deploy#upgrade**. The right to perform an upgrade of a package on an environment. This implies read and write access to the **Environments** and **Infrastructure** nodes. The permission can also be given for specific _Environment_ CIs.
+* **discovery**. The right to perform discovery. This implies read and write access to the **Infrastructure** node.
+* **repo#edit**. The right to edit (create and modify) CIs. This implies write access to the **Applications**, **Environments** and **Infrastructure** nodes. The user must also have read access to CIs to be able to edit them. The permission can also be given for specific CIs.
+* **undeploy**. The right to undeploy an application. This implies read and write access to the **Environments** and **Infrastructure** nodes. The permission can also be given for specific _Environment_ CIs.
 
 ### Granting, Revoking and Denying ###
 
-Access rights in Deployit can be _granted_ to a principal or _revoked_ from a principal. When rights are granted, the principal is allowed to perform some action or access repository entities. Rights once granted can be revoked again to prevent the action in the future. Granting and revoking rights are applicable to both _privileges_ as well as _permissions_.
+Access rights in Deployit can be _granted_ to a principal or _revoked_ from a principal. When rights are granted, the principal is allowed to perform some action or access repository entities. Rights once granted can be revoked again to prevent the action in the future. Rights can also be explicitly _denied_. Denying permission acts as a negative grant -- the right is explicitly disallowed.
 
-Privileges can also be explicitly _denied_. Denying a privilege acts as a negative grant -- the right is explicitly disallowed.
-
-### Securing User Actions ###
-
-When a user attempts to execute a particular action in Deployit, permissions and privileges are combined to verify whether the user is allowed to execute the action.
-
-**Initial Import**
-
-For an initial import, the user must have **import#initial** permission. No further privileges are required. The user performing the import will have **READ** and **WRITE** privileges on the newly created _Application_ and _DeploymentPackage_ CIs.
-
-**Upgrade Import**
-
-For an upgrade import, the user must have **import#upgrade** permission as well as **WRITE** privilege on the target CI, the _Application_ CI for which the package is imported. The user performing the import will have **READ** and **WRITE** privileges on the newly created _DeploymentPackage_ CI.
-
-**Initial Deployment**
-
-For an initial deployment, the user must have **deployment#initial** permission. Also, the user needs **READ** permission on the _Package_ CI and **WRITE** permission on both the _Environment_ and _Infrastructure_ CIs that is being deployed to. The user performing the deployment will have **READ** and **WRITE** privileges on the newly created _Deployment_ and deployed item CIs.
-
-**Upgrade Deployment**
-
-For an upgrade deployment, the user must have **deployment#upgrade** permission. Also, the user needs **READ** permission on the _Package_ CI and **WRITE** permission on both the _Environment_ and _Infrastructure_ CIs that is being deployed to. The user performing the deployment will have **READ** and **WRITE** privileges on the newly created _Deployment_ CI and any created deployed item CIs.
-
-**Undeployment**
-
-For undeployment, the user needs **WRITE** permission on the _Deployment_ CI that is being undeployed.
+Access rights can be used stand-alone or in combination with one or more CIs. In the former case, the principal will have access to **all** CIs associated with the permission. In the latter case, the access rights will be restricted to the particular CIs. For example, granting _import#initial_ to a principal allows the principal to import any application. Granting _import#initial_ to _Applications/PetClinic_ allows the principal to import only _PetClinic_ packages.
 
 ### Configuring Repository Security ###
 
@@ -348,31 +364,44 @@ Deployit can only create users in it's own repository, even if it is configured 
 
 	deployer = security.createUser("john", "secret")
 
-xxx will it be moved to the proxies??? xxx
-
-**Granting Permissions and Privileges**
+**Granting Permissions**
 
 To grant a particular permission to a principal, use a statement such as the following:
 
-	security.grant("john", ["import#initial"])
+	security.grant("import#initial", "john")
 
-To grant a particular privilege to a principal on a resource, use a statement such as the following:
+To grant a particular permission to a principal on a resource, use a statement such as the following:
 
-	security.grant("mary", "Environments/Dev", ["ALL"])
+	security.grant("read", "mary", ['Environments/Dev'])
 
 **Revoking Permissions and Privileges**
 
 To revoke a particular permission from a principal, use a statement such as the following:
 
-	security.revoke("john", ["import#initial"])
+	security.revoke("read", "john", ['Environments/Dev'])
 
-To revoke a particular privilege from a principal on a resource, use a statement such as the following:
+### Inherited Permissions ###
 
-	security.revoke("mary", "Environments/Dev", ["ALL"])
+Permissions in Deployit are _inherited_ for all CIs that are contained in the CI node you specified the permissions for. For example, if you have read permission on _Environments/Dev_, you will also have read permission on all of the CIs under this node such as deployed applications. This is what happens when you use stand-alone permissions. If you use permissions on specific CIs, these permissions are set only on the specified CIs and are inherited from this CI onwards.
+
+### Permissions on Deployed Applications###
+
+Giving users permissions on deployed applications requires some knowledge of how these CIs are stored in the repository. As described in the **Deployit Reference Manual**, deployed applications are stored under both the **/Environments** as well as **/Infrastructure** nodes. Giving users read permission on a deployed application involves giving them permissions under both nodes.
 
 ### Security Configuration Example ###
 
-xxx make up a sample xxx
+Let's illustrate the security setup with an example.
+
+In a typical medium to large size company, there several different groups of people that perform tasks related to deployments. There are administrators that install, test and maintain hardware, there are deployers that deploy applications to development, test, acceptance and production environments. And finally there are the developer who build these applications.
+
+Translating this into Deployit terms:
+
+* **administrators**: permission to create, update and delete infrastructure as well as permission to create, update and delete environments. (all handled by _infrastructure#management permission)
+* **deployers**: permission to import new applications (_import#initial_), deploy to DEV, TEST and view PROD (_deploy#initial_ and _deploy#upgrade_ on environments DEV and TEST, _read_ rights on environment PROD).
+* **senior deployers**: permission to import new applications (_import#initial_), deploy to DEV, TEST and PROD (_deploy#initial_ and _deploy#upgrade_ on environments DEV, TEST and PROD).
+* **developers**: permission to import new versions of existing applications (_import#upgrade_) and to upgrade existing deployments (_deploy#upgrade_).
+
+See the **Deployit Command Line Interface (CLI) Manual** for the exact commands to implement this.
 
 ### Configuring LDAP Security ###
 
@@ -409,8 +438,27 @@ The class **LdapPrincipalProvider** is an example of how to connect Deployit to 
 
 ### Using a Database ###
 
-xxx how to store JCR repo stuff in MySQL or Oracle? xxx
-xxx anything else? xxx
+Deployit can also use a database to store it's repository in. The built-in Jackrabit repository must be configured to make this possible. The two relevant components are Jackrabbit's `PersistenceManager` (used for storing nodes an d revisions) and `DataStore` (optionally used for storing large binary objects). In the default Deployit configuration, the [Derby database](http://db.apache.org/derby/) and file system DataStore are used.
+
+This is an example of how to configure Deployit to use the [MySQL](http://www.mysql.com/) database [^3].
+
+First, extract the Jackrabbit configuration file and copy it to the `conf` directory where it will be picked up by Deployit:
+
+	cd $DEPLOYIT_HOME/conf
+	jar xvf ../bin/deployit-3.0-server.jar jackrabbit-repository.xml
+
+Edit the Jackrabbit configuration file and change each `PersistenceManager` to the following:
+
+	<PersistenceManager class="org.apache.jackrabbit.core.persistence.pool.MySqlPersistenceManager">
+		<param name="url" value="jdbc:mysql://localhost:3306/deployit" />
+		<param name="user" value="deployit" />
+        <param name="password" value="deployit" />
+		<param name="schemaObjectPrefix" value="${wsp.name}_" />
+	</PersistenceManager>
+
+For more information about using a database with Jackrabbit, see it's [PersistenceManager FAQ](http://wiki.apache.org/jackrabbit/PersistenceManagerFAQ) and [DataStore FAQ](http://wiki.apache.org/jackrabbit/DataStore).
+
+[^3]: The MySQL database is not suited for storage of large binary objects, see [the MySQL bug tracker](http://bugs.mysql.com/bug.php?id=10859).
 
 ## Installing Plugins ##
 
@@ -425,16 +473,6 @@ To install a new plugin, simply stop the Deployit server and copy the plugin JAR
 **Deinstalling a Plugin**
 
 To deinstall a plugin, simply stop the Deployit server and remove the plugin JAR archive from the `plugins` directory, then restart the Deployit server.
-
-## Installing CLI Extensions ##
-
-The Deployit **CLI** is used to communicate with the Deployit server. It can be extended with Python scripts that are loaded on CLI startup.
-
-To install CLI extensions follow these steps:
-
-1. **Create a directory called `ext`**. This directory in the same directory from which you start the CLI.
-2. **Copy Python scripts into the `ext` directory**.
-3.  **Start the CLI**. The CLI will load and execute all scripts with the `py` or `cli` suffix found in the extension directory.
 
 ## Configuring Logging ##
 
@@ -487,16 +525,16 @@ This section describes how to setup Deployit server in your environment.
 Deployit must be setup for your environment before it can be used to execute deployments. This entails the following steps:
 
 1. **Start the Deployit server**.
-2. **Discover your middleware**. Deployit can inspect your environment and automatically create CIs for your middleware.
+2. **Discover your middleware**. Deployit can inspect your environment and automatically create CIs for your middleware. Alternatively, you can use a bulk-import to import your middleware or create them by hand.
 3. **Ådd the discovered middleware to an environment**. CIs must be grouped in an environment to use them for deployment.
 
-Setup of Deployit is performed using the Deployit **Command Line Interface (CLI)**. For more information about the CLI, see the **Deployit Command Line Manual**.
+Setup of Deployit is performed using the Deployit **Command Line Interface (CLI)**. For more information about the CLI, see the **Deployit Command Line Interface (CLI) Manual**.
 
 ## Starting and Stopping ##
 
 **Starting the Server**
 
-Open a terminal window and change to the Deployit server directory. Start the Deployit server with the command:
+Open a terminal window and change to the DEPLOYIT_HOME directory. Start the Deployit server with the command:
 
 	bin/server.sh
 
@@ -512,20 +550,42 @@ By starting the server with the `-h` flag, a message is printed that shows the p
 		-reinitialize : Reinitialize the repository, only useful with -setup
 		-setup        : (Re-)run the setup for Deployit
 
-The options are:
+The command line options are:
 
 * `-reinitialize` -- tells Deployit to reinitialize the repository. Used only in conjunction with `-setup`.
 * `-setup` -- runs the Deployit Setup Wizard.
 * `-test-mode` -- enables Deployit serer test-mode. When test-mode is enabled, WebDAV access to the JCR repository is installed. The repository can be accessed using a URL such as `http://localhost:4516/repository/default/`.
 
+**Starting Deployit in the Background**
+
+By running the `server.sh` or `server.cmd` command, the Deployit server is started in the foreground. To run the server as a background process, use:
+
+	nohup bin/server.sh &
+	
+on Unix or run Deployit as a [service on Windows](http://support.microsoft.com/kb/137890).
+
+**Java Properties **
+
+Deployit server also responds to certain Java properties that influence it's behavior. These properties may be set in the environment (e.g. by executing `export jetty.host=127.0.0.1` in the terminal used to start the server) or by passing them to Java on the command line (for instance, by adding the flag `-Djetty.host=127.0.0.1` to the command that starts the server). The following options are supported:
+
+* `deployit.supported.extensions.in.archive` -- sets the file extensions for which Deployit will attempt to replace placeholders. See the **Deployit Packaging Manual** for more information.
+* `jetty.host` -- sets the host that Deployit's embedded HTTP server binds to. Default value is `localhost`.
+* `ssh.privatekey.filename` -- supplies Deployit with a private key file that is used to access a remote host using public-private key security over SSH.
+* `ssh.privatekey.passphrase` -- supplies Deployit with the passphrase to use in conjunction with the SSH private key.
+* `com.xebia.ad.donotcleanuptemporaryfiles` -- **debugging only**: tells Deployit to retain the temporary files it uses to execute commands on a remote host.
+* `com.xebialabs.deployit.jetty.ClassPathResourceContentServlet.fallbackDirectory` -- **debugging only**: tells Deployit to serve classpath resources from a different directory.
+* `com.xebialabs.deployit.plugin.was.disableDaemon` -- **debugging only**: tells Deployit **not** to use the daemon to speed up command execution on WAS.
+
+**Note**: Depoyit's main configuration takes place in the `deployit.conf` file. In an effort to consolidate configuration in one place, the properties mentioned above are expected to be migrated to the `deployit.conf` file in a future release.
+
 **Stopping the Server**
 
-It is possible to stop the Deployit server using a REST API call. The command requires a username and password with administrator privileges (xxx true? xxx). The following is an example of a command to generate such a call:
+It is possible to stop the Deployit server using a REST API call. The following is an example of a command to generate such a call (replace `admin:admin` with your own credentials):
 
 	curl -X POST --basic -u admin:admin 
 		http://admin:admin@localhost:4516/deployit/server/shutdown
 
-This requires the external `curl` command, available for both Unix and Windows. xxx wget example? xxx
+This requires the external `curl` command, available for both Unix and Windows.
 
 ## Editing CIs ##
 
@@ -535,12 +595,24 @@ The CIs in the Deployit repository can also be edited, either using the command 
 
 This section describes how to maintain the Deployit server in your environment.
 
-## Backing up Deployit ##
+## Creating Backups ##
 
 To create a backup of Deployit, several components may need to be backed up depending on your configuration:
 
 * **JCR repository**. 
-    * Built-in repository: Create a backup of the built-in JCR repository by backing up the files in the repository directory. **Note: to create the backup, Deployit must be stopped.**
+    * Built-in repository: Create a backup of the built-in JCR repository by backing up the files in the repository directory. 
     * Database repository: Create a backup of the database using the tools provdided by your vendor.
-* **LDAP repository**. Create a backup of the LDAP repository using the tools provdided by your vendor.
 * **Configuration**. Create a backup of the Deployit configuration by backing up the files in the `conf` directory in the installation directory.
+
+**Note:** Deployit **must not** be running when you are making a backup. Schedule backups outside of regular working hours to ensure the server is not being used.
+
+## Restoring Backups ##
+
+To restore a backup of Deployit, restore one of the following components:
+
+* **JCR repository**. 
+    * Built-in repository: Remove the repository directory and replace it with the backup.
+    * Database repository: Restore a backup of the database using the tools provdided by your vendor.
+* **Configuration**. Remove the `conf` directory in the DEPLOYIT_HOME directory and replace it with the backup.
+
+**Note:** Deployit **must not** be running when you are restoring a backup.

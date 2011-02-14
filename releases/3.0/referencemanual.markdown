@@ -1,7 +1,8 @@
----
+Opening file ./src/markdown/referencemanual/referencemanual.markdown
+----
 layout: default
 title: Deployit Reference Manual
----
+----
 
 # Preface #
 
@@ -9,12 +10,14 @@ This manual contains general background information for users of Deployit.
 
 # Deployment Overview #
 
-Deployit is a tool that helps you perform deployments. A deployment consists of all the actions needed to install and start an application on a target environment. Deployments are defined by:
+Deployit is the first out-of-the-box deployment automation solution that allows non-experts to perform application deployments. A deployment consists of all the actions needed to install, configure and start an application on a target environment. Deployments are defined by:
 
 * A **Package** or _what_ is to be deployed.
 * A **Environment** or _where_ the package is to be deployed.
+* A **Deployment** or _customizations_ to the package to be deployed.
 
-Once the _what_ and the _where_ are known, Deployit (and it's runbooks) takes care of the _how_ by putting together a list of steps (such as copying files, starting / stopping application servers) that perform the actual deployment.
+Once the _what_ and the _where_ are known, h
+Deployit (and it's runbooks) takes care of the _how_ by putting together a list of steps (such as copying files, starting / stopping application servers) that perform the actual deployment.
 
 Deployments can be categorized into two major categories:
 
@@ -67,58 +70,33 @@ The following are some examples of CIs:
 Deployit CIs all share certain properties:
 
 * **id**. This is the id of the CI, a unique identifier for this CI that can be used to reference it. The id determines the place of the CI in the **Repository**.
+* **archetypeId**. This specifies which archetype (if any) the CI has. See section **Archetypes** for more information.
 
 Some properties of a CI are mandatory (must be given a value before the CI can be used), others are optional. To determine which properties are available and which are mandatory or optional for a CI, see the **CI Reference** or use the help facility in the Deployit **CLI**.
 
+## Deployed Items ##
+
+Deployed items are members of a **deployment package** that have been deployed on some target middleware. The deployed item can be configured for the specific target it is mapped to during the deployment. When configuring a deployed item it is possible to override any CI properties that the CI has in the generic package. This allows a single package to be used in different environments.
+
 ## Deploying an Application ##
 
-This process installs a particular application (contained in a **deployment package**) on an environment. Deployit copies all necessary files and makes all configuration changes to the target middleware that are necessary for the application to run. If there is already a version of the application running on the environment, the deployment is an _upgrade_ rather than an initial deployment (see **Upgrading an Application**). Before performing an initial deployment, all deployed items must be configured correctly for the deployment to work.
+This process installs a particular application (represented by a **deployment package**) on an environment. Deployit copies all necessary files and makes all configuration changes to the target middleware that are necessary for the application to run. If there is already a version of the application running on the environment, the deployment is an _upgrade_ rather than an initial deployment (see **Upgrading an Application**). Before performing an initial deployment, all deployed items must be configured correctly for the deployment to work.
 
 ## Deployment ARchive (DAR) Format ##
 
 The DAR format is the native format Deployit supports for **deployment package**s. A DAR file is basically a Java **jar** archive containing a specially formatted manifest. The archive contains the package's **artifacts** while the **middleware resources** are described in the archive's manifest file. Deployit processes the manifest file to know which CIs are stored in the archive.
 
-The following illustration shows a simple DAR archive containing two artifacts and a middleware resource:
-
-	AnimalZoo-ear.dar
-	|
-	 \_ AnimalZooBE-1.0.ear
-	|
-	 \_ AnimalZooFE-4.0.ear
-
-A manifest file for this archive could be:
-
-	Manifest-Version: 1.0
-	Deployit-Package-Format-Version: 1.1
-	CI-Application: AnimalZoo-ear
-	CI-Version: 4.0
-	
-	Name: AnimalZooBE-1.0.ear
-	CI-Type: Ear
-	CI-Name: AnimalZooBE
-	
-	Name: AnimalZooFE-4.0.ear
-	CI-Type: Ear
-	CI-Name: AnimalZooFE
-	
-	Name: petclinicDS
-	CI-Type: DummyDataSource
-	driver: com.mysql.jdbc.Driver
-	url: jdbc:mysql://localhost/petclinic
-	username: petclinic
-	password: my$ecret
-	settings-EntryKey-1: autoCommit
-	settings-EntryValue-1: true
-
-When this archive is imported, Deployit will create a package CI containing two CIs of type _ear_ (AnimalZooBE and AnimalZooFE) as well as a middleware resource CI of type _DummyDataSource_ (petclinicDS).
-
-For a comprehensive description of the manifest format, see **Deployit Packaging Manual**.
+For a comprehensive description of the manifest format, see the **Deployit Packaging Manual**.
 
 ## Deployment Package ##
 
 A deployment package is an archive containing a particular version of an application, containing all **artifacts** and **middleware resources** that the application needs. It is independent of the environment it is deployed in (see **Unified Deployment Model**).
 
 Deployit accepts packages in the **Deployment ARchive (DAR)** format.
+
+## Environment ##
+
+An **Environment** is a grouping of infrastructure items, such as hosts, servers, clusters, etc. Environments can contain any combination of infrastructure items that are used in your situation. An environment is used as the target of a deployment, allowing members of the **deployment package** to be mapped to members of the environment.
 
 ## Middleware Resources ##
 
@@ -128,28 +106,23 @@ Middleware resources are pieces of middleware configuration that an application 
 * a topic.
 * a datasource.
 * a classpath entry.
-* an SQL file containing a database upgrade.
 
 In the **Unified Deployment Model**, a complete application (consisting of both middleware resources and artifacts) is contained in a single deployment package.
 
 ## Plug-in ##
 
-A plug-in is a self-contained piece of functionality that adds capabilities to the Deployit system. **Runbooks** are contained in plug-ins.
+A plug-in is a self-contained piece of functionality that adds capabilities to the Deployit system. Plugins contain **Runbooks**, **Steps** and **Configuration Item** types.
 
 ## Repository ##
 
 The _repository_ is a storage space for all things Deployit knows about. This includes configuration items (CIs), binary files (such as **deployment packages**) and Deployit's security configuration (user accounts and rights). The repository can be stored on disk (default) or in a database (see **Configuring Database Storage**).
 
-In Deployit, the repository conforms to the Java Content Repository (JCR) standard. Deployit's repository has a hierarchical layout and a version history. The following illustration shows the basic repository layout.
-
-![Figure 1: Repository Layout](images/example_cis.png "Repository Layout")
-
-The repository stores all CIs of all types. The top-level folders indicate the type of CI stored below it. Depending on the type of CI, the repository stores it under a particular folder:
+In Deployit, the repository conforms to the Java Content Repository (JCR) standard. Deployit's repository has a hierarchical layout and a version history. The repository stores all CIs of all types. The top-level folders indicate the type of CI stored below it. Depending on the type of CI, the repository stores it under a particular folder:
 
 * _Application_ CIs are stored under the **/Applications** folder.
 * _Environment_ CIs are stored under the **/Environments** folder.
 * Middleware CIs (_Host_, _Server_, etc.) are stored under the **/Infrastructure** folder.
-* _Archetype_ CIs are stored under the **/Archetypes** folder.
+* _Archetypes_ are stored under the **/Archetypes** folder.
 
 ### Containment and References ###
 
@@ -158,9 +131,15 @@ Deployit's repository contains CIs that are containers for other CIs. There are 
 * **Containment**. In this case, one CI contains another CI. If the parent CI is removed, so is the child CI. An example of this type of reference is an _Environment_ CI and it's deployed applications.
 * **Reference**. In this case, one CI refers to another CI. If the referring CI is removed, the referred CI is unchanged. Removing a CI when it is still being referred to is not allowed. An example of this type of reference is an _Environment_ CI and it's middleware. The middleware exists in the **/Infrastructure** folder independently of the environments the middleware is in.
 
+### Deployed Applications ###
+
+Deployed applications have a special structure in the repository. A deployed application is the result of deploying a _package_ to an _environment_. While performing the deployment, package members are installed as _deployed items_ on individual environment members. In the repository, the _deployed application_ CI is stored under the _Environment_ node. Each of the _deployed items_ are stored under the infrastructure members in the _Infrastructure_ node.
+
+So, deployed applications exist in both the **/Environment** as well as **/Infrastructure** folder. This has some consequences for the security setup. See the **Deployit System Administration Manual** for details.
+
 ## Runbook ##
 
-A runbook is a ??? that generates a **steplist** when presented with a **task**. A runbook can produce **steps** for any task or only for particular tasks. A runbook is integrated into Deployit by means of a **plug-in**.
+A runbook is a component that generates a **steplist** when presented with a **task**. A runbook can produce **steps** for any task or only for particular tasks. A runbook is integrated into Deployit by means of a **plug-in**.
 
 Deployit ships with the following runbooks:
 
@@ -174,11 +153,11 @@ XebiaLabs also provides the following optional runbooks:
 * **IBM MQ runbook**. This runbook makes it possible to deploy to the **IBM MQ Series** platform.
 * **IBM Portal runbook**. This runbook makes it possible to deploy to the **IBM WebSphere Portal** application server.
 
-It is also possible to customize Deployit by changing an existing runbook or by building your own runbook from scratch. Please see the **Deployit Programmers Manual** for more information.
+It is also possible to customize Deployit by building your own runbook from scratch or by changing an existing runbook. Please see the **Deployit Programmers Manual** for more information.
 
 ## Step ##
 
-A step is one concrete action to be performed to accomplish a **task**. A step is created by a **runbook** and contained in a **steplist**.
+A step is one concrete action to be performed to accomplish a **task**. A step is created by a **runbook** and contained in a **steplist**. Deployit ships with a number of standard infrastructure steps. Other middleware-specific steps are contributed by the plugins.
 
 The following are examples of steps:
 
@@ -193,7 +172,7 @@ A steplist is a sequential list of **step**s that is generated by one or more ru
 
 ## Task ##
 
-A task is an activity in Deployit.
+A **task** is an activity in Deployit. When starting a deployment, Deployit will create and start a task. The task contains a list of **step**s that must be executed to successfully complete the task. To execute the task, Deployit will execute each of the steps in turn. When all of the steps are successfully executed, the task itself is successfully executed. If one of the steps fails, the task itself is marked stopped.
 
 Deployit supports the following tasks:
 
@@ -212,19 +191,11 @@ When a user logs in, the Deployit GUI loads any tasks that are pending for this 
 
 ### Task State ###
 
-When starting a deployment, Deployit will create and start a **task**. The task contains a list of **step**s that must be executed to successfully complete the task. To execute the task, Deployit will execute each of the steps in turn. When all of the steps are successfully executed, the task itself is successfully executed. If one of the steps fails, the task itself is marked stopped.
-
 Deployit allows a user to interact with the task. In addition to starting a task, a user can:
 
 * **stop the task**. Deployit will wait for the currently executing step to finish and will then cleanly stop the task. Note that, due to the nature of some steps, this is not always possible. For example, a step that calls an external script may hang indefinitely.
 * **abort the task**. Deployit will attempt to kill the currently executing step. If successful, the aborted step and task are marked failed. 
 * **cancel the task**. Deployit will remove the task from the system. If the task was executing before, the task will be archived since it may have made changes to the middleware. If the task was pending and never started, it will be removed.
-
-The following two state diagrams illustrate this process.
-
-![Figure 3: Task state diagram](images/task_state_diagram.png "Task state diagram")
-
-![Figure 4: Step state diagram](images/step_state_diagram.png "Step state diagram")
 
 ## Undeploying an Application ##
 
@@ -232,11 +203,7 @@ This process removes an application from an environment. Deployit stops the appl
 
 ## Unified Deployment Model (UDM) ##
 
-The UDM is XebiaLabs' model for describing deployments and is used in Deployit.
-
-![Figure 2: Unified Deployment Model](images/udm.jpg)
-
-The UDM consists of the following components:
+The UDM is XebiaLabs' model for describing deployments and is used in Deployit. The UDM consists of the following components:
 
 * **Deployment Package**. This is an environment-independent package containing a complete application. The application contains both **artifacts** as well as associated **middleware resources**.
 * **Environment**. This is an environment containing deployment targets, i.e. resources that applications can be deployed on. An example is a test environment containing a cluster of WebSphere servers.

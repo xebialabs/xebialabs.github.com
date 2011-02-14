@@ -1,6 +1,8 @@
-% Deployit GUI - Reports Screen Help
-%
-% January, 2011
+Opening file ./src/markdown/onlinehelp/reports.markdown
+----
+layout: default
+title: Deployit GUI 
+----
 
 # The Reports Screen #
 
@@ -18,7 +20,7 @@ The screen consists of the following components:
 The reports browser shows all available report types. Deployit supports two report types:
 
 * **Deployed Applications per Environment**. Shows all deployed applications that were deployed in a certain environment at a particular date.
-* **Deployments per Data Range**. Shows all deployments performed with Deployit in a particular data range.
+* **Deployments per Date Range**. Shows all deployments performed with Deployit in a particular date range.
 
 Click on a report type to create a report of the specified type.
 

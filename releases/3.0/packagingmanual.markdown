@@ -1,7 +1,8 @@
----
+Opening file ./src/markdown/packagingmanual/packagingmanual.markdown
+----
 layout: default
 title: Deployit Packaging Manual
----
+----
 
 # Preface #
 
@@ -12,6 +13,12 @@ See **Deployit Reference Manual** for background information on Deployit and dep
 # Introduction #
 
 The Deployit deployment automation tool is designed to help you deploy application packages to target middleware. To make it possible to deploy your applications, they must be packaged in a format that Deployit understands. This manual describes the Deployment ARchive (DAR) format and various other topics related to packaging applications.
+
+# Packages #
+
+Deployit uses the Unified Deployment Model (UDM) to structure it's deployments (see the **Deployit Reference Manual**). In this model, packages are containers to distribute complete applications, including both the application artifacts as well as the middleware resources (datasources, topics, queues) that the application needs to run. When a package is deployed to an environment, you can be sure that everything is in place to run the application successfully.
+
+Also, packages are promoted **unchanged** from development to test to acceptance and finally to production. All environment- or target-dependent configuration is removed from the artifacts and resources and is instead specified when describing how to deploy the package to a specific environment or target. This enables a single artifact to make the entire journey from development to production.
 
 # DAR Format #
 
@@ -29,7 +36,7 @@ The manifest file included in a DAR describes the contents of the archive for De
 A valid Deployit manifest starts with the following preamble:
 
 	Manifest-Version: 1.0
-	Deployit-Package-Format-Version: 1.1
+	Deployit-Package-Format-Version: 1.2
 
 This identifies the Java manifest version and the Deployit package format version.
 
@@ -70,19 +77,21 @@ For example, this manifest snippet constructs a _Datasource_ CI:
 
 	Name: petclinicDS
 	CI-Type: DataSource
-	driver: com.mysql.jdbc.Driver
-	url: jdbc:mysql://localhost/petclinic
-	username: petclinic
-	password: my$ecret
+	CI-driver: com.mysql.jdbc.Driver
+	CI-url: jdbc:mysql://localhost/petclinic
+	CI-username: petclinic
+	CI-password: my$ecret
 
 The `Name` entry specifies the name of the CI to be created [^1]. The `CI-Type` is the shortname of a CI type that exists in Deployit. This type can be part of standard Deployit or it can be provided by one of the plugins.
+
+**Note:** the names of artifacts in your package must conform to platform requirements. For instance, deploying an _SqlFolder_ CI with name "q2>2" cannot be deployed to a Windows host, because ">" may not be part of a file or directory name in Windows.
 
 The other entries, `url`, `username` and `password` refer to properties on the new CI. These properties will get the values specified.
 
 It is also possible to specify a map using the following syntax:
 
-	settings-EntryKey-1: autoCommit
-	settings-EntryValue-1: true
+	CI-settings-EntryKey-1: autoCommit
+	CI-settings-EntryValue-1: true
 
 This populates the `settings` map with the name-value pair `autoCommit=true`.
 
@@ -90,7 +99,7 @@ Note that it is also possible to add middleware resources to a package that is a
 
 [^1]: In contrast to the manifest specification, the `Name` property in a Deployit manifest does not refer to a physical file present in the DAR in the case of a middleware resource.
 
-# Placeholders #
+# Using Placeholders #
 
 When importing a package, certain files in the package are scanned for _placeholders_. Placeholders are configurable entries in your application that will receive an actual value at deployment time. This allows the deployment package to be environment-independent and thus reusable. The value can be dependent on the deployment environment or specific mapping. 
 
@@ -120,18 +129,17 @@ Creating a deployment package can be done by hand. If you are using a Unix syste
 * Issue the following commands:
 
 		cd myApplication
-		jar cmf ../MANIFEST.MF ../myApplication.dar *
+		jar cmf ../myApplication.dar ../MANIFEST.MF *
 		cd ..
 
 This results in a deployment archive called `myApplication.dar` in the current directory.
 
-# Package customization #
+# Maven Plugin #
 
-# Package inheritance #
+To enable continuous deployment, Deployit can be integrated with the Maven build system. A maven plugin exists that exposes some of Deployit's functionality via maven. Specifically, the plugin supports:
 
-# Best Practices #
+* creating a deployment package containing artifacts from the build
+* performing a deployment to a target environment
+* undeploying a previously deployed application
 
-# Packaging in the Continuous Build #
-
-# Using the Maven Plugin #
-
+For more information, see [the Deployit maven plugin documentation](http://tech.xebialabs.com/deployit-maven-plugin).

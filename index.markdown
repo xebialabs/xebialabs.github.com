@@ -11,7 +11,7 @@ Welcome to the Deployit product documentation.
 
 This site contains Deployit documentation for the following releases:
 
-* [3.0-SNAPSHOT](/releases/3.0-SNAPSHOT)
+* [3.0](/releases/3.0)
 
 The [latest documentation](/releases/latest) is also available.
 

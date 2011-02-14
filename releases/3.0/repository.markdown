@@ -1,6 +1,8 @@
-% Deployit GUI - Repository Screen Help
-%
-% January, 2011
+Opening file ./src/markdown/onlinehelp/repository.markdown
+----
+layout: default
+title: Deployit GUI 
+----
 
 # The Repository Screen #
 

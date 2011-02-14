@@ -1,6 +1,8 @@
-% Deployit GUI - Deployment Screen Help
-%
-% January, 2011
+Opening file ./src/markdown/onlinehelp/deployment.markdown
+----
+layout: default
+title: Deployit GUI 
+----
 
 # The Deployment Screen #
 

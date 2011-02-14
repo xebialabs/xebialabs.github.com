@@ -1,4 +1,3 @@
-Opening file ./src/markdown/plugins/tomcat-pluginmanual.markdown
 ----
 layout: default
 title: Deployit Tomcat Plugin Manual

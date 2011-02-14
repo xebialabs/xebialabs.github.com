@@ -1,4 +1,3 @@
-Opening file ./src/markdown/referencemanual/referencemanual.markdown
 ----
 layout: default
 title: Deployit Reference Manual

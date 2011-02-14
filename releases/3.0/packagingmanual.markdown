@@ -1,4 +1,3 @@
-Opening file ./src/markdown/packagingmanual/packagingmanual.markdown
 ----
 layout: default
 title: Deployit Packaging Manual

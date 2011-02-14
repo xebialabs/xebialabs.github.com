@@ -1,4 +1,3 @@
-Opening file ./src/markdown/onlinehelp/deployment.markdown
 ----
 layout: default
 title: Deployit GUI 

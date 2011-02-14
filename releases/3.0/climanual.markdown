@@ -1,4 +1,3 @@
-Opening file ./src/markdown/climanual/climanual.markdown
 ----
 layout: default
 title: Deployit Command Line Interface 

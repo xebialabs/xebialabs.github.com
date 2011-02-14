@@ -1,4 +1,3 @@
-Opening file ./src/markdown/guimanual/guimanual.markdown
 ----
 layout: default
 title: Deployit Graphical User Interface 

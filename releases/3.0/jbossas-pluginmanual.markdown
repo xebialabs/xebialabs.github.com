@@ -1,4 +1,3 @@
-Opening file ./src/markdown/plugins/jbossas-pluginmanual.markdown
 ----
 layout: default
 title: Deployit JBoass AS Plugin Manual

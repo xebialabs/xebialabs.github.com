@@ -1,4 +1,3 @@
-Opening file ./src/markdown/plugins/was-pluginmanual.markdown
 ----
 layout: default
 title: Deployit WebSphere Plugin Manual

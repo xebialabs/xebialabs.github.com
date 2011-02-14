@@ -1,4 +1,3 @@
-Opening file ./src/markdown/systemadminmanual/systemadminmanual.markdown
 ----
 layout: default
 title: Deployit System Administration Manual

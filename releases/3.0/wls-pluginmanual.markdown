@@ -1,4 +1,3 @@
-Opening file ./src/markdown/plugins/wls-pluginmanual.markdown
 ----
 layout: default
 title: Deployit Oracle WebLogic Server 

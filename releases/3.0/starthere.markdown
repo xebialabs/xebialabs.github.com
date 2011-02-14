@@ -1,4 +1,3 @@
-Opening file ./src/markdown/starthere/starthere.markdown
 ----
 layout: default
 title: Start Here

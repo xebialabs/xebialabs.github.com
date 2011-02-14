@@ -102,8 +102,8 @@ _Properties:_
 
 * **source(java.io.Serializable)**: Source
 * **target(java.io.Serializable)**: Target
-* _clusters(Set<com.xebialabs.deployit.plugin.wls.ci.WlsCluster>)_: Clusters
-* _sourcePropertyOverrides(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Overrides for properties of the mapping's source. The key is the property name (consult the documentation or run 'describe' in the CLI), the value is the value to set. Only string, integer and enumerable properties can be overridden. Example: Key: redeliveryLimits, Value: 2
+* _clusters(Set of com.xebialabs.deployit.plugin.wls.ci.WlsCluster)_: Clusters
+* _sourcePropertyOverrides(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Overrides for properties of the mapping's source. The key is the property name (consult the documentation or run 'describe' in the CLI), the value is the value to set. Only string, integer and enumerable properties can be overridden. Example: Key: redeliveryLimits, Value: 2
 * _virtualHost(STRING)_: Virtual Host
 
 
@@ -118,7 +118,7 @@ _Properties:_
 
 * **domain(com.xebialabs.deployit.plugin.wls.ci.WlsDomain)**: The domain to which the WebLogic Cluster belongs
 * **name(STRING)**: Name of the WebLogic Cluster
-* _servers(Set<com.xebialabs.deployit.plugin.wls.ci.WlsServer>)_: Servers in the WebLogic Cluster
+* _servers(Set of com.xebialabs.deployit.plugin.wls.ci.WlsServer)_: Servers in the WebLogic Cluster
 
 
 
@@ -132,7 +132,7 @@ _Properties:_
 
 * **source(java.io.Serializable)**: Source
 * **target(java.io.Serializable)**: Target
-* _sourcePropertyOverrides(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Overrides for properties of the mapping's source. The key is the property name (consult the documentation or run 'describe' in the CLI), the value is the value to set. Only string, integer and enumerable properties can be overridden. Example: Key: redeliveryLimits, Value: 2
+* _sourcePropertyOverrides(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Overrides for properties of the mapping's source. The key is the property name (consult the documentation or run 'describe' in the CLI), the value is the value to set. Only string, integer and enumerable properties can be overridden. Example: Key: redeliveryLimits, Value: 2
 
 
 
@@ -207,7 +207,7 @@ _Properties:_
 * _deploymentPlanStagingDirectory(STRING)_: Deployment Plan Staging Directory
 * _deploymentStrategy(ENUM)_: Deployment Strategy
     * Values: [CLASSIC, STOP_START, SIDE_BY_SIDE]
-* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
+* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Key Value Pairs
 * _placeholderFormat(ENUM)_: Placeholder Format
     * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
 * _stageMode(ENUM)_: Deployment staging mode (default is stage)
@@ -231,8 +231,8 @@ _Properties:_
 * _deploymentPlanStagingDirectory(STRING)_: Deployment Plan Staging Directory
 * _deploymentStrategy(ENUM)_: Deployment Strategy
     * Values: [CLASSIC, STOP_START, SIDE_BY_SIDE]
-* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
-* _mdbListenerPortJndiNameBindings(List<com.xebialabs.deployit.ci.mapping.MdbListenerPortBinding>)_: Bindings of message driven beans JNDI names to the corresponding listener ports present on the target middleware
+* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Key Value Pairs
+* _mdbListenerPortJndiNameBindings(List of com.xebialabs.deployit.ci.mapping.MdbListenerPortBinding)_: Bindings of message driven beans JNDI names to the corresponding listener ports present on the target middleware
 * _placeholderFormat(ENUM)_: Placeholder Format
     * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
 * _stageMode(ENUM)_: Deployment staging mode (default is stage)
@@ -378,7 +378,7 @@ _Properties:_
 
 * **source(java.io.Serializable)**: Source
 * **target(java.io.Serializable)**: Target
-* _sourcePropertyOverrides(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Overrides for properties of the mapping's source. The key is the property name (consult the documentation or run 'describe' in the CLI), the value is the value to set. Only string, integer and enumerable properties can be overridden. Example: Key: redeliveryLimits, Value: 2
+* _sourcePropertyOverrides(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Overrides for properties of the mapping's source. The key is the property name (consult the documentation or run 'describe' in the CLI), the value is the value to set. Only string, integer and enumerable properties can be overridden. Example: Key: redeliveryLimits, Value: 2
 
 
 
@@ -407,7 +407,7 @@ _Properties:_
 * **target(java.io.Serializable)**: Target
 * _deploymentStrategy(ENUM)_: Deployment Strategy
     * Values: [CLASSIC, STOP_START, SIDE_BY_SIDE]
-* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
+* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Key Value Pairs
 * _placeholderFormat(ENUM)_: Placeholder Format
     * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
 * _stageMode(ENUM)_: Deployment staging mode (default is stage
@@ -431,12 +431,12 @@ _Properties:_
 * _deploymentPlanStagingDirectory(STRING)_: Deployment Plan Staging Directory
 * _deploymentStrategy(ENUM)_: Deployment Strategy
     * Values: [CLASSIC, STOP_START, SIDE_BY_SIDE]
-* _ejbReferences(List<com.xebialabs.deployit.ci.mapping.EjbReference>)_: Specifies the mapping from ejb reference jndi names and locals used in the web.xml to bean jndi names available in middleware
-* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
+* _ejbReferences(List of com.xebialabs.deployit.ci.mapping.EjbReference)_: Specifies the mapping from ejb reference jndi names and locals used in the web.xml to bean jndi names available in middleware
+* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Key Value Pairs
 * _placeholderFormat(ENUM)_: Placeholder Format
     * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
-* _resourceEnvironmentEntryReferences(List<com.xebialabs.deployit.ci.mapping.ResourceReference>)_: Specifies the mapping from resource environment references jndi names and types used in the web.xml to resource references jndi names available in middleware
-* _resourceReferences(List<com.xebialabs.deployit.ci.mapping.ResourceReference>)_: Specifies the mapping from resource references jndi names and types used in the web.xml to resource references jndi names available in middleware
+* _resourceEnvironmentEntryReferences(List of com.xebialabs.deployit.ci.mapping.ResourceReference)_: Specifies the mapping from resource environment references jndi names and types used in the web.xml to resource references jndi names available in middleware
+* _resourceReferences(List of com.xebialabs.deployit.ci.mapping.ResourceReference)_: Specifies the mapping from resource references jndi names and types used in the web.xml to resource references jndi names available in middleware
 * _stageMode(ENUM)_: Deployment staging mode (default is stage
     * Values: [Stage, NoStage]
 * _stagingDirectory(STRING)_: Remote directory where the archives (ear, jar, war) are copied before deploying

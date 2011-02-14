@@ -236,7 +236,7 @@ _Properties:_
 
 * **location(STRING)**: Location of the artifact.
 * **name(STRING)**: The technical name of the artifact as it will be used within application servers.
-* _placeholders(Set<String>)_: Placeholders found after scanning the artifact
+* _placeholders(Set of String)_: Placeholders found after scanning the artifact
 
 
 
@@ -252,7 +252,7 @@ _Properties:_
 * **target(java.io.Serializable)**: Target
 * **targetDirectory(STRING)**: The directory on the target host to which the configuration is to be copied. Example: /data/petclinic/1.0/conf. It can be overidden by using Key TARGET_DIRECTORY
 * _createIfNotExist(BOOLEAN)_: create the target directory and sub directory if they are not exist
-* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
+* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Key Value Pairs
 * _placeholderFormat(ENUM)_: Placeholder Format
     * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
 * _shared(BOOLEAN)_: The target directory is shared when another resources using it as well, default true.
@@ -298,7 +298,7 @@ _Properties:_
 
 * **source(com.xebialabs.deployit.ci.DeploymentPackage)**: Source
 * **target(com.xebialabs.deployit.ci.Environment)**: Target
-* _mappings(Set<com.xebialabs.deployit.ci.mapping.Mapping>)_: Mappings
+* _mappings(Set of com.xebialabs.deployit.ci.mapping.Mapping)_: Mappings
 * _vhostDefinition(STRING)_: The virtual host <hostname>:<portnumber> as used by the HTTP and application server. Valid examples; www.xebialabs.com:80
 
 
@@ -312,8 +312,8 @@ _Type_: com.xebialabs.deployit.ci.DeploymentPackage
 _Properties:_
 
 * **application(com.xebialabs.deployit.ci.Application)**: The application the package is a part of.
-* _deployableArtifacts(Set<com.xebialabs.deployit.ci.artifact.DeployableArtifact>)_: The set of deployable artifacts that are part of this package
-* _middlewareResources(Set<com.xebialabs.deployit.ci.MiddlewareResource>)_: The set of middleware resources that are part of this package
+* _deployableArtifacts(Set of com.xebialabs.deployit.ci.artifact.DeployableArtifact)_: The set of deployable artifacts that are part of this package
+* _middlewareResources(Set of com.xebialabs.deployit.ci.MiddlewareResource)_: The set of middleware resources that are part of this package
 * _version(STRING)_: The version of the application package. Examples; 1.0, 1.2.3, 1.0-SNAPSHOT, 3.4-MILESTONE-RC-3
 
 
@@ -354,8 +354,8 @@ _Properties:_
 
 * **source(java.io.Serializable)**: Source
 * **target(java.io.Serializable)**: Target
-* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
-* _mdbListenerPortJndiNameBindings(List<com.xebialabs.deployit.ci.mapping.MdbListenerPortBinding>)_: Bindings of message driven beans JNDI names to the corresponding listener ports present on the target middleware
+* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Key Value Pairs
+* _mdbListenerPortJndiNameBindings(List of com.xebialabs.deployit.ci.mapping.MdbListenerPortBinding)_: Bindings of message driven beans JNDI names to the corresponding listener ports present on the target middleware
 * _placeholderFormat(ENUM)_: Placeholder Format
     * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
 
@@ -369,7 +369,7 @@ _Type_: com.xebialabs.deployit.ci.Environment
 
 _Properties:_
 
-* _members(Set<java.io.Serializable>)_: Members
+* _members(Set of java.io.Serializable)_: Members
 
 
 
@@ -411,7 +411,7 @@ _Properties:_
 * **target(java.io.Serializable)**: Target
 * **targetDirectory(STRING)**: The directory on the target host to which the configuration is to be copied. Example: /data/petclinic/1.0/conf. It can be overidden by using Key TARGET_DIRECTORY
 * _createIfNotExist(BOOLEAN)_: create the target directory and sub directory if they are not exist
-* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
+* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Key Value Pairs
 * _placeholderFormat(ENUM)_: Placeholder Format
     * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
 * _shared(BOOLEAN)_: The target directory is shared when another resources using it as well, default true.
@@ -475,7 +475,7 @@ _Properties:_
 * **target(java.io.Serializable)**: Target
 * **targetDirectory(STRING)**: The directory on the target host to which the configuration is to be copied. Example: /data/petclinic/1.0/conf. It can be overidden by using Key TARGET_DIRECTORY
 * _createIfNotExist(BOOLEAN)_: create the target directory and sub directory if they are not exist
-* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
+* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Key Value Pairs
 * _placeholderFormat(ENUM)_: Placeholder Format
     * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
 * _shared(BOOLEAN)_: The target directory is shared when another resources using it as well, default true.
@@ -516,8 +516,8 @@ _Type_: com.xebialabs.deployit.ci.security.PermissionScheme
 
 _Properties:_
 
-* **accessControlEntries(List<com.xebialabs.deployit.ci.security.AccessControlEntry>)**: Access control entries.
-* _allowedCiTypes(Set<String>)_: Allowed CI types.
+* **accessControlEntries(List of com.xebialabs.deployit.ci.security.AccessControlEntry)**: Access control entries.
+* _allowedCiTypes(Set of String)_: Allowed CI types.
 
 
 
@@ -554,7 +554,7 @@ _Properties:_
 
 * **source(java.io.Serializable)**: Source
 * **target(java.io.Serializable)**: Target
-* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
+* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Key Value Pairs
 * _placeholderFormat(ENUM)_: Placeholder Format
     * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
 
@@ -570,7 +570,7 @@ _Properties:_
 
 * **source(java.io.Serializable)**: Source
 * **target(java.io.Serializable)**: Target
-* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
+* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Key Value Pairs
 * _placeholderFormat(ENUM)_: Placeholder Format
     * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
 

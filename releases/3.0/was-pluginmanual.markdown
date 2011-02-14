@@ -91,7 +91,7 @@ _Properties:_
 
 * **cell(com.xebialabs.deployit.plugin.was.ci.WasDeploymentManager)**: Deployment manager that manages this this cluster
 * **name(STRING)**: Name of the WebSphere cluster, e.g. cluster1
-* _servers(Set<com.xebialabs.deployit.plugin.was.ci.WasManagedServer>)_: Servers that are part of this cluster
+* _servers(Set of com.xebialabs.deployit.plugin.was.ci.WasManagedServer)_: Servers that are part of this cluster
 
 
 
@@ -105,7 +105,7 @@ _Properties:_
 
 * **source(java.io.Serializable)**: Source
 * **target(java.io.Serializable)**: Target
-* _sourcePropertyOverrides(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Overrides for properties of the mapping's source. The key is the property name (consult the documentation or run 'describe' in the CLI), the value is the value to set. Only string, integer and enumerable properties can be overridden. Example: Key: redeliveryLimits, Value: 2
+* _sourcePropertyOverrides(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Overrides for properties of the mapping's source. The key is the property name (consult the documentation or run 'describe' in the CLI), the value is the value to set. Only string, integer and enumerable properties can be overridden. Example: Key: redeliveryLimits, Value: 2
 
 
 
@@ -164,17 +164,17 @@ _Properties:_
     * Values: [PARENT_FIRST, PARENT_LAST]
 * _classLoaderPolicy(ENUM)_: Specifies the Classloader policy
     * Values: [SINGLE, MULTIPLE]
-* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
+* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Key Value Pairs
 * _placeholderFormat(ENUM)_: Placeholder Format
     * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
-* _securityRoleUserGroupMappings(List<com.xebialabs.deployit.plugin.was.ci.SecurityRoleUserGroupMappings>)_: Map Security role to users and groups used by EnterPrise Application
-* _sharedLibraries(Set<com.xebialabs.deployit.plugin.was.ci.WasSharedLibrary>)_: Set of shared library which will used by the ear
+* _securityRoleUserGroupMappings(List of com.xebialabs.deployit.plugin.was.ci.SecurityRoleUserGroupMappings)_: Map Security role to users and groups used by EnterPrise Application
+* _sharedLibraries(Set of com.xebialabs.deployit.plugin.was.ci.WasSharedLibrary)_: Set of shared library which will used by the ear
 * _startingWeight(INTEGER)_: Specifies the order in which applications are started. Lower values start earlier.
 * _suffixArtifactNameWithTarget(BOOLEAN)_: If true, the artifact name will be suffixed with the name of the target.
 * _virtualHost(STRING)_: Virtual Host
-* _warClassLoaderMapping(List<com.xebialabs.deployit.plugin.was.ci.WasWarClassLoaderMapping>)_: Specifies the Class loader mode to WARs in EAR
-* _warsWebserversVirtualHostMapping(List<com.xebialabs.deployit.plugin.was.ci.WarsWebserversVirtualHostMapping>)_: Map Wars to Webservers and Virtual hosts in EnterPrise Application
-* _webservers(Set<com.xebialabs.deployit.plugin.was.ci.WasManagedApacheHttpdServer>)_: Set of webservers that expose the Eneterprise Application
+* _warClassLoaderMapping(List of com.xebialabs.deployit.plugin.was.ci.WasWarClassLoaderMapping)_: Specifies the Class loader mode to WARs in EAR
+* _warsWebserversVirtualHostMapping(List of com.xebialabs.deployit.plugin.was.ci.WarsWebserversVirtualHostMapping)_: Map Wars to Webservers and Virtual hosts in EnterPrise Application
+* _webservers(Set of com.xebialabs.deployit.plugin.was.ci.WasManagedApacheHttpdServer)_: Set of webservers that expose the Eneterprise Application
 
 
 
@@ -188,11 +188,11 @@ _Properties:_
 
 * **source(java.io.Serializable)**: Source
 * **target(java.io.Serializable)**: Target
-* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
-* _mdbListenerPortJndiNameBindings(List<com.xebialabs.deployit.ci.mapping.MdbListenerPortBinding>)_: Bindings of message driven beans JNDI names to the corresponding listener ports present on the target middleware
+* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Key Value Pairs
+* _mdbListenerPortJndiNameBindings(List of com.xebialabs.deployit.ci.mapping.MdbListenerPortBinding)_: Bindings of message driven beans JNDI names to the corresponding listener ports present on the target middleware
 * _placeholderFormat(ENUM)_: Placeholder Format
     * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
-* _sharedLibraries(Set<com.xebialabs.deployit.plugin.was.ci.WasSharedLibrary>)_: Set of shared library which will used by the ejb
+* _sharedLibraries(Set of com.xebialabs.deployit.plugin.was.ci.WasSharedLibrary)_: Set of shared library which will used by the ejb
 * _startingWeight(INTEGER)_: Specifies the order in which applications are started. Lower values start earlier.
 
 
@@ -205,7 +205,7 @@ _Type_: com.xebialabs.deployit.plugin.was.ci.WasJndiProperties
 
 _Properties:_
 
-* _stringNameSpaceBindings(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key/value pairs that are to stored in the WebSphere JNDI tree
+* _stringNameSpaceBindings(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Key/value pairs that are to stored in the WebSphere JNDI tree
 
 
 
@@ -219,7 +219,7 @@ _Properties:_
 
 * **source(java.io.Serializable)**: Source
 * **target(java.io.Serializable)**: Target
-* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Values for placeholders in the WasJndiProperties that are to be replaced. The key is the placeholder name. Example: Key: DATABASE_USER, Value: testUser
+* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Values for placeholders in the WasJndiProperties that are to be replaced. The key is the placeholder name. Example: Key: DATABASE_USER, Value: testUser
 
 
 
@@ -243,7 +243,7 @@ _Properties:_
 * **port(INTEGER)**: The port where the Apache HTTPD server is running on. e.g. 80, 443
 * **webServerVendorType(ENUM)**: The Web server vendor type.
     * Values: [APACHE, IHS]
-* _modules(Set<com.xebialabs.deployit.plugin.apache.httpd.ci.ApacheModule>)_: Modules
+* _modules(Set of com.xebialabs.deployit.plugin.apache.httpd.ci.ApacheModule)_: Modules
 * _pluginConfigurationPath(STRING)_: The path of the WebSphere plugin configuration file. Defaults to <pluginInstallationDirPath>/config/<webservername>/plugin-cfg.xml
 
 
@@ -266,7 +266,7 @@ _Properties:_
 * _cookiePath(STRING)_: Session cookie path
 * _disableJit(BOOLEAN)_: Disable just-in-time compiler.
 * _enableSessionCookies(BOOLEAN)_: Enable session cookies
-* _environmentEntries(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Environment entries
+* _environmentEntries(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Environment entries
 * _initHeapSize(INTEGER)_: Initial heap size to be allocated to the JVM (in megabytes).
 * _jvmArguments(STRING)_: Generic JVM arguments.
 * _jvmStdErr(STRING)_: Path to the JVM stderr log file. Example; /data/waslogs/jvm_stderr.log
@@ -306,7 +306,7 @@ _Properties:_
 
 * **source(java.io.Serializable)**: Source
 * **target(java.io.Serializable)**: Target
-* _sourcePropertyOverrides(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Overrides for properties of the mapping's source. The key is the property name (consult the documentation or run 'describe' in the CLI), the value is the value to set. Only string, integer and enumerable properties can be overridden. Example: Key: redeliveryLimits, Value: 2
+* _sourcePropertyOverrides(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Overrides for properties of the mapping's source. The key is the property name (consult the documentation or run 'describe' in the CLI), the value is the value to set. Only string, integer and enumerable properties can be overridden. Example: Key: redeliveryLimits, Value: 2
 
 
 
@@ -320,8 +320,8 @@ _Properties:_
 
 * **name(STRING)**: Name of the shared library so it can be used by reference in an Application
 * _classPath(STRING)_: classpath of the shared library, e.g. /var/shared/log4j.jar;/var/shared/lib/ora/ojdbc14.jar
-* _configurationFiles(Set<com.xebialabs.deployit.ci.artifact.ConfigurationFiles>)_: The set of configuration files that are part of this shared library
-* _libraries(Set<com.xebialabs.deployit.ci.artifact.Libraries>)_: The set of libraries that are part of this shared library
+* _configurationFiles(Set of com.xebialabs.deployit.ci.artifact.ConfigurationFiles)_: The set of configuration files that are part of this shared library
+* _libraries(Set of com.xebialabs.deployit.ci.artifact.Libraries)_: The set of libraries that are part of this shared library
 
 
 
@@ -335,7 +335,7 @@ _Properties:_
 
 * **source(java.io.Serializable)**: Source
 * **target(java.io.Serializable)**: Target
-* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Values for placeholders in the deployable artifact that are to be replaced. The key is the placeholder name. Example: Key: DATABASE_USER, Value: testUser
+* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Values for placeholders in the deployable artifact that are to be replaced. The key is the placeholder name. Example: Key: DATABASE_USER, Value: testUser
 
 
 
@@ -359,7 +359,7 @@ _Properties:_
 * **port(INTEGER)**: The port where the Apache HTTPD server is running on. e.g. 80, 443
 * **webServerVendorType(ENUM)**: The Web server vendor type.
     * Values: [APACHE, IHS]
-* _modules(Set<com.xebialabs.deployit.plugin.apache.httpd.ci.ApacheModule>)_: Modules
+* _modules(Set of com.xebialabs.deployit.plugin.apache.httpd.ci.ApacheModule)_: Modules
 * _pluginConfigurationPath(STRING)_: The path of the WebSphere plugin configuration file. Defaults to <pluginInstallationDirPath>/config/<webservername>/plugin-cfg.xml
 
 
@@ -388,7 +388,7 @@ _Properties:_
 * _cookiePath(STRING)_: Session cookie path
 * _disableJit(BOOLEAN)_: Disable just-in-time compiler.
 * _enableSessionCookies(BOOLEAN)_: Enable session cookies
-* _environmentEntries(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Environment entries
+* _environmentEntries(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Environment entries
 * _initHeapSize(INTEGER)_: Initial heap size to be allocated to the JVM (in megabytes).
 * _jvmArguments(STRING)_: Generic JVM arguments.
 * _jvmStdErr(STRING)_: Path to the JVM stderr log file. Example; /data/waslogs/jvm_stderr.log
@@ -397,7 +397,7 @@ _Properties:_
 * _maximumSessionsInMemory(INTEGER)_: Maximum # of HTTP sessions in memory
 * _password(STRING)_: Password which is used to login to the WebSphere Administration.
 * _port(INTEGER)_: TCP port which is used to login to the WebSphere Administration, default is 8880
-* _resourceEnvironmentJndiNames(Set<String>)_: Resource environment jndi names
+* _resourceEnvironmentJndiNames(Set of String)_: Resource environment jndi names
 * _servletCaching(BOOLEAN)_: Enable servlet caching
 * _sessionTimeout(INTEGER)_: HTTP session timeout in minutes
 * _stdErr(STRING)_: Path to the stderr log file. Example; /data/waslogs/stderr.log
@@ -435,20 +435,20 @@ _Properties:_
 * _classLoaderMode(ENUM)_: Specifies the Classloader mode
     * Values: [PARENT_FIRST, PARENT_LAST]
 * _contextRoot(STRING)_: Context root to deploy to
-* _ejbReferences(List<com.xebialabs.deployit.ci.mapping.EjbReference>)_: Specifies the mapping from ejb reference jndi names and locals used in the web.xml to bean jndi names available in middleware
+* _ejbReferences(List of com.xebialabs.deployit.ci.mapping.EjbReference)_: Specifies the mapping from ejb reference jndi names and locals used in the web.xml to bean jndi names available in middleware
 * _fileServing(ENUM)_: Set File Serving enabled to WAR
     * Values: [DO_NOT_OVERRIDE, FALSE, TRUE]
-* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
+* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Key Value Pairs
 * _placeholderFormat(ENUM)_: Placeholder Format
     * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
-* _resourceEnvironmentEntryReferences(List<com.xebialabs.deployit.ci.mapping.ResourceReference>)_: Specifies the mapping from resource environment references jndi names and types used in the web.xml to resource references jndi names available in middleware
-* _resourceReferences(List<com.xebialabs.deployit.ci.mapping.ResourceReference>)_: Specifies the mapping from resource references jndi names and types used in the web.xml to resource references jndi names available in middleware
-* _securityRoleUserGroupMappings(List<com.xebialabs.deployit.plugin.was.ci.SecurityRoleUserGroupMappings>)_: Map Security role to users and groups used by EnterPrise Application
-* _sharedLibraries(Set<com.xebialabs.deployit.plugin.was.ci.WasSharedLibrary>)_: Set of shared library which will used by the war
+* _resourceEnvironmentEntryReferences(List of com.xebialabs.deployit.ci.mapping.ResourceReference)_: Specifies the mapping from resource environment references jndi names and types used in the web.xml to resource references jndi names available in middleware
+* _resourceReferences(List of com.xebialabs.deployit.ci.mapping.ResourceReference)_: Specifies the mapping from resource references jndi names and types used in the web.xml to resource references jndi names available in middleware
+* _securityRoleUserGroupMappings(List of com.xebialabs.deployit.plugin.was.ci.SecurityRoleUserGroupMappings)_: Map Security role to users and groups used by EnterPrise Application
+* _sharedLibraries(Set of com.xebialabs.deployit.plugin.was.ci.WasSharedLibrary)_: Set of shared library which will used by the war
 * _startingWeight(INTEGER)_: Specifies the order in which applications are started. Lower values start earlier.
 * _suffixArtifactNameWithTarget(BOOLEAN)_: If true, the artifact name will be suffixed with the name of the target.
 * _virtualHost(STRING)_: Virtual host to deploy to
-* _webservers(Set<com.xebialabs.deployit.plugin.was.ci.WasManagedApacheHttpdServer>)_: Set of webservers that expose the Eneterprise Application
+* _webservers(Set of com.xebialabs.deployit.plugin.was.ci.WasManagedApacheHttpdServer)_: Set of webservers that expose the Eneterprise Application
 
 
 

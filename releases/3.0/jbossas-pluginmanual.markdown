@@ -114,7 +114,7 @@ _Properties:_
 * **target(java.io.Serializable)**: Target
 * _deploymentStrategy(ENUM)_: Deployment Strategy
     * Values: [ENABLED_HOT_DEPLOYMENT_STRATEGY, DISABLED_HOT_DEPLOYMENT_STRATEGY]
-* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
+* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Key Value Pairs
 * _placeholderFormat(ENUM)_: Placeholder Format
     * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
 * _virtualHost(STRING)_: Virtual Host
@@ -133,8 +133,8 @@ _Properties:_
 * **target(java.io.Serializable)**: Target
 * _deploymentStrategy(ENUM)_: Deployment Strategy
     * Values: [ENABLED_HOT_DEPLOYMENT_STRATEGY, DISABLED_HOT_DEPLOYMENT_STRATEGY]
-* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
-* _mdbListenerPortJndiNameBindings(List<com.xebialabs.deployit.ci.mapping.MdbListenerPortBinding>)_: Bindings of message driven beans JNDI names to the corresponding listener ports present on the target middleware
+* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Key Value Pairs
+* _mdbListenerPortJndiNameBindings(List of com.xebialabs.deployit.ci.mapping.MdbListenerPortBinding)_: Bindings of message driven beans JNDI names to the corresponding listener ports present on the target middleware
 * _placeholderFormat(ENUM)_: Placeholder Format
     * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
 
@@ -176,7 +176,7 @@ _Properties:_
 
 * **source(java.io.Serializable)**: Source
 * **target(java.io.Serializable)**: Target
-* _sourcePropertyOverrides(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Overrides for properties of the mapping's source. The key is the property name (consult the documentation or run 'describe' in the CLI), the value is the value to set. Only string, integer and enumerable properties can be overridden. Example: Key: redeliveryLimits, Value: 2
+* _sourcePropertyOverrides(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Overrides for properties of the mapping's source. The key is the property name (consult the documentation or run 'describe' in the CLI), the value is the value to set. Only string, integer and enumerable properties can be overridden. Example: Key: redeliveryLimits, Value: 2
 
 
 
@@ -196,7 +196,7 @@ _Properties:_
     * Values: [JBOSSAS_40, JBOSSAS_50, JBOSSAS_60, JBOSSAS_UNKNOWN]
 * _ajpPort(INTEGER)_: AJP Port for the JBoss Server, default is 8009
 * _controlPort(INTEGER)_: ControlPort of the JBoss Server, default is 1099 for JBoss 5, 1090 for JBoss 6+
-* _deployDirectories(List<com.xebialabs.deployit.plugin.jbossas.ci.JbossasPath>)_: Deploy Directories
+* _deployDirectories(List of com.xebialabs.deployit.plugin.jbossas.ci.JbossasPath)_: Deploy Directories
 * _deploymentCompletionWaitTime(INTEGER)_: Estimated time in miliseconds to wait for the deployment completion.
 * _restartCommand(STRING)_: Command that should be executed to restart the JBoss server.
 * _stopCommand(STRING)_: Command that should be executed to stop the JBoss server.
@@ -232,12 +232,12 @@ _Properties:_
 * _contextRoot(STRING)_: Context root to deploy to
 * _deploymentStrategy(ENUM)_: Deployment Strategy
     * Values: [ENABLED_HOT_DEPLOYMENT_STRATEGY, DISABLED_HOT_DEPLOYMENT_STRATEGY]
-* _ejbReferences(List<com.xebialabs.deployit.ci.mapping.EjbReference>)_: Specifies the mapping from ejb reference jndi names and locals used in the web.xml to bean jndi names available in middleware
-* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
+* _ejbReferences(List of com.xebialabs.deployit.ci.mapping.EjbReference)_: Specifies the mapping from ejb reference jndi names and locals used in the web.xml to bean jndi names available in middleware
+* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Key Value Pairs
 * _placeholderFormat(ENUM)_: Placeholder Format
     * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
-* _resourceEnvironmentEntryReferences(List<com.xebialabs.deployit.ci.mapping.ResourceReference>)_: Specifies the mapping from resource environment references jndi names and types used in the web.xml to resource references jndi names available in middleware
-* _resourceReferences(List<com.xebialabs.deployit.ci.mapping.ResourceReference>)_: Specifies the mapping from resource references jndi names and types used in the web.xml to resource references jndi names available in middleware
+* _resourceEnvironmentEntryReferences(List of com.xebialabs.deployit.ci.mapping.ResourceReference)_: Specifies the mapping from resource environment references jndi names and types used in the web.xml to resource references jndi names available in middleware
+* _resourceReferences(List of com.xebialabs.deployit.ci.mapping.ResourceReference)_: Specifies the mapping from resource references jndi names and types used in the web.xml to resource references jndi names available in middleware
 * _virtualHost(STRING)_: Virtual host to deploy to
 
 

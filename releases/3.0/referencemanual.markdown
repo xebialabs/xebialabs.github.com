@@ -216,3 +216,436 @@ This process replaces an application deployed to an environment with another ver
 
 Deployit ships with a number of **configuration items** that you can use to define your middleware configuration and deploy applications. This section contains an overview of these CIs, their purpose and the properties they support. This section of the manual was generated from the Deployit **CLI** interface.
 
+
+## Application ##
+
+An application. Each version of the application is a separate package.
+
+_Type_: com.xebialabs.deployit.ci.Application
+
+
+
+
+## ConfigurationFiles ##
+
+Folder in the Application Package containing configuration files. Might contain sub folders
+
+_Type_: com.xebialabs.deployit.ci.artifact.ConfigurationFiles
+
+_Properties:_
+
+* **location(STRING)**: Location of the artifact.
+* **name(STRING)**: The technical name of the artifact as it will be used within application servers.
+* _placeholders(Set<String>)_: Placeholders found after scanning the artifact
+
+
+
+## ConfigurationFilesMapping ##
+
+A mapping of a ConfigurationFiles CI to a Host
+
+_Type_: com.xebialabs.deployit.ci.artifact.mapping.ConfigurationFilesMapping
+
+_Properties:_
+
+* **source(java.io.Serializable)**: Source
+* **target(java.io.Serializable)**: Target
+* **targetDirectory(STRING)**: The directory on the target host to which the configuration is to be copied. Example: /data/petclinic/1.0/conf. It can be overidden by using Key TARGET_DIRECTORY
+* _createIfNotExist(BOOLEAN)_: create the target directory and sub directory if they are not exist
+* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
+* _placeholderFormat(ENUM)_: Placeholder Format
+    * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
+* _shared(BOOLEAN)_: The target directory is shared when another resources using it as well, default true.
+
+
+
+## Database ##
+
+SQL database instance
+
+_Type_: com.xebialabs.deployit.ci.Database
+
+_Properties:_
+
+* **host(com.xebialabs.deployit.ci.Host)**: The host on which the SQL client is running
+* **password(STRING)**: value of the password option provided to the client command, replaces "${password}" in options
+* **user(STRING)**: value of the user option provided to the client command, replaces "${user}" in options
+* _command(STRING)_: The plain command to the SQL client, such as "/home/centos/oracle/product/10.2.0/db_5/bin/sqlplus" for Oracle or "/usr/local/mysql/bin/mysql" for MySql
+* _database(STRING)_: value of the database option provided to the client command, replaces "${database}" in options
+* _options(STRING)_: All options for the command, such as "${user}/${password}@${database}" for Oracle or "-u ${user} -p${password} ${database}" for MySql
+
+
+
+## DeployableArtifact ##
+
+Deployable artifact.
+
+_Type_: com.xebialabs.deployit.ci.artifact.DeployableArtifact
+
+_Properties:_
+
+* **location(STRING)**: Location of the artifact.
+
+
+
+## Deployment ##
+
+A deployment of an application package or a deployable artifact to a middleware CI or an environment.
+
+_Type_: com.xebialabs.deployit.ci.Deployment
+
+_Properties:_
+
+* **source(com.xebialabs.deployit.ci.DeploymentPackage)**: Source
+* **target(com.xebialabs.deployit.ci.Environment)**: Target
+* _mappings(Set<com.xebialabs.deployit.ci.mapping.Mapping>)_: Mappings
+* _vhostDefinition(STRING)_: The virtual host <hostname>:<portnumber> as used by the HTTP and application server. Valid examples; www.xebialabs.com:80
+
+
+
+## DeploymentPackage ##
+
+A package of a certion version of an application, i.e. a grouping of a number of deployable artifact CI's. Contains as its members all the application components that make it up. Is contained by the Application CI of which it supplies a version.
+
+_Type_: com.xebialabs.deployit.ci.DeploymentPackage
+
+_Properties:_
+
+* **application(com.xebialabs.deployit.ci.Application)**: The application the package is a part of.
+* _deployableArtifacts(Set<com.xebialabs.deployit.ci.artifact.DeployableArtifact>)_: The set of deployable artifacts that are part of this package
+* _middlewareResources(Set<com.xebialabs.deployit.ci.MiddlewareResource>)_: The set of middleware resources that are part of this package
+* _version(STRING)_: The version of the application package. Examples; 1.0, 1.2.3, 1.0-SNAPSHOT, 3.4-MILESTONE-RC-3
+
+
+
+## Ear ##
+
+Deployable EAR artifact.
+
+_Type_: com.xebialabs.deployit.ci.artifact.Ear
+
+_Properties:_
+
+* **location(STRING)**: Location of the artifact.
+* **name(STRING)**: The technical name of the artifact as it will be used within application servers.
+
+
+
+## EjbJar ##
+
+Deployable EJB JAR artifact.
+
+_Type_: com.xebialabs.deployit.ci.artifact.EjbJar
+
+_Properties:_
+
+* **location(STRING)**: Location of the artifact.
+* **name(STRING)**: The technical name of the artifact as it will be used within application servers.
+
+
+
+## EjbJarMapping ##
+
+A mapping of an EjbJar to any kind of middleware
+
+_Type_: com.xebialabs.deployit.ci.artifact.mapping.EjbJarMapping
+
+_Properties:_
+
+* **source(java.io.Serializable)**: Source
+* **target(java.io.Serializable)**: Target
+* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
+* _mdbListenerPortJndiNameBindings(List<com.xebialabs.deployit.ci.mapping.MdbListenerPortBinding>)_: Bindings of message driven beans JNDI names to the corresponding listener ports present on the target middleware
+* _placeholderFormat(ENUM)_: Placeholder Format
+    * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
+
+
+
+## Environment ##
+
+A group where middleware CI's can be added, can serve as a target for a deployment.
+
+_Type_: com.xebialabs.deployit.ci.Environment
+
+_Properties:_
+
+* _members(Set<java.io.Serializable>)_: Members
+
+
+
+## Folder ##
+
+Description unavailable
+
+_Type_: com.xebialabs.deployit.ci.artifact.Folder
+
+_Properties:_
+
+* **location(STRING)**: Location of the artifact.
+* **name(STRING)**: The technical name of the artifact as it will be used within application servers.
+
+
+
+## GenericFolder ##
+
+Folder in the Application Package containing non typed files. Might contain sub folders
+
+_Type_: com.xebialabs.deployit.ci.artifact.GenericFolder
+
+_Properties:_
+
+* **location(STRING)**: Location of the artifact.
+* **name(STRING)**: The technical name of the artifact as it will be used within application servers.
+
+
+
+## GenericFolderMapping ##
+
+A mapping of a GenericFolder CI to a Host
+
+_Type_: com.xebialabs.deployit.ci.artifact.mapping.GenericFolderMapping
+
+_Properties:_
+
+* **source(java.io.Serializable)**: Source
+* **target(java.io.Serializable)**: Target
+* **targetDirectory(STRING)**: The directory on the target host to which the configuration is to be copied. Example: /data/petclinic/1.0/conf. It can be overidden by using Key TARGET_DIRECTORY
+* _createIfNotExist(BOOLEAN)_: create the target directory and sub directory if they are not exist
+* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
+* _placeholderFormat(ENUM)_: Placeholder Format
+    * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
+* _shared(BOOLEAN)_: The target directory is shared when another resources using it as well, default true.
+
+
+
+## Host ##
+
+A machine that runs middleware. Used to find out how to connect to the machine to run configuration and installation commands. Contains as its members the middleware CI's running on it (ApacheHttpd, WebSphereCell, etc.).
+
+_Type_: com.xebialabs.deployit.ci.Host
+
+_Properties:_
+
+* **accessMethod(ENUM)**: How deployit will access this host. For local use use local, for remote access use the rest of the options.
+    * Values: [NONE, LOCAL, SSH_SFTP, SSH_SCP, SSH_SUDO, SSH_INTERACTIVE_SUDO, CIFS_TELNET]
+* **address(STRING)**: Where to access this host. Valid examples; www.xebialabs.com, localhost, 127.0.0.1, 172.16.1.3
+* **operatingSystemFamily(ENUM)**: The type of operating system this host is running, Valid examples; Windows, Unix
+    * Values: [WINDOWS, UNIX]
+* _password(STRING)_: The password used to authenticate the username with.
+* _sudoUsername(STRING)_: When using the SSH_SUDO access method, deployit will use the sudo username to execute command on this host.
+* _temporaryDirectoryLocation(STRING)_: Overrides the location (on windows \TEMP, on unix /tmp) where deployit will store temporary files.
+* _username(STRING)_: The username needed to connect to this host.
+
+
+
+## HttpdServer ##
+
+A generic web server.
+
+_Type_: com.xebialabs.deployit.ci.HttpdServer
+
+_Properties:_
+
+* **host(com.xebialabs.deployit.ci.Host)**: Host on which the web server runs
+
+
+
+## Libraries ##
+
+Folder in the Application Package containing library files. Might contain sub folders
+
+_Type_: com.xebialabs.deployit.ci.artifact.Libraries
+
+_Properties:_
+
+* **location(STRING)**: Location of the artifact.
+* **name(STRING)**: The technical name of the artifact as it will be used within application servers.
+
+
+
+## LibrariesMapping ##
+
+Description unavailable
+
+_Type_: com.xebialabs.deployit.ci.artifact.mapping.LibrariesMapping
+
+_Properties:_
+
+* **source(java.io.Serializable)**: Source
+* **target(java.io.Serializable)**: Target
+* **targetDirectory(STRING)**: The directory on the target host to which the configuration is to be copied. Example: /data/petclinic/1.0/conf. It can be overidden by using Key TARGET_DIRECTORY
+* _createIfNotExist(BOOLEAN)_: create the target directory and sub directory if they are not exist
+* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
+* _placeholderFormat(ENUM)_: Placeholder Format
+    * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
+* _shared(BOOLEAN)_: The target directory is shared when another resources using it as well, default true.
+
+
+
+## ListenServer ##
+
+Description unavailable
+
+_Type_: com.xebialabs.deployit.ci.ListenServer
+
+_Properties:_
+
+* _host(com.xebialabs.deployit.ci.Host)_: Host
+* _listenPort(INTEGER)_: Listen Port
+
+
+
+## NamedDeployableArtifact ##
+
+Description unavailable
+
+_Type_: com.xebialabs.deployit.ci.artifact.NamedDeployableArtifact
+
+_Properties:_
+
+* **location(STRING)**: Location of the artifact.
+* **name(STRING)**: The technical name of the artifact as it will be used within application servers.
+
+
+
+## PermissionScheme ##
+
+A permission scheme to apply to a configuration item.
+
+_Type_: com.xebialabs.deployit.ci.security.PermissionScheme
+
+_Properties:_
+
+* **accessControlEntries(List<com.xebialabs.deployit.ci.security.AccessControlEntry>)**: Access control entries.
+* _allowedCiTypes(Set<String>)_: Allowed CI types.
+
+
+
+## Root ##
+
+A root in the JCR tree
+
+_Type_: com.xebialabs.deployit.ci.Root
+
+
+
+
+## SqlFolder ##
+
+Folder in the Application Package containing sql files. Might contain sub folders
+
+_Type_: com.xebialabs.deployit.ci.artifact.SqlFolder
+
+_Properties:_
+
+* **location(STRING)**: Location of the artifact.
+* **name(STRING)**: The technical name of the artifact as it will be used within application servers.
+* _filter(STRING)_: Default is .sql
+
+
+
+## SqlFolderMapping ##
+
+Description unavailable
+
+_Type_: com.xebialabs.deployit.ci.artifact.mapping.SqlFolderMapping
+
+_Properties:_
+
+* **source(java.io.Serializable)**: Source
+* **target(java.io.Serializable)**: Target
+* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
+* _placeholderFormat(ENUM)_: Placeholder Format
+    * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
+
+
+
+## SqlMapping ##
+
+Description unavailable
+
+_Type_: com.xebialabs.deployit.ci.artifact.mapping.SqlMapping
+
+_Properties:_
+
+* **source(java.io.Serializable)**: Source
+* **target(java.io.Serializable)**: Target
+* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
+* _placeholderFormat(ENUM)_: Placeholder Format
+    * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
+
+
+
+## SqlScript ##
+
+SQL script instance
+
+_Type_: com.xebialabs.deployit.ci.artifact.SqlScript
+
+_Properties:_
+
+* **location(STRING)**: Location of the artifact.
+* **name(STRING)**: The technical name of the artifact as it will be used within application servers.
+
+
+
+## StaticContent ##
+
+Deployable static content artifact.
+
+_Type_: com.xebialabs.deployit.ci.artifact.StaticContent
+
+_Properties:_
+
+* **location(STRING)**: Location of the artifact.
+* **name(STRING)**: The technical name of the artifact as it will be used within application servers.
+
+
+
+## StaticContentMapping ##
+
+A mapping of a StaticContent to any kind of middleware
+
+_Type_: com.xebialabs.deployit.ci.artifact.mapping.StaticContentMapping
+
+_Properties:_
+
+* **source(java.io.Serializable)**: Source
+* **target(java.io.Serializable)**: Target
+* _virtualHost(STRING)_: The virtual host <hostname>:<portnumber> as used by the HTTP and application server. Example: www.xebialabs.com:80
+
+
+
+## UnreachableHost ##
+
+A machine that runs middleware but cannot be directly accessed from the Deployit server. Used to find out how to connect to the machine to run configuration and installation commands. Contains as its members the middleware CI's running on it (ApacheHttpd, WebSphereCell, etc.).
+
+_Type_: com.xebialabs.deployit.ci.UnreachableHost
+
+_Properties:_
+
+* **accessMethod(ENUM)**: How deployit will access this host. For local use use local, for remote access use the rest of the options.
+    * Values: [NONE, LOCAL, SSH_SFTP, SSH_SCP, SSH_SUDO, SSH_INTERACTIVE_SUDO, CIFS_TELNET]
+* **address(STRING)**: Where to access this host. Valid examples; www.xebialabs.com, localhost, 127.0.0.1, 172.16.1.3
+* **jumpingStation(com.xebialabs.deployit.ci.Host)**: The host where the ssh tunnel will be started
+* **operatingSystemFamily(ENUM)**: The type of operating system this host is running, Valid examples; Windows, Unix
+    * Values: [WINDOWS, UNIX]
+* _password(STRING)_: The password used to authenticate the username with.
+* _sudoUsername(STRING)_: When using the SSH_SUDO access method, deployit will use the sudo username to execute command on this host.
+* _temporaryDirectoryLocation(STRING)_: Overrides the location (on windows \TEMP, on unix /tmp) where deployit will store temporary files.
+* _username(STRING)_: The username needed to connect to this host.
+
+
+
+## War ##
+
+Deployable WAR artifact.
+
+_Type_: com.xebialabs.deployit.ci.artifact.War
+
+_Properties:_
+
+* **location(STRING)**: Location of the artifact.
+* **name(STRING)**: The technical name of the artifact as it will be used within application servers.
+
+

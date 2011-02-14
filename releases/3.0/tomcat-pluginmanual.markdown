@@ -87,7 +87,7 @@ _Properties:_
 
 * **source(java.io.Serializable)**: Source
 * **target(java.io.Serializable)**: Target
-* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Key Value Pairs
+* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
 * _placeholderFormat(ENUM)_: Placeholder Format
     * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
 
@@ -120,7 +120,7 @@ _Properties:_
 * **target(java.io.Serializable)**: Target
 * **targetDirectory(STRING)**: The directory on the target host to which the configuration is to be copied. Example: /data/petclinic/1.0/conf. It can be overidden by using Key TARGET_DIRECTORY
 * _createIfNotExist(BOOLEAN)_: create the target directory and sub directory if they are not exist
-* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Key Value Pairs
+* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
 * _placeholderFormat(ENUM)_: Placeholder Format
     * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
 * _shared(BOOLEAN)_: The target directory is shared when another resources using it as well, default true.
@@ -174,7 +174,7 @@ _Type_: com.xebialabs.deployit.plugin.tomcat.ci.TomcatJNDIResources
 
 _Properties:_
 
-* _resourceLinks(List of com.xebialabs.deployit.plugin.tomcat.ci.ResourceLink)_: Resources links that are to stored in the Tomcat JNDI tree
+* _resourceLinks(List<com.xebialabs.deployit.plugin.tomcat.ci.ResourceLink>)_: Resources links that are to stored in the Tomcat JNDI tree
 
 
 
@@ -188,7 +188,7 @@ _Properties:_
 
 * **source(java.io.Serializable)**: Source
 * **target(java.io.Serializable)**: Target
-* _resourceLinks(List of com.xebialabs.deployit.plugin.tomcat.ci.ResourceLink)_: Resources links that are to stored in the Tomcat JNDI tree
+* _resourceLinks(List<com.xebialabs.deployit.plugin.tomcat.ci.ResourceLink>)_: Resources links that are to stored in the Tomcat JNDI tree
 
 
 
@@ -204,7 +204,7 @@ _Properties:_
 * **target(java.io.Serializable)**: Target
 * **targetDirectory(STRING)**: The directory on the target host to which the configuration is to be copied. Example: /data/petclinic/1.0/conf. It can be overidden by using Key TARGET_DIRECTORY
 * _createIfNotExist(BOOLEAN)_: create the target directory and sub directory if they are not exist
-* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Key Value Pairs
+* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
 * _placeholderFormat(ENUM)_: Placeholder Format
     * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
 * _shared(BOOLEAN)_: The target directory is shared when another resources using it as well, default true.
@@ -240,7 +240,7 @@ _Properties:_
 
 * **source(java.io.Serializable)**: Source
 * **target(java.io.Serializable)**: Target
-* _sourcePropertyOverrides(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Overrides for properties of the mapping's source. The key is the property name (consult the documentation or run 'describe' in the CLI), the value is the value to set. Only string, integer and enumerable properties can be overridden. Example: Key: redeliveryLimits, Value: 2
+* _sourcePropertyOverrides(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Overrides for properties of the mapping's source. The key is the property name (consult the documentation or run 'describe' in the CLI), the value is the value to set. Only string, integer and enumerable properties can be overridden. Example: Key: redeliveryLimits, Value: 2
 
 
 
@@ -275,13 +275,13 @@ _Properties:_
 * **target(java.io.Serializable)**: Target
 * _appBase(STRING)_: aaabsolute path of the directory where wars are deployed. Only needed when context path specified in the mapping is different from the war name
 * _contextRoot(STRING)_: Context root to deploy to
-* _ejbReferences(List of com.xebialabs.deployit.ci.mapping.EjbReference)_: Specifies the mapping from ejb reference jndi names and locals used in the web.xml to bean jndi names available in middleware
+* _ejbReferences(List<com.xebialabs.deployit.ci.mapping.EjbReference>)_: Specifies the mapping from ejb reference jndi names and locals used in the web.xml to bean jndi names available in middleware
 * _exploded(BOOLEAN)_: Explode the war file on tomcat server (does not work when using the Tomcat manager).
-* _keyValuePairs(List of com.xebialabs.deployit.ci.mapping.KeyValuePair)_: Key Value Pairs
+* _keyValuePairs(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: Key Value Pairs
 * _placeholderFormat(ENUM)_: Placeholder Format
     * Values: [SPRING, WINDOWS_SHELL, STARS, NONE]
-* _resourceEnvironmentEntryReferences(List of com.xebialabs.deployit.ci.mapping.ResourceReference)_: Specifies the mapping from resource environment references jndi names and types used in the web.xml to resource references jndi names available in middleware
-* _resourceReferences(List of com.xebialabs.deployit.ci.mapping.ResourceReference)_: Specifies the mapping from resource references jndi names and types used in the web.xml to resource references jndi names available in middleware
+* _resourceEnvironmentEntryReferences(List<com.xebialabs.deployit.ci.mapping.ResourceReference>)_: Specifies the mapping from resource environment references jndi names and types used in the web.xml to resource references jndi names available in middleware
+* _resourceReferences(List<com.xebialabs.deployit.ci.mapping.ResourceReference>)_: Specifies the mapping from resource references jndi names and types used in the web.xml to resource references jndi names available in middleware
 * _virtualHost(STRING)_: Virtual host to deploy to
 
 

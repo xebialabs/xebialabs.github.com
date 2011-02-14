@@ -1,7 +1,7 @@
-----
+---
 layout: default
 title: Deployit Command Line Interface 
-----
+---
 
 # Preface #
 

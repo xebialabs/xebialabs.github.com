@@ -1,7 +1,7 @@
-----
+---
 layout: default
 title: Deployit System Administration Manual
-----
+---
 
 # Preface #
 

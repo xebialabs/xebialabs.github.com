@@ -1,7 +1,7 @@
-----
+---
 layout: default
 title: Deployit GUI 
-----
+---
 
 # The Deployment Screen #
 

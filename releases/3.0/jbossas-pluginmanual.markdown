@@ -1,7 +1,7 @@
-----
+---
 layout: default
 title: Deployit JBoass AS Plugin Manual
-----
+---
 
 # Preface #
 

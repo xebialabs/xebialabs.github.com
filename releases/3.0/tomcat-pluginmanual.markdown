@@ -1,7 +1,7 @@
-----
+---
 layout: default
 title: Deployit Tomcat Plugin Manual
-----
+---
 
 # Preface #
 

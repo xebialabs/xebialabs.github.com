@@ -1,7 +1,7 @@
-----
+---
 layout: default
 title: Deployit Packaging Manual
-----
+---
 
 # Preface #
 

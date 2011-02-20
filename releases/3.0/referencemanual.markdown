@@ -140,13 +140,10 @@ So, deployed applications exist in both the **/Environment** as well as **/Infra
 
 A runbook is a component that generates a **steplist** when presented with a **task**. A runbook can produce **steps** for any task or only for particular tasks. A runbook is integrated into Deployit by means of a **plug-in**.
 
-Deployit ships with the following runbooks:
+Deployit ships with one of the following runbooks:
 
 * **Tomcat runbook**. This runbook makes it possible to deploy to the **Tomcat** application server.
 * **JBoss runbook**. This runbook makes it possible to deploy to the **JBossAS** application server.
-
-XebiaLabs also provides the following optional runbooks:
-
 * **WAS runbook**. This runbook makes it possible to deploy to the **WebSphere Application Server (WAS)**.
 * **WLS runbook**. This runbook makes it possible to deploy to the **WebLogic** application server.
 * **IBM MQ runbook**. This runbook makes it possible to deploy to the **IBM MQ Series** platform.

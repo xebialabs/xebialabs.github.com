@@ -85,7 +85,7 @@ _Type_: com.xebialabs.deployit.plugin.wls.ci.ApacheHttpdWlsPluginConfiguration
 
 _Properties:_
 
-* **name(STRING)**: configuration name
+* **name(STRING)**: Name
 * _errorPage(STRING)_: Error Page
 * _mimeMatchExpressions(STRING)_: Comma separated list of match expression to proxy requests by MIME type
 * _pathExpressions(STRING)_: Comma separated list of path to be used for proxing requests by path
@@ -298,6 +298,23 @@ _Properties:_
 
 
 
+## WlsJmsDistributedQueue ##
+
+A WebLogic JMS Queue
+
+_Type_: com.xebialabs.deployit.plugin.wls.ci.WlsJmsDistributedQueue
+
+_Properties:_
+
+* **jndiName(STRING)**: Jndi Name
+* **name(STRING)**: The name of the distributed queue
+* _forwardDelay(INTEGER)_: Defaults to -1
+* _loadBalancingPolicy(ENUM)_: Load Balancing Policy
+    * Values: [ROUND_ROBIN, RANDOM]
+* _members(Set<com.xebialabs.deployit.plugin.wls.ci.WlsJmsQueue>)_: Members
+
+
+
 ## WlsJmsQueue ##
 
 A WebLogic JMS Queue
@@ -328,6 +345,34 @@ _Properties:_
 
 * **fileStorePath(STRING)**: Path to the file store that the JMSServer will use to store JMS messages. e.g. /var/jms/store1
 * **name(STRING)**: Name of the JMSServer. e.g. JMSServer1
+
+
+
+## WlsJmsUniformDistributedQueue ##
+
+A WebLogic JMS Uniform Distributed Queue
+
+_Type_: com.xebialabs.deployit.plugin.wls.ci.WlsJmsUniformDistributedQueue
+
+_Properties:_
+
+* **jndiName(STRING)**: Jndi Name
+* **name(STRING)**: The name of the queue
+* _jmsServers(Set<com.xebialabs.deployit.plugin.wls.ci.WlsJmsServer>)_: The JMS servers across which the queue should be distributed. These all need to reside on servers of the cluster to which the queue is targeted.
+
+
+
+## WlsMailSession ##
+
+A WebLogic Mail Session that facilitates the use of the JavaMail API
+
+_Type_: com.xebialabs.deployit.plugin.wls.ci.WlsMailSession
+
+_Properties:_
+
+* **jndiName(STRING)**: Jndi Name
+* **name(STRING)**: Name of the Mail Session
+* _javaMailProperties(List<com.xebialabs.deployit.ci.mapping.KeyValuePair>)_: The JavaMail properties to be set for this Mail Session, as key/value pairs
 
 
 

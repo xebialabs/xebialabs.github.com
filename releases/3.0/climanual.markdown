@@ -156,20 +156,19 @@ Optional steps:
 
 ### Creating the discovery starting point ###
 
-The discovery starting point is a CI that indicates where the discovery process should start. This starting point specifies at least the host that the discovery should start at. 
+The discovery starting point is a CI that indicates where the discovery process should start. This starting point specifies at least the host that the discovery should start at. Depending on the middleware you are trying to discover, additional parameters may be needed. 
 
 Example:
 
 	# create ci with required discover parameters filled in
-	host = ConfigurationItem("com.xebialabs.deployit.ci.Host")
-	host.id = "Infrastructure/host at localhost"
-	host.values = {"address":"localhost","username":"deployit","password":"admin",
-		"operatingSystemFamily":"UNIX","accessMethod":"SSH_SUDO"}
-	repository.create(host.id, host)
+	wasHost = repository.create("Infrastructure/rs94asob.k94.corp.nl (DEV99)",
+		factory.configurationItem("Host",{"address":"was-61","username":"root",
+		"password":"root","operatingSystemFamily":"UNIX","accessMethod":"SSH_SFTP"}))
 
-	dmEntity = ConfigurationItem("com.xebialabs.deployit.plugin.test.WasDeploymentManager")
-	dmEntity.id = "dmngr1";
-	dmEntity.values = {"host":host.id}
+	aDmManager = factory.configurationItem("WasDeploymentManager", 
+		{'host':'Infrastructure/rs94asob.k94.corp.nl (DEV99)', 
+		"wasHome":"/opt/ws/6.1/profiles/dmgr", "username":"wsadmin","*****":"wsadmin"})
+	aDmManager.id="c-ws-dev99"
 
 ### Start Discovery ###
 
@@ -177,7 +176,7 @@ The Deployit CLI discovery functionality is synchronous, that means that the CLI
 
 The command to start discovery is:
 
-	discoveredRepositoryObjectsContainer = deployit.discover(dmEntity)
+	discoveredRepositoryObjectsContainer = deployit.discover(aDmManager)
 	discoveredCIs = discoveredRepositoryObjectsContainer.objects;
 
 The discovery process works like a regular task in that it executes a number of steps behind the scenes. Whenever one of these steps fails, the entire discovery process fails and aborts. It is not possible to continue an interrupted discovery process.

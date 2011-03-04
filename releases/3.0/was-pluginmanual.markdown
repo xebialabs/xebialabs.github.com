@@ -131,6 +131,32 @@ _Properties:_
 
 
 
+## WasDefaultQueue ##
+
+A queue in WebSphere's V5 default messaging provider
+
+_Type_: com.xebialabs.deployit.plugin.was.ci.WasDefaultQueue
+
+_Properties:_
+
+* **jndiName(STRING)**: JNDI name
+* **name(STRING)**: WebSphere name
+
+
+
+## WasDefaultQueueConnectionFactory ##
+
+A queue connection factory in WebSphere's V5 default messaging provider
+
+_Type_: com.xebialabs.deployit.plugin.was.ci.WasDefaultQueueConnectionFactory
+
+_Properties:_
+
+* **jndiName(STRING)**: JNDI name
+* **name(STRING)**: WebSphere name
+
+
+
 ## WasDeploymentManager ##
 
 A WebSphere Application Server deployment manager (WAS ND)
@@ -339,6 +365,78 @@ _Properties:_
 
 
 
+## WasSibJmsActivationSpec ##
+
+An activation specification in WebSphere's Default messaging provider
+
+_Type_: com.xebialabs.deployit.plugin.was.ci.WasSibJmsActivationSpec
+
+_Properties:_
+
+* **destination(com.xebialabs.deployit.plugin.was.ci.WasSibJmsTarget)**: The SIB JMS Destination the Activation Specification should listen on
+* **jndiName(STRING)**: JNDI name
+* **name(STRING)**: WebSphere name
+
+
+
+## WasSibJmsQueue ##
+
+A queue in WebSphere's Default messaging provider
+
+_Type_: com.xebialabs.deployit.plugin.was.ci.WasSibJmsQueue
+
+_Properties:_
+
+* **busName(STRING)**: The name of the Service Integration Bus in which a destination should be created
+* **jndiName(STRING)**: JNDI name
+* **name(STRING)**: WebSphere name
+* **queueName(STRING)**: The name of the Service Integration Bus destination for this queue
+
+
+
+## WasSibJmsQueueConnectionFactory ##
+
+A queue connection factory in WebSphere's Default messaging provider
+
+_Type_: com.xebialabs.deployit.plugin.was.ci.WasSibJmsQueueConnectionFactory
+
+_Properties:_
+
+* **busName(STRING)**: Bus Name
+* **jndiName(STRING)**: JNDI name
+* **name(STRING)**: WebSphere name
+
+
+
+## WasSibJmsTopic ##
+
+A topic in WebSphere's Default messaging provider
+
+_Type_: com.xebialabs.deployit.plugin.was.ci.WasSibJmsTopic
+
+_Properties:_
+
+* **busName(STRING)**: The name of the Service Integration Bus in which a destination should be created
+* **jndiName(STRING)**: JNDI name
+* **name(STRING)**: WebSphere name
+* **topicName(STRING)**: The name of the Service Integration Bus destination for this topic
+
+
+
+## WasSibJmsTopicConnectionFactory ##
+
+A topic connection factory in WebSphere's Default messaging provider
+
+_Type_: com.xebialabs.deployit.plugin.was.ci.WasSibJmsTopicConnectionFactory
+
+_Properties:_
+
+* **busName(STRING)**: Bus Name
+* **jndiName(STRING)**: JNDI name
+* **name(STRING)**: WebSphere name
+
+
+
 ## WasUnManagedApacheHttpdServer ##
 
 Description unavailable
@@ -460,9 +558,9 @@ _Type_: com.xebialabs.deployit.plugin.was.ci.WasWmqQueue
 
 _Properties:_
 
+* **jndiName(STRING)**: JNDI name
+* **name(STRING)**: WebSphere name
 * _baseQueueName(STRING)_: Base Queue Name
-* _jndiName(STRING)_: JNDI name
-* _name(STRING)_: WebSphere name
 
 
 
@@ -474,9 +572,9 @@ _Type_: com.xebialabs.deployit.plugin.was.ci.WasWmqQueueConnectionFactory
 
 _Properties:_
 
+* **jndiName(STRING)**: JNDI name
+* **name(STRING)**: WebSphere name
 * _channel(STRING)_: Channel
-* _jndiName(STRING)_: JNDI name
-* _name(STRING)_: WebSphere name
 * _queueManagerHost(com.xebialabs.deployit.ci.Host)_: Queue Manager Host
 * _queueManagerName(STRING)_: Queue Manager Name
 * _queueManagerPort(INTEGER)_: Queue Manager Port
@@ -491,9 +589,9 @@ _Type_: com.xebialabs.deployit.plugin.was.ci.WasWmqTopic
 
 _Properties:_
 
+* **jndiName(STRING)**: JNDI name
+* **name(STRING)**: WebSphere name
 * _baseTopicName(STRING)_: Base Topic Name
-* _jndiName(STRING)_: JNDI name
-* _name(STRING)_: WebSphere name
 
 
 
@@ -505,9 +603,9 @@ _Type_: com.xebialabs.deployit.plugin.was.ci.WasWmqTopicConnectionFactory
 
 _Properties:_
 
+* **jndiName(STRING)**: JNDI name
+* **name(STRING)**: WebSphere name
 * _channel(STRING)_: Channel
-* _jndiName(STRING)_: JNDI name
-* _name(STRING)_: WebSphere name
 * _queueManagerHost(com.xebialabs.deployit.ci.Host)_: Queue Manager Host
 * _queueManagerName(STRING)_: Queue Manager Name
 * _queueManagerPort(INTEGER)_: Queue Manager Port

@@ -439,7 +439,7 @@ The class **LdapPrincipalProvider** is an example of how to connect Deployit to 
 
 Deployit can also use a database to store it's repository in. The built-in Jackrabit repository must be configured to make this possible. The two relevant components are Jackrabbit's `PersistenceManager` (used for storing nodes an d revisions) and `DataStore` (optionally used for storing large binary objects). In the default Deployit configuration, the [Derby database](http://db.apache.org/derby/) and file system DataStore are used.
 
-This is an example of how to configure Deployit to use the [MySQL](http://www.mysql.com/) database [^3].
+This is an example of how to configure Deployit to use a database.
 
 First, extract the Jackrabbit configuration file and copy it to the `conf` directory where it will be picked up by Deployit:
 
@@ -448,12 +448,34 @@ First, extract the Jackrabbit configuration file and copy it to the `conf` direc
 
 Edit the Jackrabbit configuration file and change each `PersistenceManager` to the following:
 
+**[MySQL](http://www.mysql.com/) [^3].**
+
 	<PersistenceManager class="org.apache.jackrabbit.core.persistence.pool.MySqlPersistenceManager">
 		<param name="url" value="jdbc:mysql://localhost:3306/deployit" />
 		<param name="user" value="deployit" />
         <param name="password" value="deployit" />
 		<param name="schemaObjectPrefix" value="${wsp.name}_" />
 	</PersistenceManager>
+
+**[DB2](http://www-01.ibm.com/software/data/db2/)**
+	 <PersistenceManager class="org.apache.jackrabbit.core.persistence.pool.BundleDbPersistenceManager">
+        <param name="driver" value="com.ibm.db2.jcc.DB2Driver"/>
+        <param name="url" value="jdbc:db2://localhost:50002/deployit" /> 
+        <param name="user" value="deployit" /> 
+        <param name="password" value="deployit" />
+        <param name="databaseType" value="db2" /> 
+        <param name="schemaObjectPrefix" value="${wsp.name}_" /> 
+     </PersistenceManager>
+
+**[Oracle](http://www.oracle.com/us/products/database/index.html)**
+	 <PersistenceManager class="org.apache.jackrabbit.core.persistence.bundle.OraclePersistenceManager">
+        <param name="driver" value="oracle.jdbc.driver.OracleDriver"/>
+        <param name="url" value="jdbc:oracle:thin:@localhost:1521:orcl"/>
+        <param name="user" value="deployit" /> 
+        <param name="password" value="deployit" />
+        <param name="schema" value="oracle" /> 
+        <param name="schemaObjectPrefix" value="${wsp.name}_" /> 
+    </PersistenceManager>
 
 For more information about using a database with Jackrabbit, see it's [PersistenceManager FAQ](http://wiki.apache.org/jackrabbit/PersistenceManagerFAQ) and [DataStore FAQ](http://wiki.apache.org/jackrabbit/DataStore).
 

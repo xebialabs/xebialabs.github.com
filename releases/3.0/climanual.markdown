@@ -209,7 +209,7 @@ The _repository_ CLI object makes it possible to store all of the discovered CIs
 
 This is the command to do this:
 
-	repository.create(discoveredCIs)
+	repository.create(discoveredRepositoryObjectsContainer)
 
 **Note:** the user needs specific permission to store CIs in the database. See the **Deployit System Administration Manual**.
 

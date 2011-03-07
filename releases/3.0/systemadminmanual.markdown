@@ -428,7 +428,7 @@ To configure Deployit to use an LDAP repository, the built-in JCR repository, Ja
 
 2. **Modify the Deployit server startup command**. Notify the Deployit server of the new configuration file by including the following parameter on the Java command line:
 
-		-Djava.security.auth.login.config==/path/to/jackrabbit_jaas.config
+		-Djava.security.auth.login.config=/path/to/jackrabbit_jaas.config
 
 
 The class **LdapPrincipalProvider** is an example of how to connect Deployit to LDAP through Jackrabbit. If your LDAP server has a different structure or to connect Jackrabbit to another user store, see the information about Jackrabbit configuration on the [the Jackrabbit website](http://jackrabbit.apache.org/).

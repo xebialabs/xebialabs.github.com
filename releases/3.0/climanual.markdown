@@ -141,18 +141,18 @@ The following script demos a common way to use archetypes:
 	
 ## Discovering CIs ##
 
-To help in setting up Deployit, it is possible to discover middleware in your environment. Deployit will scan your environment and create CIs based on the configuration it encounters, saving you the trouble of defining the CIs manually. Because this capability is part of the Deployit plugins, the exact discovery functionality available varies depending on your middleware platform.
+To help in setting up Deployit, it is possible to discover middleware in your environment. Deployit will scan your environment and create CIs based on the configuration it encounters. The discovered CIs help you in setting up your infrastructure, but they may not be complete. Some CIs contain values that can not be discovered, like passwords. These will have to be entered manually. Because discovery is part of the Deployit plugins, the exact discovery functionality available varies depending on your middleware platform.
 
 The discovery process consists of the following steps:
 
 1. Create a CI representing the starting point for discovery (often a _Host_ CI).
 2. Start discovery passing in the starting CI.
-3. Receive a list of discovered middleware CIs.
+3. Store the CIs in the repository.
+4. Complete the discovered CIs by providing missing information.
 
 Optional steps:
 
-4. Add the discovered CIs to an environment.
-5. Store the CIs in the repository.
+5. Add the discovered CIs to an environment.
 
 ### Creating the discovery starting point ###
 
@@ -167,7 +167,7 @@ Example:
 
 	aDmManager = factory.configurationItem("WasDeploymentManager", 
 		{'host':'Infrastructure/rs94asob.k94.corp.nl (DEV99)', 
-		"wasHome":"/opt/ws/6.1/profiles/dmgr", "username":"wsadmin","*****":"wsadmin"})
+		"wasHome":"/opt/ws/6.1/profiles/dmgr", "username":"wsadmin","password":"wsadmin"})
 	aDmManager.id="c-ws-dev99"
 
 ### Start Discovery ###
@@ -181,9 +181,19 @@ The command to start discovery is:
 
 The discovery process works like a regular task in that it executes a number of steps behind the scenes. Whenever one of these steps fails, the entire discovery process fails and aborts. It is not possible to continue an interrupted discovery process.
 
-### Receive discovered middleware CIs ###
+### Store the CIs in the repository ###
 
-Deployit returns a list of discovered middleware CIs. Note that these are not yet persisted. It is possible to modify the returned CIs before processing them further.
+Deployit returns a list of discovered middleware CIs. Note that these are not yet persisted. To store them in the repository, use the following code:
+
+	repository.create(discoveredRepositoryObjectsContainer)
+
+### Complete discovered middleware CIs ###
+
+The easiest way to find out which of the discovered CIs require additional information is by printing them. Any CIs that contain passwords (displayed as '********') will need to be completed. To print the stored CIs, the following code can be used:
+
+	for ci in discoveredCIs: deployit.print(repository.read(ci.id));
+
+**Note:** the created CIs can also be edited in the GUI using the Repository Browser.
 
 ### Adding CIs to Environments ###
 
@@ -193,7 +203,9 @@ Middleware that is used as a deployment target must be grouped together in an en
 
 Add the discovered CIs to the environment:
 
-	devEnv.members = discoveredCIs
+	devEnv.values['members'] = [ci.id for ci in discoveredCIs]
+
+**Note:** not all of the discovered CIs should necessarily be stored in an environment. For example, in the case of WAS, some nested CIs may be discovered of which only the top-level one must be stored.
 	
 Store the new environment:
 

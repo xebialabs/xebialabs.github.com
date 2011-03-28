@@ -90,28 +90,54 @@ The clients that access Deployit must meet the following requirements:
 
 ## Installation Procedure ##
 
+To begin installing Deployit, first unpack the distribution archive. The distribution archive contains the following:
+
+* Release notes describing the changes made in this version of Deployit.
+* A server archive.
+* A CLI archive.
+
 ### Installing the Server ###
 
 Follow these steps to install the Deployit server application:
 
-1. **Login to the server where Deployit will be installed**. The recommended way to install Deployit is to use a non-root user.
+1. **Login to the server where the Deployit Server will be installed**. It is recommended to install Deployit Server as a non-root user.
 2. **Create an installation directory**.
-3. **Copy the Deployit release distribution to the directory**.
-3. **Unzip the release into the created directory**.
+3. **Copy the Deployit Server archive to the directory**.
+3. **Extract the archive into the directory**.
 
-### Deployit Directory Structure ###
+**Deployit Server Directory Structure**
 
-Once the Deployit installation file is extracted, the following directory structure exists in the Deployit installation directory (in the remainder of the document this directory will be referred to as DEPLOYIT_HOME):
+Once the Deployit installation file is extracted, the following directory structure exists in the installation directory (in the remainder of the document this directory will be referred to as DEPLOYIT_HOME):
 
-* **bin**: contains the server binaries
-* **cli**: contains the client application, including binaries and libraries
-* **doc**: contains the documentation
+* **bin**: contains the Server binaries
+* **conf**: contains Server configuration files (this directory is only present if you have configured Deployit Server)
+* **doc**: contains the Deployit product documentation
+* **hotfix**: contains hotfixes that fix issues with the Deployit Server software
 * **importablePackages**: default location for importable packages
-* **lib**: contains server libraries
+* **lib**: contains necessary libraries
 * **plugins**: contains the Deployit middleware plugins
-* **recovery.dat**: stores tasks that are in progress for recovery purposes
+* **recovery.dat**: stores tasks that are in progress for recovery purposes (this file is only present if you have started Deployit server)
 
-### Running the Setup Wizard ###
+### Installing the CLI ###
+
+Follow these steps to install the Deployit CLI application:
+
+1. **Login to the server where the Deployit CLI will be installed**.
+2. **Create an installation directory**.
+3. **Copy the Deployit CLI archive to the directory**.
+3. **Extract the archive into the directory**.
+
+**Deployit CLI Directory Structure**
+
+Once the Deployit installation file is extracted, the following directory structure exists in the installation directory:
+
+* **bin**: contains the CLI binaries
+* **ext**: contains CLI Python extension scripts
+* **hotfix**: contains hotfixes that fix issues with the Deployit software
+* **lib**: contains necessary libraries
+* **plugins**: contains the Deployit CLI plugins
+
+### Running the Server Setup Wizard ###
 
 Run the Deployit Setup Wizard to start the Deployit server and make it ready for use. The command `deployit.sh -setup` starts the wizard. If you want to stop the Setup Wizard at any time, enter `exitsetup`. All changes to the configuration will be discarded.
 
@@ -314,6 +340,38 @@ The easiest way to achieve such a configuration is by using the same configurati
 When switching from one Deployit instance to another, any running tasks will be recovered by the new instance (see **Task Recovery**). 
 
 To configure such a setup, a router with _active/passive_ support must be used.
+
+# Upgrading Deployit #
+
+To begin upgrading Deployit, first unpack the distribution archive. The distribution archive contains the following:
+
+* Release notes describing the changes made in this version of Deployit.
+* A server archive.
+* A CLI archive.
+
+## Upgrading the Server ##
+
+To upgrade an existing Deployit server installation, do the following:
+
+1. Make a backup copy of the existing Deployit server installation directory.
+3. Create a new installation directory with the same name as the previous installation directory.
+4. Extract the server archive in this directory.
+5. Copy the contents of the **conf**, **repository** and **hotfix** directories from the backup directory into the installation directory.
+6. Copy the contents of the **importablePackages** directory from the backup directory into the installation directory.
+7. Copy the contents of the **plugins** directory from the backup directory into the installation directory.
+
+This completes upgrading of the Deployit server.
+
+## Upgrading the CLI ##
+
+To upgrade an existing Deployit CLI installation, do the following:
+
+1. Make a backup copy of the existing Deployit CLI installation directory.
+3. Create a new installation directory with the same name as the previous installation directory.
+4. Extract the CLI archive in this directory.
+5. Copy the contents of the **plugins**, **ext** and **hotfix** directories from the backup directory into the installation directory.
+
+This completes upgrading of the Deployit CLI.
 
 # Configuring Deployit #
 

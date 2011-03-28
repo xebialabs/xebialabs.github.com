@@ -23,8 +23,9 @@ The Deployit documentation contains all the information needed to install, confi
 * [WLS Plugin Manual](wls-pluginmanual.html). This document describes the features of the Deployit WebLogic plugin. (1)
 * Customization Manual. This document describes the customizations that were made to Deployit by XebiaLabs staff during a POC or implementation. (2)
 
-1: This manual is only available if the plugin is part of your Deployit installation.
-2: This manual may not be available depending on the installation at your site.
+**1**: This manual is only available if the plugin is part of your Deployit installation.
+
+**2**: This manual may not be available depending on the installation at your site.
 
 # Online Demo Scenario #
 

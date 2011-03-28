@@ -17,14 +17,15 @@ The Deployit documentation contains all the information needed to install, confi
 * [Graphical User Interface (GUI) Manual](guimanual.html). This document describes how to use the Deployit GUI.
 * [Command Line Interface (CLI) Manual](climanual.html). This document describes how to use the Deployit CLI.
 * [Packaging Manual](packagingmanual.html). This document describes how to create packages that can be imported into Deployit.
-* [Tomcat Plugin Manual](tomcat-pluginmanual.html). This document describes the features of the Deployit Tomcat plugin. [^1]
-* [JBoss Plugin Manual](jbossas-pluginmanual.html). This document describes the features of the Deployit JBoss plugin. [^1]
-* [WAS Plugin Manual](was-pluginmanual.html). This document describes the features of the Deployit WebSphere Application Server plugin. [^1]
-* [WLS Plugin Manual](wls-pluginmanual.html). This document describes the features of the Deployit WebLogic plugin. [^1]
-* [Customization Manual]. This document describes the customizations that were made to Deployit by XebiaLabs staff during a POC or implementation. [^2]
+* [Tomcat Plugin Manual](tomcat-pluginmanual.html). This document describes the features of the Deployit Tomcat plugin. (1)
+* [JBoss Plugin Manual](jbossas-pluginmanual.html). This document describes the features of the Deployit JBoss plugin. (1)
+* [WAS Plugin Manual](was-pluginmanual.html). This document describes the features of the Deployit WebSphere Application Server plugin. (1)
+* [WLS Plugin Manual](wls-pluginmanual.html). This document describes the features of the Deployit WebLogic plugin. (1)
+* Customization Manual. This document describes the customizations that were made to Deployit by XebiaLabs staff during a POC or implementation. (2)
 
-[^1]: This manual is only available if the plugin is part of your Deployit installation.
-[^2]: This manual may not be available depending on the installation at your site.
+**1**: This manual is only available if the plugin is part of your Deployit installation.
+
+**2**: This manual may not be available depending on the installation at your site.
 
 # Online Demo Scenario #
 

@@ -34,14 +34,6 @@ The JBoss AS plugin supports the following versions of JBoss AS:
 
 # Supported JBoss Features #
 
-* <ul>
-* <li>the initial deployment, re- and undeployment of deployment packages to/from JBoss environments
-* via the {@link com.xebialabs.deployit.plugin.jbossas.runbook.JbossasDeploymentRunBook JBoss Deployment RunBook}
-* </ul>
-* 
-* For details of the exact components supported, sequence in which steps are carried out, limitations
-* etc. please consult the documentation of the appropriate run book.
-
 The JBoss AS Plugin supports the following features:
 
 Concept                                 | Remarks

@@ -32,18 +32,18 @@ The WLS plugin supports the following versions of WLS:
 
 The WLS Plugin supports the following features:
 
-Concept                                   Remarks
---------                                  --------
-EAR/WAR/EJB-Jar                           Deploy and undeploy EAR, WAR and EJB-Jar's.
-LibraryJar                                
-Apache Httpd Wls Plugin Configuration     Create and destroy Apache HTTPD Server configuration.
-DataSource                                Create and destroy datasources.
-Foreign Jms Connection Factory            Create and destroy JMS Connection factories.
-Foreign Jms Destination                   Create and destroy JMS destinations.
-Foreign Jms Server                        Create and destroy JMS Servers.
-Maximum Threads Constraint                Configure maximum thread constraints in the server.
-Shared Library Jar                        Deploy and undeploy sharedl library jars.
-Work Manager                              Configure the work manager in the server instances.
+Concept                                 | Remarks
+--------                                | --------
+EAR/WAR/EJB-Jar                         | Deploy and undeploy EAR, WAR and EJB-Jar's.
+LibraryJar                              | 
+Apache Httpd Wls Plugin Configuration   | Create and destroy Apache HTTPD Server configuration.
+DataSource                              | Create and destroy datasources.
+Foreign Jms Connection Factory          | Create and destroy JMS Connection factories.
+Foreign Jms Destination                 | Create and destroy JMS destinations.
+Foreign Jms Server                      | Create and destroy JMS Servers.
+Maximum Threads Constraint              | Configure maximum thread constraints in the server.
+Shared Library Jar                      | Deploy and undeploy sharedl library jars.
+Work Manager                            | Configure the work manager in the server instances.
 
 # WLS Runbook #
 

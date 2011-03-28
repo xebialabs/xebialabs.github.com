@@ -30,16 +30,16 @@ The Tomcat plugin supports the following versions of Tomcat:
 
 The Tomcat Plugin supports the following features:
 
-Concept                                   Remarks
---------                                  --------
-WAR files                                 Deploy and undeploy WAR archives to Tomcat.
-Context files                             Deploy and undeploy folders containing context files.
-ActiveMQ connection factory               Deploy and undeploy ActiveMQ connection factories.
-Datasources                               Deploy and undeploy datasources to Tomcat.
-JNDI Resources                            Deploy and undeploy resources in the Tomcat JNDI tree.
-Libraries                                 Deploy and undeploy Java libraries to Tomcat.
-Tomcat Managed Server                     Deploy and undeploy to Tomcat servers using the Tomcat manager app.
-Tomcat Unmanaged Server                   Deploy and undeploy to Tomcat servers without the Tomcat manager app.
+Concept                                 | Remarks
+--------                                | --------
+WAR files                               | Deploy and undeploy WAR archives to Tomcat.
+Context files                           | Deploy and undeploy folders containing context files.
+ActiveMQ connection factory             | Deploy and undeploy ActiveMQ connection factories.
+Datasources                             | Deploy and undeploy datasources to Tomcat.
+JNDI Resources                          | Deploy and undeploy resources in the Tomcat JNDI tree.
+Libraries                               | Deploy and undeploy Java libraries to Tomcat.
+Tomcat Managed Server                   | Deploy and undeploy to Tomcat servers using the Tomcat manager app.
+Tomcat Unmanaged Server                 | Deploy and undeploy to Tomcat servers without the Tomcat manager app.
 
 # Tomcat Runbook #
 

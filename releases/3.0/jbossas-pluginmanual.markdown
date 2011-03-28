@@ -44,17 +44,17 @@ The JBoss AS plugin supports the following versions of JBoss AS:
 
 The JBoss AS Plugin supports the following features:
 
-Concept                                   Remarks
---------                                  --------
-WAR files                                 Deploy and undeploy WAR archives.
-EAR files                                 Deploy and undeploy EAR archives.
-Topics / Queues                           Deploy and undeploy topics and queues.
-Datasources                               Deploy and undeploy datasources.
-Libraries                                 Deploy and undeploy Java libraries.
-Folders                                   Deploy and undeploy folders.
-Configuration files                       Deploy and undeploy configuration files.
-SQL files                                 Deploy and undeploy SQL files.
-SQL folders                               Deploy and undeploy folders containing SQL files.
+Concept                                 | Remarks
+--------                                | --------
+WAR files                               | Deploy and undeploy WAR archives.
+EAR files                               | Deploy and undeploy EAR archives.
+Topics / Queues                         | Deploy and undeploy topics and queues.
+Datasources                             | Deploy and undeploy datasources.
+Libraries                               | Deploy and undeploy Java libraries.
+Folders                                 | Deploy and undeploy folders.
+Configuration files                     | Deploy and undeploy configuration files.
+SQL files                               | Deploy and undeploy SQL files.
+SQL folders                             | Deploy and undeploy folders containing SQL files.
 
 # Known Limitations #
 

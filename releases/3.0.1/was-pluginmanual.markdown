@@ -34,19 +34,19 @@ The WAS plugin supports the following versions of WAS Network Deployment and Sta
 
 The WAS Plugin supports the following features:
 
-Concept                                   Remarks
---------                                  --------
-EAR files                                 Deploy and undeploy EAR archives to WAS with support for resource references, security role user groups, jndi namespace bindings and virtual hosts.
-WAR files                                 Deploy and undeploy WAR archives to WAS with support for resource references, security role user groups, jndi namespace bindings and virtual hosts.
-EJB-Jar files                             Deploy and undeploy EJB-Jar archives to WAS with support for resource references, security role user groups and jndi namespace bindings.
-Cluster                                   Create, Modify, Destroy and start/stop Clusters.
-DataSource                                Create, Modify, Destroy Oracle and DB2 DataSources.
-Was(Un)ManagedApacheHttpdServer           Create, Modify and Destroy WebServers, also allows exposing web applications (via mapping) through web servers.
-WasSharedLibrary                          Create, Modif and Destroy shared libraries.
-WasWmqQueueConnectionFactory              Create, Modif and Destroy WebSphere MQ Queue Connection Factories.
-WasWmqTopicConnectionFactory              Create, Modif and Destroy WebSphere MQ Topic Connection Factories.
-WasWmqQueue                               Create, Modif and Destroy WebSphere MQ Queue Connection Factories.
-WasWmqTopic                               Create, Modif and Destroy WebSphere MQ Topic Connection Factories.
+Concept                            |      Remarks
+--------                           |      --------
+EAR files                          |      Deploy and undeploy EAR archives to WAS with support for resource references, security role user groups, jndi namespace bindings and virtual hosts.
+WAR files                          |      Deploy and undeploy WAR archives to WAS with support for resource references, security role user groups, jndi namespace bindings and virtual hosts.
+EJB-Jar files                      |      Deploy and undeploy EJB-Jar archives to WAS with support for resource references, security role user groups and jndi namespace bindings.
+Cluster                            |      Create, Modify, Destroy and start/stop Clusters.
+DataSource                         |      Create, Modify, Destroy Oracle and DB2 DataSources.
+Was(Un)ManagedApacheHttpdServer    |      Create, Modify and Destroy WebServers, also allows exposing web applications (via mapping) through web servers.
+WasSharedLibrary                   |      Create, Modif and Destroy shared libraries.
+WasWmqQueueConnectionFactory       |      Create, Modif and Destroy WebSphere MQ Queue Connection Factories.
+WasWmqTopicConnectionFactory       |      Create, Modif and Destroy WebSphere MQ Topic Connection Factories.
+WasWmqQueue                        |      Create, Modif and Destroy WebSphere MQ Queue Connection Factories.
+WasWmqTopic                        |      Create, Modif and Destroy WebSphere MQ Topic Connection Factories.
 
 # WAS Runbook #
 

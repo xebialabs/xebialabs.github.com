@@ -516,7 +516,17 @@ First, extract the Jackrabbit configuration file and copy it to the `conf` direc
 	cd $DEPLOYIT_HOME/conf
 	jar xvf ../bin/deployit-3.0-server.jar jackrabbit-repository.xml
 
-Edit the Jackrabbit configuration file and change each `PersistenceManager` to the following:
+Inside the Jackrabbit configuration file, there are two XML fragments specifying the `PersistenceManager`. Both need to be modified, but there is a slight difference. The first occurrence, in the `Workspace` section, is a template and contains the line:
+
+	<param name="schemaObjectPrefix" value="${wsp.name}_" /> 
+	
+Note the variable `${wsp.name}` here.
+
+The second occurrence, in the `Versioning` section, looks exactly like the previous one, except it does not have this variable. Here, the line should be:
+
+	<param name="schemaObjectPrefix" value="version_" /> 
+
+The examples below all contain the `Workspace` version of the configuration.
 
 **[MySQL](http://www.mysql.com/) [^3].**
 
@@ -528,6 +538,7 @@ Edit the Jackrabbit configuration file and change each `PersistenceManager` to t
 	</PersistenceManager>
 
 **[DB2](http://www-01.ibm.com/software/data/db2/)**
+
 	 <PersistenceManager class="org.apache.jackrabbit.core.persistence.pool.BundleDbPersistenceManager">
         <param name="driver" value="com.ibm.db2.jcc.DB2Driver"/>
         <param name="url" value="jdbc:db2://localhost:50002/deployit" /> 
@@ -538,6 +549,7 @@ Edit the Jackrabbit configuration file and change each `PersistenceManager` to t
      </PersistenceManager>
 
 **[Oracle](http://www.oracle.com/us/products/database/index.html)**
+
 	 <PersistenceManager class="org.apache.jackrabbit.core.persistence.bundle.OraclePersistenceManager">
         <param name="driver" value="oracle.jdbc.driver.OracleDriver"/>
         <param name="url" value="jdbc:oracle:thin:@localhost:1521:orcl"/>

@@ -13,4 +13,5 @@ This site contains Deployit documentation for the following releases:
 
 * [3.0](/releases/3.0)
 * [3.0.1](/releases/3.0.1)
+* [3.0.4](/releases/3.0.4)
 

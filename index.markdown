@@ -7,6 +7,10 @@ title: Deployit product documentation by XebiaLabs
 
 Welcome to the Deployit product documentation.
 
+# FAQ #
+
+Frequently asked questions about Deployit can be found [here](faq).
+
 # Releases #
 
 This site contains Deployit documentation for the following releases:

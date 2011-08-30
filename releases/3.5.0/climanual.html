@@ -1,0 +1,272 @@
+<html><head><LINK REL=StyleSheet HREF="css/deployit.css" TYPE="text/css" MEDIA=screen>
+<LINK REL=StyleSheet HREF="css/ci-reference-api.css" TYPE="text/css" MEDIA=screen>
+<script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="js/jquery.tableofcontents.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+    document.body.id = "top-toc";
+    var title = $("<div class='manual-title'/>")
+    title.html("<div class='title'>Command Line Interface Manual</div><div class='version'>Version <span class='version-number'>3.5.0</span></div>");
+    $("body").css('width', '100%');
+    $("body").prepend(title);
+    $("body").prepend($("<ol id='toc'/>"));
+    $("#toc").tableOfContents("body", { topLinks: true, } );
+});
+
+</script>
+<title>Command Line Interface Manual</title>
+</head><body><h1>Preface</h1><p>Sometimes the need arises to interact <em>Deployit</em> programmatically. Discovering your middleware topology, setting up environments, importing packages and performing deployments are just some examples of parts of your deployment life-cycle that you may want to control or execute programmatically. </p><p>Just to make it possible for users to use <em>Deployit</em>'s powerful capabilities in a programmatic way, <em>Deployit</em> ships with a rich <em>Command Line Interface</em> (CLI) that makes it possible to control and administer most of its features. The aim of this manual is to describe and teach how to use the CLI.</p><p>The CLI has been designed to allow it to be programmed by using the standard <a href="http://www.python.org/"><em>Python</em></a> programming language. This language has been specifically chosen as the default because most system administrators and developers are familiar with it. In the Appendix to this manual, all objects available for scripting are listed including an overview of the methods that can be invoked on them. Throughout this manual, examples will also show how to use the objects to perform various tasks when using the CLI.</p><p>The <em>Deployit</em> Reference Manual contains background information on <em>Deployit</em>, an overview of its features and a short explanation of basic deployment concepts. Together with this manual, it will present you with enough information to enable you to use the CLI to its full potential.</p><h1>Using the CLI</h1><p>The CLI connects to the <em>Deployit</em> server using the standardized HTTP / HTTPS protocol. This makes it possible to easily use the CLI remotely without hindrance from, e.g., firewalls.</p><p>To start the CLI successfully, the <em>Deployit</em> server to connect to must be running. See the <em>Deployit System Administrator Manual</em> for more information on how to startup the <em>Deployit</em> server.</p><h2>Environment variables</h2><p>After installing the <em>Deployit</em> CLI, set an environment variable named <code>DEPLOYIT_CLI_HOME</code> which points to the root directory where the CLI has been installed. In the remainder of this manual, the <code>DEPLOYIT_CLI_HOME</code> environment variable will be assumed to be set and to refer to the <em>Deployit</em> CLI installation directory.</p><p>A second environment variable, named <code>DEPLOYIT_CLI_OPTS</code> can be set in the startup <code>cli.cmd</code> or <code>cli.sh</code> script. This variable allows to override default JVM options and to set, for example, memory parameters. To set the initial Java heap size to 512 megabytes of memory, and the maximum Java heap size to 2 gigabytes of memory, the environment variable would be set like:</p>
+<ul>
+  <li><p><em>Unix</em> like platforms : <code>export DEPLOYIT_CLI_OPTIONS=&quot;-Xms512m -Xmx2g&quot;</code></p></li>
+  <li><p><em>Windows</em> platforms : <code>set DEPLOYIT_CLI_OPTIONS=&quot;-Xms512m -Xmx2g&quot;</code> </p></li>
+</ul><p>Suggested options for the CLI are:</p>
+<ul>
+  <li>Minimum heap size 256 megabytes (<code>-Xms256m</code>)</li>
+  <li>Minimum permgen space 256 megabytes (<code>-XX:MaxPermSize=256m</code>)</li>
+</ul><h2>Starting the CLI</h2><p>To access the CLI, open a terminal window or command shell and change to the <code>DEPLOYIT_CLI_HOME/cli/bin</code> directory.</p><p>Once a terminal window or command shell has been opened and the directory changed to where the <em>Deployit</em> binaries are, the CLI may be started by entering the command <code>./cli.sh</code> on <em>Unix</em> like platforms, or <code>./cli.cmd</code> on <em>Windows</em> platforms.</p><p>When the CLI starts, it will prompt the user for a <code>username</code> and <code>password</code> combination and once these have been entered, it will attempt to connect to the <em>Deployit</em> server on <code>localhost</code> running on <em>Deployit</em>'s standard port of <code>4516</code>.</p><p>Once connected to the <em>Deployit</em> server, it will be possible to execute commands, within the limits of the granted permissions; see later section on security.</p><h2>Starting up with different settings</h2><p>By starting the CLI with the <code>-h</code> flag, the following message is shown which lists all possible options that may be used when starting up the CLI. Whenever <code>./cli.sh</code> is mentioned, it's understood to be read as <code>./cli.cmd</code> on <em>Windows</em> platforms:</p>
+<pre><code>    ./cli.sh [options] [[--] arguments]
+
+    options:
+
+        -configuration VAL : Specify the location of the configuration file
+        -context VAL       : The context Deployit is running at
+        -f (-source) VAL   : Execute a specified python source file
+        -host VAL          : Connect to a specified host, defaults to 127.0.0.1
+        -port N            : Connect to a specified port, defaults to 4516
+        -secure            : Use https to connect to the Deployit server
+        -username VAL      : Connect as the specified user
+        -password VAL      : Connect with the specified password
+</code></pre><p>Following is a short explanation on how to use the available options:</p>
+<ul>
+  <li><p><code>-configuration /path/to/config/file</code></p><p>This option is used to pass the location of the <em>Deployit</em> configuration file. The default location for the configuration file is <code>conf/deployit.conf</code> in the <em>Deployit</em> installation directory.</p></li>
+  <li><p><code>-context /url/path/part/you/want</code></p><p>If connecting to the <em>Deployit</em> server is hindered because of intermediate proxy servers, URL rewrite rules, etc., it's possible by use of this option to change the base part of <em>Deployit</em>'s URL. So instead of <code>/deployit/rest/of/the/url</code>, the URL will<br/>become <code>/url/path/part/you/want/rest/of/the/url</code>.</p></li>
+  <li><p><code>-f /path/to/Python/script</code></p><p>Starts the CLI in batch mode and instruct it to execute the script in the specified file. Once the script completes, the CLI will terminate.</p></li>
+  <li><p><code>-source /path/to/Python/script</code></p><p>Alternative for the <code>-f</code> option.</p></li>
+  <li><p><code>-host myhost.domain.com</code></p><p>Specifies the host where the <em>Deployit</em> server is running to connect to. The default host is <code>127.0.0.1</code>, i.e. <code>localhost</code>.</p></li>
+  <li><p><code>-port 1234</code></p><p>Specifies the port at which to connect to the <em>Deployit</em> server. If the port is not specified, it will default to <em>Deployit</em>'s default port <code>4516</code>.</p></li>
+  <li><p><code>-secure</code></p><p>This will make the CLI try to connect to the <em>Deployit</em> server on the secure port 4517. In order to be able to connect, the <em>Deployit</em> server must have been started using this secured port, which is the default. It is possible to startup using a different port using the <code>-port</code> option. Of course the <em>Deployit</em> server should also have started up using this port instead of the default one for a secure connection.</p></li>
+  <li><p><code>-username myusername</code></p><p>Specifies the username to be used for login. If the username is not specified, the CLI will enter interactive mode and prompt the user.</p></li>
+  <li><p><code>-password mypassword</code></p><p>Specifies the password to be used for login. If the password is not specified, the CLI will enter interactive mode and prompt the user.</p></li>
+</ul><p>One example of using options might be:</p>
+<pre><code>    ./cli.sh -username User -password UserPassword -context /deployit-proxy/deployit
+</code></pre><p>This will log the user with username 'User' and password 'UserPassword' in on the CLI when connecting to the <em>Deployit</em> server running on the local machine ('localhost') and listening on port <code>4516</code>.</p><h3>Passing arguments to CLI commands or script</h3><p>As can be seen from the message shown in the previous section, next to options it's also possible to pass arguments from the command line to the CLI while starting up the CLI. It's not mandatory to specify any options in order to pass arguments. Following examples demonstrate two ways of passing arguments, one without options:</p>
+<pre><code>    ./cli.sh these are four arguments
+</code></pre><p>and one with options:</p>
+<pre><code>    ./cli.sh -username User -port 8443 -secure again with four arguments
+</code></pre><p>It is possible to begin an argument with the character &#39;<code>-</code>&#39;. In order for the CLI not to try to interpret it as an option instead of an argument, use the &#39;<code>--</code>&#39; seperator between the option list and the argument list:</p>
+<pre><code>    ./cli.sh -username User -- -some-argument there are six arguments -one
+</code></pre><p>This seperator only needs to be used in case one or more of the arguments begin with &#39;<code>-</code>&#39;.</p><p>The arguments may now be used in commands given on the CLI or be used in a script passed with the <code>-f</code> option, by using the <code>sys.argv[index]</code> method, whereby the index runs from 0 to the number of arguments, with the first argument having index 1, the second argument index 2, and so forth. Given the command line in the first example presented above, the commands</p>
+<pre><code>    import sys
+    print sys.argv[1] + &quot; &quot; + sys.argv[2] + &quot; &quot; + sys.argv[4]
+</code></pre><p>would yield as a result:</p>
+<pre><code>    these are arguments
+</code></pre><h2>Logging in and Logging out</h2><p>Once the CLI has obtained the username and password of the user that wants to login, either by using the command line options or interactively, it will attempt to connect to the <em>Deployit</em> server at the specified (or default) address and port. If a successful connection can not be established, a stacktrace will be printed and the CLI will terminate.</p><p>If a successful connection with the <em>Deployit</em> server is established, a welcome message will be printed and the CLI is ready to accept commands.</p><h2>CLI extensions</h2><p>It is possible to install CLI extensions - 'extensions' for short - which are loaded during CLI startup. Extensions are nothing more but <em>Python</em> scripts, for example with <em>Python</em> class definitions, that will be available after CLI startup to be used in commands or scripts. This feature may be nicely combined with arguments given on the command line when starting up the CLI.</p><p>To install CLI extensions follow these steps:</p>
+<ol>
+  <li><strong>Create a directory called <code>ext</code></strong><br/>This directory should be created in the same directory from which you will start the CLI - during startup the current directory will be searched for the existence of the <code>ext</code> directory.</li>
+  <li><strong>Copy Python scripts into the <code>ext</code> directory</strong></li>
+  <li><strong>(Re)Start the CLI</strong><br/>During startup, the CLI will search for, load and execute all scripts with the <code>py</code> or <code>cli</code> suffix found in the extension directory.</li>
+</ol><p>Please note that the order in which loading and execution of scripts that are present in the extension directory will take place, is not guaranteed! </p><h1>Objects available on the CLI</h1><p>This chapter describes the various objects available on the CLI for scripting. At present there are five objects available, to wit: <code>deployit</code>, <code>deployment</code>, <code>repository</code>, <code>factory</code> and <code>security</code>.</p><p>Next to the four available objects, it's also possible to define custom helper objects. A brief description of these four objects and how to define custom helper objects will be given in the next sections. The next chapters will present examples on how to use these objects for scripting purposes.</p><h2>The deployit object</h2><p>The <code>deployit</code> object provides access to the main functions of <em>Deployit</em> itself. It allows the user to work with deployments like generate deployeds, prepare and execute deployments, work with tasks - stopping, starting, canceling or aborting tasks - and some other miscellaneous functionality.</p><h2>The deployment object</h2><p>The <code>deployment</code> object provides access to the deployment engine of <em>Deployit</em>. Using this object it is possible to create a task for an initial or upgrade deployment. It's also possible to generate a task for just a single deployment. The task thus created can be executed by using the <code>deployit</code> object and hence actually executing the deployment itself.</p><h2>The repository object</h2><p>The <code>repository</code> object allows the user to access <em>Deployit</em>'s repository. This includes searching the repository and performing Create, Read, Update and Delete (CRUD) operations on Configuration Items (CI) in the repository. It's also possible to export the complete task overview , or just the ones within a specified date range, to a local XML file.</p><h2>The factory object</h2><p>The <code>factory</code> object facilitates the creation of new Configuration Items (CI) and artifacts. These will be saved in <em>Deployit</em>'s repository. Artifacts are all sorts of files and packages. </p><h2>The security object</h2><p>The <code>security</code> object facilitates the login or logout of <em>Deployit</em> and the creation or deletion of users in <em>Deployit</em>'s own repository. Users of <em>Deployit</em> may also be administered using another credentials store like a LDAP directory, but creation and deletion of users on these specific stores is not within <em>Deployit</em>'s scope. </p><p>Users with administrative permissions my also grant, deny or revoke security permissions to other users, even those users that are not administered in <em>Deployit</em>'s repository but in some other credentials store. By default, users with administrative permissions own <strong>all</strong> permissions available in <em>Deployit</em>.</p><h2>Help with CLI objects when logged in</h2><p>As stated in the previous section, a welcome message is shown once the user has been successfully logged in. This message looks like: </p>
+<pre><code>    Welcome to the Deployit Jython CLI!
+    Type &#39;help&#39; to learn about the objects you can use to interact with Deployit.
+
+    Deployit Objects available on the CLI
+
+    deployit: The main gateway to interfacing with Deployit.
+    deployment: Access to the deployment engine of Deployit.
+    factory: Helper that can construct Configuration Items (CI) and artifacts.
+    repository: Gateway to doing CRUD operations on all types of CIs.               
+    security: Access to the security settings of Deployit.
+
+    To know more about a specific object, type &lt;objectname&gt;.help()
+    To get to know more about a specific method of an object, type &lt;objectname&gt;.help(&quot;&lt;methodname&gt;&quot;)
+</code></pre><p>To have this message shown again, just type <code>help</code> on the CLI command prompt, followed by <code>&lt;enter&gt;</code>.</p><p>Looking at the last paragraph of this message, one can see that it is easy to obtain information about a specific object by, for example, issuing the command:</p>
+<pre><code>    security.help()
+</code></pre><p>This will list all methods on the specific object like <code>security</code> available for scripting. Extensive help about the exact usage of a specific method can be obtained by issuing a command like:</p>
+<pre><code>    security.help(&#39;getPermissions&#39;)
+</code></pre><p>on the object in question. Notice that the name of the method is given enclosed in quote marks and without parentheses.</p><p>Also, the Appendix of this manual lists all objects available on the CLI for scripting as well as a description of the methods available on those objects with their required parameters.</p><h1>Setting up Security</h1><p>After a fresh installation of <em>Deployit</em> no permissions are granted to any user. The only users that have any permissions granted to them, are the <code>administrator</code> users and they will, by default, have <strong>all</strong> permissions granted to them. Currently, <em>Deployit</em> ships with one predefined administrator user called <code>admin</code>, with default password <code>admin</code>.</p><p>So the first task an <code>admin</code> user should do, is change the default password to something hard to guess and keep this password private. The next tasks should consist of adding users to <em>Deployit</em>'s repository - if no other credentials store is in use, or possibly in addition to another credentials store that will be used - and granting permissions to users that will work with <em>Deployit</em>, starting with the (global) permission to login. </p><h2>Adding users to the repository</h2><p>In a typical medium to large size company, there are several different groups of people that perform tasks related to deployments. For example, there are administrators that install, test and maintain hardware and there are deployers that deploy applications to development, test, acceptance as well as production environments. And obviously there are developers who build the applications waiting to be deployed to their respective target environments.</p><p>In order to create a new user, the following command must be issued while logged in as the <code>admin</code> user:</p>
+<pre><code>    security.create(&#39;username&#39;, &#39;userPassword&#39;)
+</code></pre><p>To create a user with username 'John' and password 'Doe', this command would become:</p>
+<pre><code>    security.create(&#39;John&#39;, &#39;Doe&#39;)
+</code></pre><p>Users created this way will however only end up in <em>Deployit</em>'s own repository. In order to create users in, for example, a LDAP credentials store, use your favorite LDAP administration tool.</p><p>The concept of groups is also supported by <em>Deployit</em> when using LDAP as the credentials store. All groups defined in LDAP can be assigned permissions in <em>Deployit</em> and users belonging to these groups will be assigned the group permissions when they use the system.</p><h2>Granting, revoking and denying permissions to users</h2><p>Permissions in the <em>Deployit</em> security system are either global or local. Global permissions that are granted to the user are in effect for <strong>all</strong> Configuration Items (CI) in the repository, meaning the permission is granted on <strong>all</strong> Configuration Items (CI), even the CI's that will be created after the permission has been granted. On the other hand, local permissions are set on specific CI's in the repository and need not be automatically in effect for newly created CI's. </p><p>Setting global and/or local permissions will result in a so-called <code>Access Control Entry</code> (ACE) being added to the user's <code>Access Control List</code> (ACL). Permissions set on CI's are <strong>transitive</strong>, meaning that a permission set on a CI will also be in effect on all of its children, their children and so forth, unless explicitly denied.</p><p>A permission can be either granted, denied or revoked:</p>
+<ul>
+  <li><code>granted</code><br/> a user will be explicitly allowed to execute a specific task</li>
+  <li><code>denied</code><br/> a user will be explicitly denied to execute a specific task</li>
+  <li><code>revoked</code><br/> a user's previously <code>granted</code> permission will be revoked, whereby the user is no longer allowed to execute this  specific task, but it will not be explicitly denied.</li>
+</ul><h3>Permissions available in the security system</h3><p>Following is a list of all permissions available in <em>Deployit</em>'s security system. Some permissions are termed <code>global</code>, meaning that they are in effect on <strong>all</strong> CI's. Permissions not specifically termed <code>global</code> can be either allowed on all CI's, by not specifying any CI's on which the permission should be in effect, or an a set of CI's - and their children! - by specifying a list of the specific CI's the permission should be in effect upon. </p><p>Permissions available in the <em>Deployit</em> security system are:</p>
+<ul>
+  <li><code>login</code><br/> This global permission allows a user to login to <em>Deployit</em>. Without this permission a user will not be able to  work with <em>Deployit</em>.</li>
+  <li><code>read</code><br/> This permission is needed to read a CI, or any of its children, from the repository.</li>
+  <li><code>repo#edit</code><br/> This permission allows a user to edit CI's in the repository.</li>
+  <li><code>discovery</code><br/> This global permission allows a user to be able to do discovery of infrastructure topology. Although it is termed as being global, it is  actually only in effect on the CI's under the <code>Infrastructure</code> node because only infrastructure can be discovered.</li>
+  <li><code>import#initial</code><br/> This permission allows a user to import a package that is not already in <em>Deployit</em>'s repository.</li>
+  <li><code>import#upgrade</code><br/> This permission allows a user to import a package that already exists in <em>Deployit</em>'s repository and effectively upgrades it to a newer version.</li>
+  <li><code>deploy#initial</code><br/> This permission allows a user to perform a deployment from a package to an environment for the first time, thereby allowing to specify what  specific package to deploy to what environment.</li>
+  <li><code>deploy#upgrade</code><br/> This permission allows a user to perform a deployment from a package to an environment that has already been performed before, thereby  effectively upgrading the previous deployment. Note that no deployment of a package, application or resource is allowed to a member of an  environment that has not been specified in the initial deployment, or a different environment altogether. Also, no other package may be specified.</li>
+  <li><code>deploy#undeploy</code><br/> This permission allows a user to undo a previously performed deployment.</li>
+  <li><code>task#move_step</code><br/> This global permission allows a user to move a step present in the sequence of steps to another position in this sequence before the execution of the deployment  process, being either initial, upgrade or undeploy, thereby effectively changing the order in which the steps comprising the deployment process are executed.</li>
+  <li><code>task#skip_step</code><br/> This global permission allows a user to skip a step during the deployment process, being either initial, upgrade or undeploy, thereby offering the  possibility of not executing specific actions that would otherwise be executed as being comprised in the deployment process.</li>
+</ul><h2>Managing Users</h2><p>Sometimes it proofs necessary to change a user's password, to delete a user or to login as a different user in order to perform a specific task with a different set of permissions. An example of this latter case might be the user <code>admin</code> that normally would work using another username with less permissions to perform regular deployment tasks, but needs to switch to <code>admin</code> in order to, for example, create a new user.</p><p>And sometimes it proofs useful - in case of troubleshooting for instance - to just be able to see what permissions exactly have been granted to what user on which CI's.</p><h3>Changing a user's password</h3><p>If for some reason a user's password gets compromised or the user has forgotten it, it will be possibly to set a new password for the user. Note that it will not be possibly to retrieve the user's password since <em>Deployit</em> does not store it as plain text. When requesting and viewing a user CI, passwords will always be shown as eight asterisks (*).</p><p>In order to change the password for user <code>developer</code>, issue following command:</p>
+<pre><code>    devUser = security.readUser(&#39;developer&#39;)
+    devUser.password = &#39;newpassword_1&#39;
+    security.modifyUser(devUser)
+</code></pre><p>Please note the difference between the name of the user in the first command, <code>developer</code>, and the object representing this user that was returned after executing the first command; this <code>user</code> object need also be used in the next two commands following the first one.</p><h3>Login as a different user</h3><p>It is possible to login as a different user once the CLI has started up. In order to log in as another user, you must first logout the user that is currently logged in. This will show the <code>deployit&gt;</code> prompt from which it is then possible to login again as a different user.</p><p>In following example an administrator is logged in as user <code>senior-deployer</code> and needs to login as <code>admin</code> to delete user <code>ex-developer</code>.</p>
+<pre><code>    security.logout()
+    security.login(&#39;admin&#39;, &#39;admin&#39;)
+
+    # Delete the user ex-developer
+    security.deleteUser(&#39;ex-developer&#39;)
+
+    #switch back to the account with less privileges
+    security.logout()
+    security.login(&#39;senior-deployer&#39;, &#39;password_2&#39;)
+</code></pre><h3>Retrieving and listing user permissions</h3><p>In some cases, for instance trouble shooting, it's necessary to get an overview of the permissions granted to a specific user. A user logged in to <em>Deployit</em>'s CLI may also want to retrieve and list the granted or denied permissions. Deployit's CLI comes with some auxiliary methods on it's <em>security</em> object to retrieve and list granted or denied permissions.</p><p>To retrieve and show ones own permissions, assuming user 'deployer' is logged in, issue <code>security.getPermissions()</code> or, alternatively, <code>print security.getPermissions(&#39;deployer&#39;)</code></p><p>The latter form of the command will normally only be issued by an administrator user. This is because there exists a slight difference between both commands. The first command will just simple list all permissions of the user currently logged in on standard output. The second command will return a <code>PrincipalPermissions</code> object (see the appendix for a complete description of this object) on which the <code>getPermissions(&#39;deployer&#39;)</code> method is executed. Without the <code>print</code> statement, nothing would have shown up on standard output, because the method has a <code>PrincipalPermissions</code> object as its return value. In combination with the print statement, as shown in the above command, the object will print its string representation which, for this object, is a list of granted permissions and the CIs on which these have been granted.</p><p>The <code>PrincipalPermissions</code> object makes it possible to retrieve and inspect user permissions, to find out if a given user has any permissions at all or has a specific permission and on what CIs. This will, for example, allow an administrator to automate granting and/or revoking of permissions by use of a script, depending on the retrieved permissions and their state or CIs.</p><p>Take note that only an administrator user, i.e. <code>admin</code>, is allowed to retrieve permissions for another user and to grant, deny or revoke permissions. Normally it is only possible to retrieve and list ones own permissions. Trying to grant permissions using the second form of the command while not being logged in as user <code>admin</code>, will lead to an exception. </p><p>A somewhat more extensive example of using this object, to be executed as <code>admin</code>, is listed in following snippet:</p>
+<pre><code>    permissions = security.getPermissions(&#39;deployer&#39;)
+    if not permissions.hasPermission(&#39;login&#39;):
+        security.grant(&#39;login&#39;, &#39;deployer&#39;)
+
+    if permissions.hasPermission(&#39;repo#edit&#39;, &#39;Applications/PetClinic/1.0&#39;):
+        security.revoke(&#39;repo#edit&#39;, &#39;deployer&#39; [&#39;Applications/PetClinic/1.0&#39;])
+</code></pre><h2>Example setting up initial security</h2><p>In a hypothetical company following users will work with <em>Deployit</em>:</p>
+<ul>
+  <li><strong>administrator</strong><br/> This user will have the overall authority to administer deployments in <em>Deployit</em>. He will have permissions to create, update and delete  infrastructure as well as permissions to create, update and delete environments. Beware not to confuse this user with the  <code>admin</code> user, i.e. a user that has administrative privileges over the whole of <em>Deployit</em>.</li>
+  <li><strong>senior-deployer</strong><br/> A user with permission to import new applications and to perform deployments to the development (<code>DEV</code>), test (<code>TEST</code>) and production (<code>PROD</code>)  environments.</li>
+  <li><strong>deployer</strong><br/> A user with the permission to import new applications, deploy applications to the <code>DEV</code> and <code>TEST</code> environments and to view  the <code>PROD</code> environment.</li>
+  <li><strong>developer</strong><br/> A user with permission to import new versions of existing applications and to upgrade existing deployments.</li>
+</ul><p>The first task for a user with administrator privileges, <em>Deployit</em> ships with a predefined <code>admin</code> user, will be to create the users in <em>Deployit</em> and allowing them to be able to login, executing the following code (the passwords in the examples are chosen for clarity. When creating users it's advisable to choose strong and difficult to guess passwords):</p>
+<pre><code>    #
+    # Sample security setup.
+    #
+    security.createUser(&#39;administrator&#39;, &#39;password_1&#39;)
+    security.createUser(&#39;senior-deployer&#39;, &#39;password_2&#39;)
+    security.createUser(&#39;deployer&#39;, &#39;password_3&#39;)
+    security.createUser(&#39;developer&#39;, &#39;password_4&#39;)
+
+    security.grant(&#39;login&#39;, &#39;administrator&#39;)
+    security.grant(&#39;login&#39;, &#39;senior-deployer&#39;)
+    security.grant(&#39;login&#39;, &#39;deployer&#39;)
+    security.grant(&#39;login&#39;, &#39;developer&#39;)
+</code></pre><p>Since the <code>login</code> permission is a global permission, there's no need to specify a list of CI's it will be in effect upon.</p><p>Next is to grant the individual users their needed aggregated permissions in order for them to perform their tasks. The following snippet of code is a continuation of the above snippet; together with the snippets to come, it will constitute the complete script for this example.</p><p>The first user we will grant permissions to, is user <code>administrator</code>. At minimum he needs <code>read</code> permission on the <code>Infrastructure</code> and <code>Environments</code> root nodes defined in <em>Deployit</em> and <code>repo#edit</code> permission in order to perform any creation, deletion and updating of CI's under these root nodes.</p>
+<pre><code>    security.grant(&#39;read&#39;, &#39;administrator&#39;,[&#39;Infrastructure&#39;, &#39;Environments&#39;])
+    security.grant(&#39;repo#edit&#39;, &#39;administrator&#39;)
+</code></pre><p>Notice the use of a list of target CI's in the first command. The permissions will only be set on these two specified CI's - which happen to be the root nodes for <code>Infrastructure</code> and <code>Environments</code> in this case. If for instance there would exist a user that had limited administrator privileges, it would be possible to just grant this user rights to specific environments by using the command:</p>
+<pre><code>    security.grant(&#39;repo#edit&#39;, &#39;partial-administrator&#39;, [&#39;Environments/PROD&#39;]) 
+</code></pre><p>Going back to the example, the senior-deployer needs the permissions to import and deploy applications to the <code>DEV</code>, <code>TEST</code> and <code>PROD</code> environments. Therefore, the permissions can be set "globally" and need not be set on specific CI's:</p>
+<pre><code>    security.grant(&quot;import#initial&quot;, &#39;senior-deployer&#39;)
+    security.grant(&quot;import#upgrade&quot;, &#39;senior-deployer&#39;)
+    security.grant(&quot;deploy#initial&quot;, &#39;senior-deployer&#39;)
+    security.grant(&quot;deploy#upgrade&quot;, &#39;senior-deployer&#39;)
+</code></pre><p>Setting up permissions for user deployer will be a bit more complicated because of the restrictions imposed. The first set of permissions are similar to those of the user senior-deployer:</p>
+<pre><code>    security.grant(&quot;import#initial&quot;, &#39;deployer&#39;)
+    security.grant(&quot;import#upgrade&quot;, &#39;deployer&#39;)
+    security.grant(&quot;deploy#initial&quot;, &#39;deployer&#39;, [&#39;Environments/DEV&#39;, &#39;Environments/TEST&#39;])
+    security.grant(&quot;deploy#upgrade&quot;, &#39;deployer&#39;, [&#39;Environments/DEV&#39;, &#39;Environments/TEST&#39;])
+</code></pre><p>As can be seen from the commands in the snippet above, deployer does not have permission to perform a deployment to the <code>Environment/PROD</code> environment. In order for the user deployer to see deployments in the <code>PROD</code> environment, <code>read</code> permission should be granted on both the <code>Environment/PROD</code> and the corresponding <code>Infrastructure</code> in this environment.</p>
+<pre><code>    prodEnv = repository.read(&#39;Environments/PROD&#39;)
+    security.grant(&#39;read&#39;, &#39;deployer&#39;, [prodEnv.id] + prodEnv.values[&#39;members&#39;])
+</code></pre><p>Finally permissions need to be granted to user <code>deployer</code>. This user is permitted to import new versions of applications into <em>Deployit</em> and to perform the deployment upgrade that goes hand in hand with this new version.</p>
+<pre><code>    security.grant(&quot;import#upgrade&quot;, &#39;developer&#39;)
+    security.grant(&quot;deploy#upgrade&quot;, &#39;developer&#39;)
+</code></pre><p>In this scenario the user <code>deployer</code> has the ability to import new versions of <strong>all</strong> applications known to <em>Deployit</em>. To restrict his import permission to new versions of some specific applications, like for example the <code>PetClinic</code> application, the following command can be issued:</p>
+<pre><code>    security.grant(&#39;import#upgrade&#39;, &#39;developer&#39;, [&#39;Applications/PetClinic&#39;])
+</code></pre><p>After the commands in the above snippets have been executed, the intial security setup of <em>Deployit</em> will match the intended security setup as described in the beginning of this section.</p><h1>Performing Common Tasks</h1><p>This section describes common tasks that may be performed using the CLI. Its main purpose is to present examples of how to combine commands just to perform the desired tasks.</p><h2>Working with Configuration Items</h2><p>This section shows some examples of how to work with CIs. The two main objects involved are the <code>factory</code> object and the <code>repository</code> object. The <code>factory</code> object is used to actually create the CI itself, while with the <code>repository</code> object it is possible to store the CI in the repository.</p><h3>Finding out types of available CIs and their properties</h3><p>The available CIs and their respective type need to be known before being able to create one. Using the command</p>
+<pre><code>    factory.types()
+</code></pre><p>an overview will be shown on standard output of all the available types that are shipped with <em>Deployit</em>. If at some point more plugins are added to <em>Deployit</em>, types defined therein will be added to <em>Deployit</em>'s type registry and will then also be available in addition to the types initially shipped with <em>Deployit</em>. The new types should also show up in the output of this command.</p><p>In order to obtain some more details of a specific type, for instance its required properties, execute the <code>describe</code> method on the <code>deployit</code> object with the fully qualified type name as its parameter:</p>
+<pre><code>    deployit.describe(&#39;udm.Dictionary&#39;)
+</code></pre><p>The output of this command will show something like:</p>
+<pre><code>    ConfigurationItem &quot;udm.Dictionary&quot; (udm.Dictionary):
+    Description: A Dictionary contains key-value pairs that can be replaced
+
+    Properties
+        * environment(): The environment this dictionary belongs to
+        * dict(MAP_STRING_STRING): The dictionary values
+
+    Properties marked with a &#39;*&#39; are required.
+</code></pre><h3>Discovering middleware Configuration Items</h3><p>It is possible to let <em>Deployit</em> help with setting up your environment by attempting to discover the available middleware in your environment. In order to do this, <em>Deployit</em> will scan your environment for as far as possible and create Configuration Items in its repository based on the configurations it encounters during the scan. This process is knows as <em>discovery</em>.</p><p>The CIs discovered during <em>discovery</em> will help you in setting up your infrastructure in an easy way. However, they need not be complete: some CIs contain properties that can not be automatically discovered, like passwords. These specific kind of properties will still need to be entered manually. </p><p>Because <em>discovery</em> is part of the <em>Deployit</em> plugin suite, the exact discovery functionality available varies depending on the middleware platforms present in your environment.</p><p>The following steps comprehend <em>discovery</em>:</p>
+<pre><code>    1. Create a CI representing the starting point for _discovery_ (often a _Host_ CI).
+    2. Start _discovery_ passing this CI.
+    3. Store the discoverd CIs in the repository.
+    4. Complete the discovered CIs manually by providing missing needed properties.
+    5. Add the discovered CIs to an environment.
+</code></pre><p>Note however that the last step of <em>discovery</em> is optional. The discovered CIs will be stored under the <code>Infrastructure</code> root node in the repository and may be added to an environment at some later time.</p><h4>Create a Configuration Item starting point</h4><p>The first step taken in <em>discovery</em> is to create a starting point to kick off the process from. This starting point consists of a Configuration Item specifying at least the host that <em>discovery</em> should start at. Depending on the middleware you are trying to discover, additional parameters may be needed. </p><p>Following is an example of how to start <em>discovery</em> in case of a <em>Weblogic Application Server</em> (WAS). First a CI is created for the host itself and next a Configuration Item is created for the deployment manager running on that host. The deployment manager CI will be the starting point for <em>discovery</em>.</p>
+<pre><code>    #Create a CI with the required discovery parameters filled in
+    ci = factory.configurationItem(&#39;Host&#39;, {
+            &#39;address&#39;:&#39;was-61&#39;, 
+            &#39;username&#39;:&#39;root&#39;,
+            &#39;password&#39;:&#39;rootpwd&#39;, 
+            &#39;operatingSystemFamily&#39;:&#39;UNIX&#39;, 
+            &#39;accessMethod&#39;:&#39;SSH_SFTP&#39;
+        })
+    wasHost = repository.create(&#39;Infrastructure/rs94asob.k94.corp.com&#39;, ci)
+
+    #Now create a WAS deployment manager
+    dmManager = factory.configurationItem(&#39;WasDeploymentManager&#39;, {
+            &#39;host&#39;:&#39;Infrastructure/rs94asob.k94.corp.com&#39;,
+            &#39;wasHome&#39;:&#39;/opt/ws/6.1/profiles/dmgr&#39;, 
+            &#39;username&#39;:&#39;wsadmin&#39;, 
+            &#39;password&#39;:&#39;wsadmin&#39;
+        })
+    dmManager.id=&#39;c-ws-dev99&#39;             
+</code></pre><h4>Start discovery passing a Configuration Item</h4><p>After the CI starting point has been created, it can be used to perform <em>discovery</em>. The <em>Deployit</em> CLI <em>discovery</em> functionality is synchronous, which means that the CLI will wait until the <em>discovery</em> process finishes.</p><p>The process of <em>discovery</em> works exactly like a regular task in that it executes a number of steps behind the scenes. Whenever one of these steps fails, the entire <em>discovery</em> fails and aborts. It is not possible to continue an interrupted <em>discovery</em> process.</p><p>The command to start discovery is:</p>
+<pre><code>    discoveredObjects = deployit.discover(dmManager)
+</code></pre><p>Note there are no single- or double quotes around <code>dmManager</code>, because it's an object and not a string. The result of this command will be an object containing a list of discovered CIs. These CI objects can be obtained as follows:</p>
+<pre><code>    discoveredCIs = discoveredObjects.objects;
+</code></pre><h4>Store the CIs in the repository</h4><p>Deployit returns a list of discovered middleware CIs. Note that these are not yet persisted. To store them in the repository, use the following code:</p>
+<pre><code>    repository.create(discoveredCIs)
+</code></pre><h4>Complete discovered middleware CIs</h4><p>The easiest way to find out which of the discovered CIs require additional information is by printing them. Any CIs that contain passwords (displayed as '********') will need to be completed. To print the stored CIs, the following code can be used:</p>
+<pre><code>    for ci in discoveredCIs: deployit.print(repository.read(ci.id));
+</code></pre><p>Note: the created CIs can also be edited in the GUI using the Repository Browser.</p><h4>Adding CIs to Environments</h4><p>Middleware that is used as a deployment target must be grouped together in an environment. Environments are CIs and like all CIs, they can be created from the CLI. The following command can be used for this:</p>
+<pre><code>    devEnv = factory.configurationItem(&#39;Environment&#39;) 
+</code></pre><p>Add the discovered CIs to the environment:</p>
+<pre><code>    devEnv.values[&#39;members&#39;] = [ci.id for ci in discoveredCIs]
+</code></pre><p>Note that not all of the discovered CIs should necessarily be stored in an environment. For example, in the case of WAS, some nested CIs may be discovered of which only the top-level one must be stored.</p><p>Store the new environment:</p>
+<pre><code>    devEnv = repository.create(&#39;Environments/Dev&#39;, devEnv)
+</code></pre><p>The newly created environment can now be used as a deployment target.</p><p>Note: the user needs specific permission to store CIs in the database. See the <em>Deployit System Administration Manual</em>.</p><h4>Storing the CIs</h4><p>The <em>repository</em> CLI object makes it possible to store all of the discovered CIs in one go. This is also possible when the discovered CIs reference each other.</p><p>The command to do this is:</p>
+<pre><code>    repository.create(discoveredObjects)
+</code></pre><p>In order to store CIs in the database, the user needs specific permission to be able to do so.</p><h2>Retrieving archived tasks from the repository</h2><p>The <em>repository</em> CLI object has facilities to retrieve an overview of all archived tasks, or a number of tasks within a specified date range.</p><p>The command to export all tasks is:</p>
+<pre><code>    repository.getArchivedTasks()
+</code></pre><p>This command will return an object on which you can interact with tasks and their interned steps. The returned object contains all tasks, and tasks in turn contain all of their steps. For instance, to get the number of tasks retrieved, execute:</p>
+<pre><code>    repository.getArchivedTasks().size()
+</code></pre><p>or, when you've assigned the object to a variable named <code>archivedTasks</code>:</p>
+<pre><code>    archivedTasks.size()
+</code></pre><p>To obtain the first retrieved Task from the object, yield:</p>
+<pre><code>    firstTask = archivedTasks.getTasks().get(0)
+</code></pre><p>The task count starts at 0 to size() exclusive. This call will give you a <code>TaskInfo</code> object on which you may call all normally available methods. To obtain the first step from the acquired task, execute:</p>
+<pre><code>    firstStep = firstTask.getSteps().get(0)
+</code></pre><p>Again, the count of steps starts at 0 to getSteps().size() exclusive. This will give you a <code>StepInfo</code> object on which all regular methods may be called.</p><p>Once you've obtained a <code>TaskInfo</code> or <code>StepInfo</code> object, you can query it for all relevant information, like, for instance in the case of a step, it's state:</p>
+<pre><code>    firstStep.getState()
+</code></pre><p>or it's step number:</p>
+<pre><code>    firstStep.getNr()
+</code></pre><p>Next to all tasks, one may also just export all tasks within a given date range executing the following command:</p>
+<pre><code>    repository.getArchivedTasks(String beginDate, String endDate)
+</code></pre><p>Both date parameters in the method signature should be specified in the following format <strong>mm/dd/yyyy</strong>, with <strong>m</strong> a month digit, <strong>d</strong> a day digit and <strong>y</strong> a year digit. The above method call will return an object that simply wraps the requested tasks, analogous to the getArchivedTasks() method call.</p><h3>Exporting archived tasks from the repository to a local XML file</h3><p>It's also possible to store the contents of the task repository to a local XML file. In order to store the complete task repository to a local XML file, use the following command:</p>
+<pre><code>    repository.exportArchivedTasks(String your-file-path)
+</code></pre><p>The variable <em>your-file-path</em> contains the complete path to the file, e.g.: <code>/tmp/my-xml.xml</code> on Unix/Linux systems or <code>d:/temp/my-xml.xml</code> on Windows systems. The last path may alternatively be typed as <code>d:\\temp\\my-xml.com</code> - notice the escaped backslash in this latter variant.</p><p>Of course it is also possible to export a number of tasks in a certain date range from the task repository to a local XML file using the following command:</p>
+<pre><code>    repository.exportArchivedTasks(String your-file-path, String beginDate, String endDate)
+</code></pre><p>For the format of the parameters used in the method, see above. Some examples of these commands are:</p>
+<pre><code>    repository.getArchivedTasks()
+
+    repository.getArchivedTasks(&quot;01/01/1900&quot;, &quot;12/31/2100&quot;)
+
+    repository.exportArchivedTasks(&quot;/exports/xml/task-repository.xml&quot;)
+
+    repository.exportArchivedTasks(&quot;d:\\exports\\task-repository.xml&quot;, &quot;11/11/2000&quot;, &quot;03/07/2200&quot;)
+</code></pre><h2>Performing deployments</h2><p>From the CLI it is possible to perform deployments. Following will be two examples showing how to do this. Here is an example of how to perform a simple deployment (one where the default mappings suffice):</p><h3>Performing a simple deployment</h3><p>A simple deployment using a package may be performed as follows:</p>
+<pre><code>    # Import package
+    package = deployit.importPackage(&#39;petclinic-1.0.dar&#39;)
+
+    # Load environment TEST
+    environment = repository.read(&#39;Environments/TEST&#39;)
+
+    # Start deployment
+    deploymentRef = deployment.prepareInitial(package.Id, environment.Id)
+    deploymentRef = deployment.generateAllDeployeds(deploymentRef)
+    taskID = deployment.deploy(deploymentRef).taskId
+    deployit.startTaskAndWait(taskID)
+    print &quot;Done.&quot;
+</code></pre><h3>Deploying an Application</h3><p>Importing and deploying a package using the default mappings is easy using the CLI. The following commands perform a simple version of this scenario:</p>
+<pre><code>    importedPackage = deployit.importPackage(&quot;PetClinic-ear/1.0&quot;)
+    server = repository.create(&quot;Infrastructure/dummy1&quot;, factory.configurationItem(&quot;DummyJeeServer&quot;, {&quot;name&quot;: &quot;localhost&quot;}))
+    env = repository.create(&quot;Environments/env1&quot;, factory.configurationItem(&quot;Environment&quot;, {&quot;members&quot;: [server.id]}))
+
+    taskId = deployit.deploy(importedPackage.id, env.id)
+</code></pre><p>Note that the last command returns immediately, returning the <code>taskId</code> of the started task. The Deployit server will perform the deployment asynchronously in the background.</p></body></html>

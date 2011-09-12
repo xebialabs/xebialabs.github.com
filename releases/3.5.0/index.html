@@ -6,7 +6,7 @@
 $(document).ready(function(){
     document.body.id = "top-toc";
     var title = $("<div class='manual-title'/>")
-    title.html("<div class='title'>Start Here</div><div class='version'>Version <span class='version-number'>3.5.0</span></div>");
+    title.html("<div class='title'>Start Here</div><div class='version'>Version <span class='version-number'>3.5.1-SNAPSHOT</span></div>");
     $("body").css('width', '100%');
     $("body").prepend(title);
     $("body").prepend($("<ol id='toc'/>"));
@@ -18,12 +18,17 @@ $(document).ready(function(){
 </head><body><h1>Preface</h1><p>Welcome to the Deployit system documentation. This document describes the content of the Deployit documentation and helps you find the information you need.</p><h1>Documentation Contents</h1><p>The Deployit documentation contains all the information needed to install, configure, setup and use Deployit. The documentation consists of the following documents:</p>
 <ul>
   <li><strong>Start Here</strong>. This is the document you are currently reading.</li>
-  <li><strong>Reference Manual</strong>. This document describes generic deployment concepts and basic information about Deployit.</li>
-  <li><strong>System Administration Manual</strong>. This document describes how to install Deployit and get it ready for first use.</li>
-  <li><strong>Graphical User Interface (GUI) Manual</strong>. This document describes how to use the Deployit GUI.</li>
-  <li><strong>Command Line Interface (CLI) Manual</strong>. This document describes how to use the Deployit CLI.</li>
-  <li><strong>Packaging Manual</strong>. This document describes how to create packages that can be imported into Deployit.</li>
-  <li><strong>Customization Manual</strong>. This document describes how to customize Deployit for use in your environment.</li>
+  <li><strong><a href="referencemanual.html">Reference Manual</a></strong>. This document describes generic deployment concepts and basic information about Deployit.</li>
+  <li><strong><a href="systemadminmanual.html">System Administration Manual</a></strong>. This document describes how to install Deployit and get it ready for first use.</li>
+  <li><strong><a href="guimanual.html">Graphical User Interface (GUI) Manual</a></strong>. This document describes how to use the Deployit GUI.</li>
+  <li><strong><a href="climanual.html">Command Line Interface (CLI) Manual</a></strong>. This document describes how to use the Deployit CLI.</li>
+  <li><strong><a href="packagingmanual.html">Packaging Manual</a></strong>. This document describes how to create packages that can be imported into Deployit.</li>
+  <li><strong><a href="customizationmanual.html">Customization Manual</a></strong>. This document describes how to customize Deployit for use in your environment.</li>
+</ul><p>Deployit comes with several standard plugins, whose documentation is also available:</p>
+<ul>
+  <li><strong><a href="commandPluginManual.html">Command Plugin Manual</a></strong>. This document describes the Command plugin.</li>
+  <li><strong><a href="filePluginManual.html">File Plugin Manual</a></strong>. This document describes the File plugin.</li>
+  <li><strong><a href="genericPluginManual.html">Generic Model Plugin Manual</a></strong>. This document describes the Generic Model plugin.</li>
 </ul><h1>Using the Documentation</h1><p>Every document is written as a standalone document and can be read separately. References to other documents are included when relevant. Depending on your role, some documents are more relevant than others. The following list contains a suggested reading order for specific roles:</p>
 <ul>
   <li><strong>System Administrator</strong>: Reference Manual, System Administration Manual, Command Line Interface (CLI) Manual, Customization Manual.</li>

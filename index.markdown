@@ -11,12 +11,16 @@ Welcome to the Deployit product documentation.
 
 Frequently asked questions about Deployit can be found [here](faq).
 
-# Releases #
-
-This site contains Deployit documentation for the following releases:
+# Deployit release documentation #
 
 * [3.0](/releases/3.0)
 * [3.0.1](/releases/3.0.1)
 * [3.0.4](/releases/3.0.4)
 * [3.0.5-SNAPSHOT](/releases/3.0.5-SNAPSHOT)
 * [3.5.0](/releases/3.5.0)
+
+# Plugin release documentation #
+
+* [WAS plugin 3.5.0](/releases/was-plugin-3.5.0)
+* [WLS plugin 3.5.0](/releases/wls-plugin-3.5.0)
+

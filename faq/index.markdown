@@ -27,6 +27,22 @@ When uploading a package using the CLI, Deployit stores a temporary file on the 
 
 	-Dorg.apache.james.mime4j.defaultStorageProvider=org.apache.james.mime4j.storage.MemoryStorageProvider
 
+### How do I enable additional logging for the Deployit server? ###
+
+Logging is configured in the file _SERVER\_HOME/conf/logback.xml_. To enable debug mode, change the following in the logback file:
+
+	<root level="debug">
+		...
+	</root>
+	
+If this results in too much logging, you can tailor logging for specific packages by adding loglevel definitions for them. For example:
+	
+	<logger name="com.xebialabs" level="info" />
+
+Note that the server needs to be restarted to activate the new log settings.
+
+See the [logback site](http://logback.qos.ch/) for more information.
+
 ## Middleware Server Configuration - Windows ##
 
 ### Do I always need a CIFS connection to my Windows middleware hosts? ###

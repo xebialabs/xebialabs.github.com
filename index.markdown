@@ -18,6 +18,7 @@ Frequently asked questions about Deployit can be found [here](faq).
 * [3.0.4](/releases/3.0.4)
 * [3.0.5-SNAPSHOT](/releases/3.0.5-SNAPSHOT)
 * [3.5.0](/releases/3.5.0)
+* [3.6.0](/releases/3.6.0)
 
 # Plugin release documentation #
 

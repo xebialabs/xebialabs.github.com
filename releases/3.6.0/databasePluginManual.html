@@ -1,0 +1,247 @@
+<html><head><LINK REL=StyleSheet HREF="css/deployit.css" TYPE="text/css" MEDIA=screen>
+<LINK REL=StyleSheet HREF="css/ci-reference-api.css" TYPE="text/css" MEDIA=screen>
+<script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="js/jquery.tableofcontents.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+    document.body.id = "top-toc";
+    var title = $("<div class='manual-title'/>")
+    title.html("<div class='title'>Database Plugin Manual</div><div class='version'>Version <span class='version-number'>3.6.0</span></div>");
+    $("body").css('width', '100%');
+    $("body").prepend(title);
+    $("body").prepend($("<ol id='toc'/>"));
+    $("#toc").tableOfContents("body", { topLinks: true, } );
+});
+
+</script>
+<title>Database Plugin Manual</title>
+</head><body><h1>Preface</h1><p>This document describes the functionality provided by the database plugin.</p><p>See the <strong>Deployit Reference Manual</strong> for background information on Deployit and deployment concepts.</p><h1>Overview</h1><p>The database plugin is a Deployit plugin that supports deployment of SQL files and folders to a database client.</p><h2>Features</h2>
+<ul>
+  <li>Runs on Deployit 3.6 and up.</li>
+  <li>Supports deployment to MySQL, Oracle and DB/2.</li>
+  <li>Deploys and undeploys SQL files and folders.</li>
+</ul><h1>Requirements</h1>
+<ul>
+  <li><p><strong>Deployit requirements</strong></p>
+  <ul>
+    <li><strong>Deployit</strong>: version 3.6+</li>
+    <li><strong>Other Deployit Plugins</strong>: None</li>
+  </ul></li>
+  <li><p><strong>Infrastructural requirements</strong></p>
+  <ul>
+    <li><strong>User credentials</strong> for accessing the database client executables on the host running the database.</li>
+  </ul></li>
+</ul><h1>Plugin Concepts</h1><h2>SQL Scripts</h2><p>The <a href="#sql.SqlScripts">SqlScripts</a> CI encompasses a folder containing SQL scripts that are to be executed on a database. SQL scripts come in two flavors, namely installation scripts and rollback scripts. Installation scripts are used to execute changes on the database, such as creation of a table or inserting data. Each installation script is associated with a rollback script which undoes the actions performed by it's companion installation script. Rollback scripts <strong>must</strong> have the exact same name as the installation script they are associated with and have the moniker <code>-rollback</code> attached to it. Executing an installation script followed by the accompanying rollback script should leave the database in an unchanged state.</p><p>SQL scripts are ordered alphabetically based on their filename. This is an example of ordering of several installation scripts:</p>
+<ul>
+  <li>1-create-user-table.sql</li>
+  <li>1-create-user-table-rollback.sql</li>
+  <li>10-drop-user-index.sql</li>
+  <li>10-drop-user-index-rollback.sql</li>
+  <li>2-insert-user.sql</li>
+  <li>2-insert-user-rollback.sql</li>
+  <li>...</li>
+  <li>9-create-user-index.sql</li>
+  <li>9-create-user-index-rollback.sql</li>
+</ul><p>Note that in this example, the tenth script, <em>10-drop-user-index.sql</em> would be incorrectly executed after the first script, <em>1-create-user-table.sql</em>.</p><p>When upgrading a SqlScripts CI, only those scripts that were not present in the previous package version are executed. For example, if the previous SqlScripts folder contained script1.sql and script2.sql, and the new version of SqlScripts folder contains script2.sql and script3.sql, then only script3.sql will be executed as part of the upgrade. </p><p>When undeploying a SqlScripts CI, all rollback scripts are executed in reverse alphabetical order.</p><h2>SQL Client</h2><p>The <a href="#sql.SqlClient">SqlClient</a> CIs are containers to which <a href="#sql.SqlScripts">SqlScripts</a> can be deployed. The plugin ships with SqlClient for the following databases:</p>
+<ul>
+  <li>MySQL</li>
+  <li>Oracle</li>
+  <li>DB/2</li>
+</ul><p>When SQL scripts are deployed to an SQL client, each script to be executed is run against the SQL client in turn. The SQL client can be configured with a username and password that is used to connect to the database. The credentials can be overridden on each SQL script if required.</p><h1>Usage in Deployment Packages</h1><p>The following is a manifest snippet that shows how SQL file and folder CIs can be included in a deployment package. The SQL scripts CI refers to a folder, <em>sql</em>, in the deployment package.</p>
+<pre style="display:inline-block; nobreak"><code>
+Manifest-Version: 1.0
+Deployit-Package-Format-Version: 1.3
+CI-Application: PetClinic-ear
+CI-Version: 2.0
+
+Name: PetClinic-2.0.ear
+CI-Type: jee.Ear
+CI-Name: PetClinic
+
+Name: sql
+CI-Type: sql.SqlScripts
+CI-Name: sql
+</code></pre><h1>Using the deployables and deployeds</h1><p>The following table describes which deployable/container combinations are possible.</p><h2>Deployable vs. Container table</h2>
+<table class="deployed-matrix">
+<tr>
+	<th>Deployable</th>
+	<th>Container</th>
+	<th>Generated deployed</th>
+</tr>
+<tr>
+	<td>sql.SqlScripts</td>
+	<td>sql.OracleClient,<br/>sql.MySqlClient, <br/>sql.Db2Client</td>
+	<td>sql.ExecutedSqlScripts</td>
+</tr>
+</table><p>The following table describes the effect a deployed has on it's container.</p><h2>Deployed Actions Table</h2>
+<table class="deployed-matrix">
+<tr>
+	<th class="borderless-bottom">Deployed</th>
+	<th colspan="3">Actions performed for operations</th>
+</tr>
+<tr>
+	<th class="borderless-top">&nbsp;</th>
+	<th align="center">Create</th>
+	<th align="center">Destroy</th>
+	<th align="center">Modify</th>
+</tr>
+<tr>
+	<td>sql.ExecutedSqlScripts</td>
+	<td>
+		For each installation script in the folder (ordered alphabetically by name, ascending):
+		<ul>
+			<li>Run script through template engine</li>
+			<li>Copy create script to container</li>
+			<li>Execute script</li>
+		</ul>
+	</td>
+	<td>
+		For each rollback script in the folder (ordered alphabetically by name, descending):
+		<ul>
+			<li>Run script through template engine</li>
+			<li>Copy destroy script to container</li>
+			<li>Execute script</li>
+		</ul>
+	</td>
+	<td>
+		For each installation script in the folder that was not part of the deployment being upgraded (ordered alphabetically by name, ascending):
+		<ul>
+			<li>Run script through template engine</li>
+			<li>Copy modify script to container</li>
+			<li>Execute script</li>
+		</ul>
+	</td>
+</tr>
+</table><div style='width:100%; position:relative'>
+<h1 class='ci-toc-category'>CI Reference</h1><h2>Configuration Item Overview</h2><h3 class='ci-toc-category'>Deployable Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#sql.SqlScripts'>sql.SqlScripts</a></td><td>Folder containing SQL scripts</td>
+</table>
+<h3 class='ci-toc-category'>Deployed Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#sql.ExecutedSqlScripts'>sql.ExecutedSqlScripts</a></td><td>SQL scripts executed on an SQL client</td>
+</table>
+<h3 class='ci-toc-category'>Topology Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#sql.Db2Client'>sql.Db2Client</a></td><td>IBM DB2 client</td>
+<tr class='odd'><td><a href='#sql.MySqlClient'>sql.MySqlClient</a></td><td>MySQL client</td>
+<tr class='even'><td><a href='#sql.OracleClient'>sql.OracleClient</a></td><td>Oracle SQL*Plus client</td>
+</table>
+<h3 class='ci-toc-category'>Virtual Topology Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#sql.SqlClient'>sql.SqlClient</a></td><td>Generic SQL client</td>
+</table>
+<h2 class='ci-details-title'>Configuration Item Details</h2><a name='sql.Db2Client'></a><h3 class='ci-detail-title'>sql.Db2Client</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#sql.SqlClient'>sql.SqlClient</a><span> >> </span><span>generic.Container</span><span> >> </span><span>udm.BaseContainer</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>generic.GenericContainer</span><span>, </span><span>udm.Container</span><span>, </span><span>overthere.HostContainer</span></td></tr></table></div><p class='ci-description'>IBM DB2 client</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='sql.Db2Client_databaseName'></a><span class='ci-property-name'>databaseName</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The name of the DB2 database to connect to</p></td>
+<tr class='odd'><td><a name='sql.Db2Client_db2Home'></a><span class='ci-property-name'>db2Home</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The directory that contains the DB2 installation</p></td>
+<tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='sql.Db2Client_host'></a><span class='ci-property-name'>host</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;overthere.Host&gt;</span><p class='ci-property-desc'>Host upon which the container resides</p></td>
+<tr class='odd'><td><a name='sql.Db2Client_envVars'></a><span class='ci-property-name'>envVars</span>&nbsp;:&nbsp;<span class='ci-property-kind'>MAP_STRING_STRING</span><p class='ci-property-desc'>Environment variables for container</p></td>
+<tr class='even'><td><a name='sql.Db2Client_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='sql.Db2Client_clientWrapperScript'></a><span class='ci-property-name'>clientWrapperScript</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>sql/Db2Client</span><p class='ci-property-desc'>Client Wrapper Script</p></td>
+<tr class='odd'><td><a name='sql.Db2Client_restartOrder'></a><span class='ci-property-name'>restartOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>90</span><p class='ci-property-desc'>The order of the restart container step in the step list.</p></td>
+<tr class='even'><td><a name='sql.Db2Client_startOrder'></a><span class='ci-property-name'>startOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>90</span><p class='ci-property-desc'>The order of the start container step in the step list.</p></td>
+<tr class='odd'><td><a name='sql.Db2Client_startWaitTime'></a><span class='ci-property-name'>startWaitTime</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>0</span><p class='ci-property-desc'>The time to wait in seconds for a container start action.</p></td>
+<tr class='even'><td><a name='sql.Db2Client_stopOrder'></a><span class='ci-property-name'>stopOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>10</span><p class='ci-property-desc'>The order of the stop container step in the step list.</p></td>
+<tr class='odd'><td><a name='sql.Db2Client_stopWaitTime'></a><span class='ci-property-name'>stopWaitTime</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>0</span><p class='ci-property-desc'>The time to wait in seconds for a container stop action.</p></td>
+<tr class='even'><td><a name='sql.Db2Client_password'></a><span class='ci-property-name'>password</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Password</p></td>
+<tr class='odd'><td><a name='sql.Db2Client_restartScript'></a><span class='ci-property-name'>restartScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script used to restart the generic container.</p></td>
+<tr class='even'><td><a name='sql.Db2Client_restartWaitTime'></a><span class='ci-property-name'>restartWaitTime</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>0</span><p class='ci-property-desc'>The time to wait in seconds for a container restart action.</p></td>
+<tr class='odd'><td><a name='sql.Db2Client_startScript'></a><span class='ci-property-name'>startScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script used to start the generic container.</p></td>
+<tr class='even'><td><a name='sql.Db2Client_stopScript'></a><span class='ci-property-name'>stopScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script used to stop the generic container.</p></td>
+<tr class='odd'><td><a name='sql.Db2Client_username'></a><span class='ci-property-name'>username</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Username</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='sql.ExecutedSqlScripts'></a><h3 class='ci-detail-title'>sql.ExecutedSqlScripts</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>generic.ExecutedFolder</span><span> >> </span><span>generic.AbstractDeployed</span><span> >> </span><span>udm.BaseDeployed</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Artifact</span><span>, </span><span>udm.Deployed</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>udm.DerivedArtifact</span></td></tr></table></div><p class='ci-description'>SQL scripts executed on an SQL client</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='sql.ExecutedSqlScripts_container'></a><span class='ci-property-name'>container</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Container&gt;</span><p class='ci-property-desc'>The container on which this deployed runs.</p></td>
+<tr class='odd'><td><a name='sql.ExecutedSqlScripts_deployable'></a><span class='ci-property-name'>deployable</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Deployable&gt;</span><p class='ci-property-desc'>The deployable that this deployed is derived from.</p></td>
+<tr class='even'><td><a name='sql.ExecutedSqlScripts_password'></a><span class='ci-property-name'>password</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>If set, the password to use. Falls back to the optional default password set on the sql.SqlClient container</p></td>
+<tr class='odd'><td><a name='sql.ExecutedSqlScripts_placeholders'></a><span class='ci-property-name'>placeholders</span>&nbsp;:&nbsp;<span class='ci-property-kind'>MAP_STRING_STRING</span><p class='ci-property-desc'>A key/value pair mapping of placeholders in the deployed artifact to their values. Special values are <ignore> and <empty></p></td>
+<tr class='even'><td><a name='sql.ExecutedSqlScripts_username'></a><span class='ci-property-name'>username</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>If set, the user name to use. Falls back to the optional default user name set on the sql.SqlClient container</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='sql.ExecutedSqlScripts_commonScriptFolderName'></a><span class='ci-property-name'>commonScriptFolderName</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>common</span><p class='ci-property-desc'>Common folder that should be uploaded to the working directory.</p></td>
+<tr class='odd'><td><a name='sql.ExecutedSqlScripts_createOrder'></a><span class='ci-property-name'>createOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order of the step in the step list for the create operation.</p></td>
+<tr class='even'><td><a name='sql.ExecutedSqlScripts_createVerb'></a><span class='ci-property-name'>createVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Run</span><p class='ci-property-desc'>Create Verb</p></td>
+<tr class='odd'><td><a name='sql.ExecutedSqlScripts_destroyOrder'></a><span class='ci-property-name'>destroyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>40</span><p class='ci-property-desc'>The order of the step in the step list for the destroy operation.</p></td>
+<tr class='even'><td><a name='sql.ExecutedSqlScripts_destroyVerb'></a><span class='ci-property-name'>destroyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Rollback</span><p class='ci-property-desc'>Destroy Verb</p></td>
+<tr class='odd'><td><a name='sql.ExecutedSqlScripts_executorScript'></a><span class='ci-property-name'>executorScript</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>${deployed.container.clientWrapperScript}</span><p class='ci-property-desc'>Executor Script</p></td>
+<tr class='even'><td><a name='sql.ExecutedSqlScripts_modifyOrder'></a><span class='ci-property-name'>modifyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order of the step in the step list for the modify operation.</p></td>
+<tr class='odd'><td><a name='sql.ExecutedSqlScripts_modifyVerb'></a><span class='ci-property-name'>modifyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Modify</span><p class='ci-property-desc'>Modify Verb</p></td>
+<tr class='even'><td><a name='sql.ExecutedSqlScripts_noopOrder'></a><span class='ci-property-name'>noopOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order of the step in the step list for the noop operation.</p></td>
+<tr class='odd'><td><a name='sql.ExecutedSqlScripts_noopVerb'></a><span class='ci-property-name'>noopVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Modify</span><p class='ci-property-desc'>Noop Verb</p></td>
+<tr class='even'><td><a name='sql.ExecutedSqlScripts_rollbackScriptPostfix'></a><span class='ci-property-name'>rollbackScriptPostfix</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>-rollback.sql</span><p class='ci-property-desc'>Rollback Script Postfix</p></td>
+<tr class='odd'><td><a name='sql.ExecutedSqlScripts_rollbackScriptRecognitionRegex'></a><span class='ci-property-name'>rollbackScriptRecognitionRegex</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>[0-9]*-(.*)-rollback\.sql</span><p class='ci-property-desc'>Rollback Script Recognition Regex</p></td>
+<tr class='even'><td><a name='sql.ExecutedSqlScripts_scriptRecognitionRegex'></a><span class='ci-property-name'>scriptRecognitionRegex</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>(?!.*-rollback\.sql)([0-9]*-.*)\.sql</span><p class='ci-property-desc'>Script Recognition Regex</p></td>
+<tr class='odd'><td><a name='sql.ExecutedSqlScripts_classpathResources'></a><span class='ci-property-name'>classpathResources</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Additional classpath resources that should be uploaded to the working directory before executing the script.</p></td>
+<tr class='even'><td><a name='sql.ExecutedSqlScripts_restartRequired'></a><span class='ci-property-name'>restartRequired</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>The generic container requires a restart for the action performed by this deployed.</p></td>
+<tr class='odd'><td><a name='sql.ExecutedSqlScripts_restartRequiredForNoop'></a><span class='ci-property-name'>restartRequiredForNoop</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>The generic container requires a restart for the NOOP action performed by this deployed.</p></td>
+<tr class='even'><td><a name='sql.ExecutedSqlScripts_templateClasspathResources'></a><span class='ci-property-name'>templateClasspathResources</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Additional template classpath resources that should be uploaded to the working directory before executing the script.The template is first rendered and the rendered content copied to a file, with the same name as the template, in the working directory.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='sql.MySqlClient'></a><h3 class='ci-detail-title'>sql.MySqlClient</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#sql.SqlClient'>sql.SqlClient</a><span> >> </span><span>generic.Container</span><span> >> </span><span>udm.BaseContainer</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>generic.GenericContainer</span><span>, </span><span>udm.Container</span><span>, </span><span>overthere.HostContainer</span></td></tr></table></div><p class='ci-description'>MySQL client</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='sql.MySqlClient_databaseName'></a><span class='ci-property-name'>databaseName</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The name of the MySQL database to connect to</p></td>
+<tr class='odd'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='sql.MySqlClient_host'></a><span class='ci-property-name'>host</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;overthere.Host&gt;</span><p class='ci-property-desc'>Host upon which the container resides</p></td>
+<tr class='even'><td><a name='sql.MySqlClient_mySqlHome'></a><span class='ci-property-name'>mySqlHome</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The directory that contains the MySQL installation</p></td>
+<tr class='odd'><td><a name='sql.MySqlClient_envVars'></a><span class='ci-property-name'>envVars</span>&nbsp;:&nbsp;<span class='ci-property-kind'>MAP_STRING_STRING</span><p class='ci-property-desc'>Environment variables for container</p></td>
+<tr class='even'><td><a name='sql.MySqlClient_password'></a><span class='ci-property-name'>password</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>If set, the password to use if none is set on the deployed sql.ExecutedSqlScripts</p></td>
+<tr class='odd'><td><a name='sql.MySqlClient_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+<tr class='even'><td><a name='sql.MySqlClient_username'></a><span class='ci-property-name'>username</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>If set, the user name to use if none is set on the deployed sql.ExecutedSqlScripts</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='sql.MySqlClient_clientWrapperScript'></a><span class='ci-property-name'>clientWrapperScript</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>sql/MySqlClient</span><p class='ci-property-desc'>Client Wrapper Script</p></td>
+<tr class='odd'><td><a name='sql.MySqlClient_restartOrder'></a><span class='ci-property-name'>restartOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>90</span><p class='ci-property-desc'>The order of the restart container step in the step list.</p></td>
+<tr class='even'><td><a name='sql.MySqlClient_startOrder'></a><span class='ci-property-name'>startOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>90</span><p class='ci-property-desc'>The order of the start container step in the step list.</p></td>
+<tr class='odd'><td><a name='sql.MySqlClient_startWaitTime'></a><span class='ci-property-name'>startWaitTime</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>0</span><p class='ci-property-desc'>The time to wait in seconds for a container start action.</p></td>
+<tr class='even'><td><a name='sql.MySqlClient_stopOrder'></a><span class='ci-property-name'>stopOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>10</span><p class='ci-property-desc'>The order of the stop container step in the step list.</p></td>
+<tr class='odd'><td><a name='sql.MySqlClient_stopWaitTime'></a><span class='ci-property-name'>stopWaitTime</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>0</span><p class='ci-property-desc'>The time to wait in seconds for a container stop action.</p></td>
+<tr class='even'><td><a name='sql.MySqlClient_restartScript'></a><span class='ci-property-name'>restartScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script used to restart the generic container.</p></td>
+<tr class='odd'><td><a name='sql.MySqlClient_restartWaitTime'></a><span class='ci-property-name'>restartWaitTime</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>0</span><p class='ci-property-desc'>The time to wait in seconds for a container restart action.</p></td>
+<tr class='even'><td><a name='sql.MySqlClient_startScript'></a><span class='ci-property-name'>startScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script used to start the generic container.</p></td>
+<tr class='odd'><td><a name='sql.MySqlClient_stopScript'></a><span class='ci-property-name'>stopScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script used to stop the generic container.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='sql.OracleClient'></a><h3 class='ci-detail-title'>sql.OracleClient</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#sql.SqlClient'>sql.SqlClient</a><span> >> </span><span>generic.Container</span><span> >> </span><span>udm.BaseContainer</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>generic.GenericContainer</span><span>, </span><span>udm.Container</span><span>, </span><span>overthere.HostContainer</span></td></tr></table></div><p class='ci-description'>Oracle SQL*Plus client</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='sql.OracleClient_host'></a><span class='ci-property-name'>host</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;overthere.Host&gt;</span><p class='ci-property-desc'>Host upon which the container resides</p></td>
+<tr class='odd'><td><a name='sql.OracleClient_oraHome'></a><span class='ci-property-name'>oraHome</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The directory that contains the Oracle installation</p></td>
+<tr class='even'><td><a name='sql.OracleClient_sid'></a><span class='ci-property-name'>sid</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The Oracle SID to connect to</p></td>
+<tr class='odd'><td><a name='sql.OracleClient_envVars'></a><span class='ci-property-name'>envVars</span>&nbsp;:&nbsp;<span class='ci-property-kind'>MAP_STRING_STRING</span><p class='ci-property-desc'>Environment variables for container</p></td>
+<tr class='even'><td><a name='sql.OracleClient_password'></a><span class='ci-property-name'>password</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>If set, the password to use if none is set on the deployed sql.ExecutedSqlScripts</p></td>
+<tr class='odd'><td><a name='sql.OracleClient_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+<tr class='even'><td><a name='sql.OracleClient_username'></a><span class='ci-property-name'>username</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>If set, the user name to use if none is set on the deployed sql.ExecutedSqlScripts</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='sql.OracleClient_clientWrapperScript'></a><span class='ci-property-name'>clientWrapperScript</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>sql/OracleClient</span><p class='ci-property-desc'>Client Wrapper Script</p></td>
+<tr class='odd'><td><a name='sql.OracleClient_restartOrder'></a><span class='ci-property-name'>restartOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>90</span><p class='ci-property-desc'>The order of the restart container step in the step list.</p></td>
+<tr class='even'><td><a name='sql.OracleClient_startOrder'></a><span class='ci-property-name'>startOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>90</span><p class='ci-property-desc'>The order of the start container step in the step list.</p></td>
+<tr class='odd'><td><a name='sql.OracleClient_startWaitTime'></a><span class='ci-property-name'>startWaitTime</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>0</span><p class='ci-property-desc'>The time to wait in seconds for a container start action.</p></td>
+<tr class='even'><td><a name='sql.OracleClient_stopOrder'></a><span class='ci-property-name'>stopOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>10</span><p class='ci-property-desc'>The order of the stop container step in the step list.</p></td>
+<tr class='odd'><td><a name='sql.OracleClient_stopWaitTime'></a><span class='ci-property-name'>stopWaitTime</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>0</span><p class='ci-property-desc'>The time to wait in seconds for a container stop action.</p></td>
+<tr class='even'><td><a name='sql.OracleClient_restartScript'></a><span class='ci-property-name'>restartScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script used to restart the generic container.</p></td>
+<tr class='odd'><td><a name='sql.OracleClient_restartWaitTime'></a><span class='ci-property-name'>restartWaitTime</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>0</span><p class='ci-property-desc'>The time to wait in seconds for a container restart action.</p></td>
+<tr class='even'><td><a name='sql.OracleClient_startScript'></a><span class='ci-property-name'>startScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script used to start the generic container.</p></td>
+<tr class='odd'><td><a name='sql.OracleClient_stopScript'></a><span class='ci-property-name'>stopScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script used to stop the generic container.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='sql.SqlClient'></a><h3 class='ci-detail-title'>sql.SqlClient</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>generic.Container</span><span> >> </span><span>udm.BaseContainer</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>generic.GenericContainer</span><span>, </span><span>udm.Container</span><span>, </span><span>overthere.HostContainer</span></td></tr></table></div><p class='ci-description'>Generic SQL client</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='sql.SqlClient_host'></a><span class='ci-property-name'>host</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;overthere.Host&gt;</span><p class='ci-property-desc'>Host upon which the container resides</p></td>
+<tr class='odd'><td><a name='sql.SqlClient_clientWrapperScript'></a><span class='ci-property-name'>clientWrapperScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The OS-specific wrapper script that calls the SQL client</p></td>
+<tr class='even'><td><a name='sql.SqlClient_envVars'></a><span class='ci-property-name'>envVars</span>&nbsp;:&nbsp;<span class='ci-property-kind'>MAP_STRING_STRING</span><p class='ci-property-desc'>Environment variables for container</p></td>
+<tr class='odd'><td><a name='sql.SqlClient_password'></a><span class='ci-property-name'>password</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>If set, the password to use if none is set on the deployed sql.ExecutedSqlScripts</p></td>
+<tr class='even'><td><a name='sql.SqlClient_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+<tr class='odd'><td><a name='sql.SqlClient_username'></a><span class='ci-property-name'>username</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>If set, the user name to use if none is set on the deployed sql.ExecutedSqlScripts</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='sql.SqlClient_restartOrder'></a><span class='ci-property-name'>restartOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>90</span><p class='ci-property-desc'>The order of the restart container step in the step list.</p></td>
+<tr class='odd'><td><a name='sql.SqlClient_startOrder'></a><span class='ci-property-name'>startOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>90</span><p class='ci-property-desc'>The order of the start container step in the step list.</p></td>
+<tr class='even'><td><a name='sql.SqlClient_startWaitTime'></a><span class='ci-property-name'>startWaitTime</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>0</span><p class='ci-property-desc'>The time to wait in seconds for a container start action.</p></td>
+<tr class='odd'><td><a name='sql.SqlClient_stopOrder'></a><span class='ci-property-name'>stopOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>10</span><p class='ci-property-desc'>The order of the stop container step in the step list.</p></td>
+<tr class='even'><td><a name='sql.SqlClient_stopWaitTime'></a><span class='ci-property-name'>stopWaitTime</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>0</span><p class='ci-property-desc'>The time to wait in seconds for a container stop action.</p></td>
+<tr class='odd'><td><a name='sql.SqlClient_restartScript'></a><span class='ci-property-name'>restartScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script used to restart the generic container.</p></td>
+<tr class='even'><td><a name='sql.SqlClient_restartWaitTime'></a><span class='ci-property-name'>restartWaitTime</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>0</span><p class='ci-property-desc'>The time to wait in seconds for a container restart action.</p></td>
+<tr class='odd'><td><a name='sql.SqlClient_startScript'></a><span class='ci-property-name'>startScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script used to start the generic container.</p></td>
+<tr class='even'><td><a name='sql.SqlClient_stopScript'></a><span class='ci-property-name'>stopScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script used to stop the generic container.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='sql.SqlScripts'></a><h3 class='ci-detail-title'>sql.SqlScripts</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>generic.Folder</span><span> >> </span><span>udm.BaseDeployableFolderArtifact</span><span> >> </span><span>udm.BaseDeployableArtifact</span><span> >> </span><span>udm.BaseDeployable</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.Deployable</span><span>, </span><span>udm.SourceArtifact</span><span>, </span><span>udm.Artifact</span><span>, </span><span>udm.DeployableArtifact</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>udm.FolderArtifact</span></td></tr></table></div><p class='ci-description'>Folder containing SQL scripts</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='sql.SqlScripts_placeholders'></a><span class='ci-property-name'>placeholders</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Placeholders detected in this artifact</p></td>
+<tr class='odd'><td><a name='sql.SqlScripts_scanPlaceholders'></a><span class='ci-property-name'>scanPlaceholders</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>Scan Placeholders</p></td>
+<tr class='even'><td><a name='sql.SqlScripts_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='sql.SqlScripts_textFileNamesRegex'></a><span class='ci-property-name'>textFileNamesRegex</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>.+\.(cfg | conf | config | ini | properties | props | txt | asp | aspx | htm | html | jsf | jsp | xht | xhtml | sql | xml | xsd | xsl | xslt)</span><p class='ci-property-desc'>Regular expression that matches file names of text files</p></td>
+</table>
+<hr class='ci-details-separator'/>
+</div>
+</body></html>

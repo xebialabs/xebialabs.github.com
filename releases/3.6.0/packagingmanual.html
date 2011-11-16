@@ -1,0 +1,172 @@
+<html><head><LINK REL=StyleSheet HREF="css/deployit.css" TYPE="text/css" MEDIA=screen>
+<LINK REL=StyleSheet HREF="css/ci-reference-api.css" TYPE="text/css" MEDIA=screen>
+<script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="js/jquery.tableofcontents.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+    document.body.id = "top-toc";
+    var title = $("<div class='manual-title'/>")
+    title.html("<div class='title'>Packaging Manual</div><div class='version'>Version <span class='version-number'>3.6.0</span></div>");
+    $("body").css('width', '100%');
+    $("body").prepend(title);
+    $("body").prepend($("<ol id='toc'/>"));
+    $("#toc").tableOfContents("body", { topLinks: true, } );
+});
+
+</script>
+<title>Packaging Manual</title>
+</head><body><h1>Preface</h1><p>This manual describes how to package applications for use in Deployit.</p><p>See the <strong>Deployit Reference Manual</strong> for background information on Deployit and deployment concepts.</p><h1>Introduction</h1><p>The Deployit deployment automation tool is designed to help you deploy application packages to target middleware. To make it possible to deploy your applications, they must be packaged in a format that Deployit understands. This manual describes Deployit's standard package format (the <em>Deployment ARchive (DAR)</em>) and various other topics related to packaging applications. Note that it is also possible to implement a custom importer that recognizes a different format.</p><h1>Packages</h1><p>Deployit uses the <em>Unified Deployment Model (UDM)</em> to structure it's deployments (see the <strong>Deployit Reference Manual</strong> for more information). In this model, deployment packages are containers to distribute complete applications, including both the application artifacts (EAR files, static content) as well as the resource specifications (datasources, topics, queues, etc.) that the application needs to run.</p><p>Packages should be independent of the target environment and contain customization points (for instance placeholders in configuration files) that supply environment-specific values to the deployed application. This enables a single artifact to make the entire journey from development to production.</p><h1>DAR Format</h1><p>Out of the box, Deployit supports it's own DAR format for packages. A valid DAR package consists of the following components:</p>
+<ol>
+  <li>A ZIP archive.</li>
+  <li>A manifest file containing a description of the contents of the package.</li>
+</ol><p>Valid DAR archives can be produced using standard command line tools, such as the Java <code>jar</code> utility, the Maven <code>jar</code> plugin or the Ant <code>jar</code> task. There is also a Deployit maven plugin to facilitate packaging. See the section <strong>Using the Maven plugin</strong> below.</p><p>In addition to packages in a compressed archive format, Deployit can also import <em>exploded DARs</em> or archives that have been extracted.</p><h1>Manifest Format</h1><p>The manifest file included in a DAR describes the contents of the archive for Deployit. When importing a package, the manifest is used to construct CIs in Deployit's repository based on the contents of the imported package. For background information on the JAR format and manifest, see the <a href="http://download.oracle.com/javase/6/docs/technotes/guides/jar/jar.html">JAR file specification</a>.</p><p>A valid Deployit manifest starts with the following preamble:</p>
+<pre><code>Manifest-Version: 1.0
+Deployit-Package-Format-Version: 1.3
+</code></pre><p>This identifies the Java manifest version and the Deployit package format version.</p><h2>Specifying the Application</h2><p>A deployment package contains a specific version of an application. These entries tell Deployit that the package contains the <em>AnimalZoo</em> application version <em>4.0</em>:</p>
+<pre><code>CI-Application: AnimalZoo-ear
+CI-Version: 4.0
+</code></pre><p>These entries are part of the manifest preamble.</p><h2>Specifying Artifacts</h2><p>Artifacts are represented by files or folders in the deployment package. To import an artifact as a CI in Deployit, use:</p>
+<pre><code>Name: AnimalZooBE-1.0.ear
+CI-Type: jee.Ear
+CI-Name: AnimalZooBE
+</code></pre><p>The standard <code>Name</code> entry must refer to an actual file included in the DAR. The <code>CI-Type</code> specifies a CI type name that is available in the system. The required <code>CI-Name</code> property indicates the name of the CI to be created.</p><p>Similarly, this construct can be used to create a folder CI:</p>
+<pre><code>Name: conf
+CI-Type: file.Folder
+CI-Name: configuration-files
+</code></pre><h2>Specifying Resource Specifications</h2><p>Resource specifications are not represented by files in the deployment package. They represent resources that must be created on the target middleware when the application is deployed. Resource specifications are constructed completely based on the information in the manifest. The manifest also specifies values for properties of the CI.</p><p>For example, this manifest snippet constructs a <em>was.OracleDatasourceSpec</em> CI:</p>
+<pre><code>Name: petclinicDS
+CI-Type: was.OracleDatasourceSpec
+CI-driver: com.mysql.jdbc.Driver
+CI-url: jdbc:mysql://localhost/petclinic
+CI-username: petclinic
+CI-password: my$ecret
+</code></pre><p>The <code>Name</code> entry specifies the name of the CI to be created. In contrast to the manifest specification, the <code>Name</code> property in a Deployit manifest does not refer to a physical file present in the DAR in the case of a resource specification. The <code>CI-Type</code> specifies a CI type that is available in the system.</p><p><strong>Note:</strong> the names of artifacts in your package must conform to platform requirements. For instance, a <em>file.Folder</em> CI with name "q2&gt;2" cannot be deployed to a Windows host, because "&gt;" may not be part of a file or directory name in Windows.</p><p>The other entries, <code>CI-url</code>, <code>CI-username</code> and <code>CI-password</code> refer to properties on the datasource CI. These properties will be set to the values specified. In general, any property on a CI can be set using the <code>CI-&lt;propertyname&gt;</code> notation. See the <strong>Command Line Interface (CLI) Manual</strong> for information or how to obtain the list of properties that a particular CI type supports, or consult the relevant CI reference documentation.</p><p>Note that it is also possible to add resource specifications to a package that is already imported in Deployit. See the <strong>Command Line Interface (CLI) Manual</strong> for more information.</p><h2>Setting Complex Properties</h2><p>The above example showed how to set string properties to a certain value. In addition to strings, Deployit also supports references to other CIs, sets of strings, maps of string to string, booleans and enumerations. Here are some examples.</p><h3>Properties referring to other CIs</h3>
+<pre><code>Name: myResourceSpecName
+...
+
+Name: my-artifact-file-name.ext
+CI-Name: myArtifactCiName
+...
+
+...
+CI-artifactRefProperty: myArtifactCiName
+CI-resourceSpecRefProperty: myResourceSpecName
+
+...
+CI-setOfCIProperty: myResourceSpecName
+CI-setOfCIProperty: myArtifactCiName
+</code></pre><p><em>Note that references to artifacts use the referent's <strong>CI-Name</strong> property and references to resource specifications use the referent's <strong>Name</strong> property.</em></p><h3>Set of strings properties</h3>
+<pre><code>CI-setOfStringProperty: a
+CI-setOfStringProperty: b
+</code></pre><h3>Map of string to string properties</h3>
+<pre><code>CI-mapOfStringToStringProperty-key1: value1
+CI-mapOfStringToStringProperty-key2: value2
+</code></pre><h3>Boolean and enumeration properties</h3>
+<pre><code>CI-boolProperty: true
+CI-boolProperty: false
+CI-enumProperty: ENUMVALUE
+</code></pre><h2>Using Placeholders in CI properties</h2><p>Deployit supports the use of <em>placeholders</em> to customize a package for deployment to a specific environment. CI properties specified in a manifest file can also contain placeholders. These placeholders are resolved from <em>dictionary</em> CIs during a deployment (see the <strong>Deployit Reference Manual</strong> for an explanation of placeholders and dictionaries). This is an example of using placeholders in CI properties in a <em>was.OracleDatasourceSpec</em> CI:</p>
+<pre><code>Name: petclinicDS
+CI-Type: was.OracleDatasourceSpec
+CI-driver: com.mysql.jdbc.Driver
+CI-url: jdbc:mysql://localhost/petclinic
+CI-username: {{DB_USERNAME}}
+CI-password: {{DB_PASSWORD}}
+</code></pre><p>Deployit also supports an alternative way of using dictionary values for CI properties. If the dictionary contains keys of the form <em>deployedtype.property</em>, these properties are automatically filled with values from the dictionary (provided they are not specified in the deployable). This makes it possible to use dictionaries without specifying placeholders. For example, the above could also have been achieved by specifying the following keys in the dictionary:</p>
+<pre><code>was.OracleDatasource.username
+was.OracleDatasource.password
+</code></pre><h2>Scanning for placeholders in Artifacts</h2><p>By default Deployit will try to scan files of Artifacts for the presence of placeholders. These will be added to the <em>placeholders</em> field in the artifact, so that they can be replaced upon deployment of said package. However there are scenarios when you want to disable this behaviour. This is triggered by setting the <em>scanPlaceholders</em> flag on an artifact.</p>
+<pre><code>Name: sample.txt
+CI-Type: file.File
+CI-Name: sample
+CI-scanPlaceholders: false
+</code></pre><h1>Making a deployment package</h1><p>To illustrate the way a deployment package can be created, let's describe a complete example of how to do this by hand. There is a lot of work involved in creating packages by hand, so this is not the recommended way. Subsequent sections will describe how to automate this by using the Deployit maven plugin, the maven <code>jar</code> plugin or the ant <code>jar</code> task. </p><h2>Making a Deployment Package by Hand</h2><p>Let's say we want to create a package for version 1.0 of our brand new PetClinic application. The application contains an EAR file with the application code, a configuration folder containing configuration files and a datasource. Start by creating a directory <code>petclinic-package</code> to hold the package content:</p>
+<pre><code>mkdir petclinic-package
+cd petclinic-package
+</code></pre><p>Now, collect the EAR file and configuration directory and store them in the newly created directory. The datasource is a resource specification, not an artifact, so there is no file to include:</p>
+<pre><code>cp /some/path/petclinic-1.0.ear .
+cp -r /some/path/conf .
+</code></pre><p>Now, let's create the DAR manifest for these entries. After the required preamble, add the application and version</p>
+<pre><code>CI-Application: PetClinic
+CI-Version: 1.0
+</code></pre><p>Now add the EAR and configuration folder:</p>
+<pre><code>Name: petclinic-1.0.ear
+CI-Type: jee.Ear
+CI-Name: PetClinic-Ear
+
+Name: conf
+CI-Type: file.Folder
+CI-Name: PetClinic-Config
+</code></pre><p>Add the datasource to the manifest as follows:</p>
+<pre><code>Name: PetClinic-ds
+CI-Type: was.OracleDatasourceSpec
+CI-driver: com.mysql.jdbc.Driver
+CI-url: jdbc:mysql://localhost/petclinic
+CI-username: {{DB_USERNAME}}
+CI-password: {{DB_PASSWORD}}
+</code></pre><p>Note how the datasource uses placeholders because the username and password are be different per environment.</p><p>The complete manifest looks like this:</p>
+<pre><code>Manifest-Version: 1.0
+Deployit-Package-Format-Version: 1.3
+CI-Application: PetClinic
+CI-Version: 1.0
+
+Name: petclinic-1.0.ear
+CI-Type: jee.Ear
+CI-Name: PetClinic
+
+Name: conf
+CI-Type: file.Folder
+CI-Name: PetClinic-Config
+
+Name: PetClinic-ds
+CI-Type: was.OracleDatasourceSpec
+CI-driver: com.mysql.jdbc.Driver
+CI-url: jdbc:mysql://localhost/petclinic
+CI-username: {{DB_USERNAME}}
+CI-password: {{DB_PASSWORD}}
+</code></pre><p>Save the manifest outside of the package directory, so for instance in the <code>/tmp</code> directory. Finally, create the DAR archive with the command:</p>
+<pre><code>    jar cmf ../petclinic-1.0.dar /tmp/MANIFEST.MF *
+</code></pre><p>The resulting archive can be imported into Deployit.</p><h2>Using the Deployit Maven Plugin</h2><p>To enable continuous deployment, Deployit can be integrated with the Maven build system. A maven plugin exists that exposes some of Deployit's functionality via maven. Specifically, the plugin supports:</p>
+<ul>
+  <li>creating a deployment package containing artifacts from the build</li>
+  <li>performing a deployment to a target environment</li>
+  <li>undeploying a previously deployed application</li>
+</ul><p>For more information, see <a href="http://tech.xebialabs.com/deployit-maven-plugin">the Deployit maven plugin documentation</a>.</p><h2>Using the Maven jar Plugin</h2><p>The standard maven <code>jar</code> plugin can also be used to create a Deployit package. </p>
+<ul>
+  <li>Create a manifest file conforming to the Deployit manifest standard (see section <strong>Manifest Format</strong> above).</li>
+  <li>Create a directory structure containing the files as they should appear in the package.</li>
+</ul><p>In the maven POM, configure the jar plugin as follows (the manifest file is assumed to be in the project's src/main/resources/META-INF directory):In the maven POM, configure the jar plugin as follows (the manifest file is assumed to be in the project's src/main/resources/META-INF directory):</p>
+<pre><code>&lt;project&gt;
+  ...
+  &lt;build&gt;
+    &lt;plugins&gt;
+      &lt;plugin&gt;
+        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+        &lt;artifactId&gt;maven-jar-plugin&lt;/artifactId&gt;
+        ...
+        &lt;configuration&gt;
+          &lt;includes&gt;
+            &lt;include&gt;**/*&lt;/include&gt;
+          &lt;/includes&gt;
+          &lt;archive&gt;
+            &lt;manifestFile&gt;src/main/resources/META-INF/MANIFEST.MF&lt;/manifestFile&gt;
+          &lt;/archive&gt;
+        &lt;/configuration&gt;
+        ...
+      &lt;/plugin&gt;
+    &lt;/plugins&gt;
+  &lt;/build&gt;
+  ...
+&lt;/project&gt;
+</code></pre><p>The Deployit package can be generated by invoking the command:</p>
+<pre><code>mvn package
+</code></pre><h2>Using the Ant jar Task</h2><p>Creating a Deployit package via Ant is possible using the <code>jar</code> task. </p>
+<ul>
+  <li>Create a manifest file conforming to the Deployit manifest standard (see section <strong>Manifest Format</strong> above).</li>
+  <li>Create a directory structure containing the files as they should appear in the package.</li>
+</ul><p>In the Ant build file, include a <code>jar</code> task invocation as follows (the manifest file is assumed to be called <code>MANIFEST.MF</code>):</p>
+<pre><code>&lt;jar destfile=&quot;package.jar&quot;
+    basedir=&quot;.&quot;
+    includes=&quot;**/*&quot;
+    manifest=&quot;MANIFEST.MF&quot;/&gt;
+</code></pre><h1>Sample Packages</h1><p>Deployit ships with several sample packages. These examples are stored in the Deployit server's <code>importablePackages</code> directory.</p></body></html>

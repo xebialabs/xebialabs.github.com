@@ -1,0 +1,276 @@
+<html><head><LINK REL=StyleSheet HREF="css/deployit.css" TYPE="text/css" MEDIA=screen>
+<LINK REL=StyleSheet HREF="css/ci-reference-api.css" TYPE="text/css" MEDIA=screen>
+<script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="js/jquery.tableofcontents.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+    document.body.id = "top-toc";
+    var title = $("<div class='manual-title'/>")
+    title.html("<div class='title'>Webserver Plugin Manual</div><div class='version'>Version <span class='version-number'>3.6.0</span></div>");
+    $("body").css('width', '100%');
+    $("body").prepend(title);
+    $("body").prepend($("<ol id='toc'/>"));
+    $("#toc").tableOfContents("body", { topLinks: true, } );
+});
+
+</script>
+<title>Webserver Plugin Manual</title>
+</head><body><h1>Preface</h1><p>This document describes the functionality provided by the Webserver plugin.</p><p>See the <strong>Deployit Reference Manual</strong> for background information on Deployit and deployment concepts.</p><h1>Overview</h1><p>The webserver-plugin is a Deployit plugin that supports deployment of web content and webserver configuration to a webserver.</p><h2>Features</h2>
+<ul>
+  <li>Runs on Deployit 3.6 and up.</li>
+  <li>Supports deployment to Apache and IHS webservers.</li>
+  <li>Deploys and undeploys webserver artifacts:
+  <ul>
+    <li>Web content (HTML pages, images, etc.)</li>
+    <li>Virtual host configuration</li>
+    <li>Any configuration fragment</li>
+  </ul></li>
+  <li>Supports starting, stopping and restarting of webservers as control tasks.</li>
+</ul><h1>Requirements</h1>
+<ul>
+  <li><p><strong>Deployit requirements</strong></p>
+  <ul>
+    <li><strong>Deployit</strong>: version 3.6+</li>
+    <li><strong>Other Deployit Plugins</strong>: None</li>
+  </ul></li>
+  <li><p><strong>Infrastructural requirements</strong></p>
+  <ul>
+    <li><strong>User credentials</strong> for accessing the webserver executables on the host running the webserver.</li>
+  </ul></li>
+</ul><h1>Usage in Deployment Packages</h1><p>The following is a manifest snippet that shows how web content and a virtual host can be included in a deployment package. The web content CI refers to a folder, <em>html</em>, included in the deployment package.</p>
+<pre style="display:inline-block; nobreak"><code>
+Manifest-Version: 1.0
+Deployit-Package-Format-Version: 1.3
+CI-Application: PetClinic-ear
+CI-Version: 2.0
+
+Name: PetClinic-2.0.ear
+CI-Type: jee.Ear
+CI-Name: PetClinic
+
+Name: html
+CI-Type: www.WebContent
+CI-Name: PetClinic-html
+
+Name: PetClinic-vh
+CI-Type: www.ApacheVirtualHostSpec
+CI-host: *
+CI-port: 8080
+</code></pre><h1>Using the deployables and deployeds</h1><p>The following table describes which deployable/container combinations are possible.</p><h2>Deployable vs. Container table</h2>
+<table class="deployed-matrix">
+<tr>
+	<th>Deployable</th>
+	<th>Container</th>
+	<th>Generated deployed</th>
+</tr>
+<tr>
+	<td>www.WebContent</td>
+	<td>www.ApacheHttpdServer</td>
+	<td>www.PublishedWebContent</td>
+</tr>
+<tr>
+	<td>www.ApacheVirtualHostSpec</td>
+	<td>www.ApacheHttpdServer</td>
+	<td>www.ApacheVirtualHost</td>
+</tr>
+<tr>
+	<td>www.ApacheConfFragmentSpec</td>
+	<td>www.ApacheHttpdServer</td>
+	<td>www.ApacheConfFragment</td>
+</tr>
+</table><p>The following table describes the effect a deployed has on it's container.</p><h2>Deployed Actions Table</h2>
+<table class="deployed-matrix">
+<tr>
+	<th class="borderless-bottom">Deployed</th>
+	<th colspan="3">Actions performed for operations</th>
+</tr>
+<tr>
+	<th class="borderless-top">&nbsp;</th>
+	<th align="center">Create</th>
+	<th align="center">Destroy</th>
+	<th align="center">Modify</th>
+</tr>
+<tr>
+	<td>www.PublishedWebContent</td>
+	<td>
+	    <ul>
+	        <li>Create target path on webserver, if needed</li>
+	        <li>Copy web content to target path on webserver</li>
+	    </ul>
+	</td>
+	<td>
+	    <ul>
+	        <li>Delete web content from host</li>
+	    </ul>
+	</td>
+	<td>
+	    <ul>
+	        <li>Delete existing web content from webserver</li>
+	        <li>Copy modified web content to target path on webserver</li>
+	    </ul>
+	</td>
+<tr>
+	<td>www.ApacheVirtualHost</td>
+		<td>
+			<ul>
+				<li>Copy virtual host configuration to webserver</li>
+			</ul>
+		</td>
+		<td>
+			<ul>
+				<li>Delete virtual host configuration from webserver</li>
+			</ul>
+		</td>
+		<td>
+			<ul>
+				<li>Delete virtual host configuration from webserver</li>
+				<li>Copy new virtual host configuration to webserver</li>
+			</ul>
+		</td>
+</tr>
+<tr>
+	<td>www.ApacheConfFragment</td>
+	<td>
+		<ul>
+			<li>Copy configuration fragment to webserver</li>
+		</ul>
+	</td>
+	<td>
+		<ul>
+			<li>Delete configuration fragment from webserver</li>
+		</ul>
+	</td>
+	<td>
+		<ul>
+			<li>Delete configuration fragment from webserver</li>
+			<li>Copy new configuration fragment to webserver</li>
+		</ul>
+	</td>
+</tr>
+</table><div style='width:100%; position:relative'>
+<h1 class='ci-toc-category'>CI Reference</h1><h2>Configuration Item Overview</h2><h3 class='ci-toc-category'>Deployable Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#www.ApacheConfFragmentSpec'>www.ApacheConfFragmentSpec</a></td><td>Specification for an Apache configuration fragment</td>
+<tr class='odd'><td><a href='#www.ApacheVirtualHostSpec'>www.ApacheVirtualHostSpec</a></td><td>Specification for an Apache virtual host</td>
+<tr class='even'><td><a href='#www.WebContent'>www.WebContent</a></td><td>Folder containing web content (HTML pages, images, etc)</td>
+</table>
+<h3 class='ci-toc-category'>Deployed Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#www.ApacheConfFragment'>www.ApacheConfFragment</a></td><td>Apache configuration fragment</td>
+<tr class='odd'><td><a href='#www.ApacheVirtualHost'>www.ApacheVirtualHost</a></td><td>Apache virtual host</td>
+<tr class='even'><td><a href='#www.PublishedWebContent'>www.PublishedWebContent</a></td><td>Web content on the webserver</td>
+</table>
+<h3 class='ci-toc-category'>Topology Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#www.ApacheHttpdServer'>www.ApacheHttpdServer</a></td><td>Apache HTTPD web server</td>
+</table>
+<h2 class='ci-details-title'>Configuration Item Details</h2><a name='www.ApacheConfFragment'></a><h3 class='ci-detail-title'>www.ApacheConfFragment</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>generic.ProcessedTemplate</span><span> >> </span><span>generic.AbstractDeployedArtifact</span><span> >> </span><span>generic.AbstractDeployed</span><span> >> </span><span>udm.BaseDeployed</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Deployed</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Apache configuration fragment</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='www.ApacheConfFragment_container'></a><span class='ci-property-name'>container</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Container&gt;</span><p class='ci-property-desc'>The container on which this deployed runs.</p></td>
+<tr class='odd'><td><a name='www.ApacheConfFragment_deployable'></a><span class='ci-property-name'>deployable</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Deployable&gt;</span><p class='ci-property-desc'>The deployable that this deployed is derived from.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='www.ApacheConfFragment_createOrder'></a><span class='ci-property-name'>createOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order of the step in the step list for the create operation.</p></td>
+<tr class='odd'><td><a name='www.ApacheConfFragment_createVerb'></a><span class='ci-property-name'>createVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Create</span><p class='ci-property-desc'>Create Verb</p></td>
+<tr class='even'><td><a name='www.ApacheConfFragment_destroyOrder'></a><span class='ci-property-name'>destroyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>40</span><p class='ci-property-desc'>The order of the step in the step list for the destroy operation.</p></td>
+<tr class='odd'><td><a name='www.ApacheConfFragment_destroyVerb'></a><span class='ci-property-name'>destroyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Destroy</span><p class='ci-property-desc'>Destroy Verb</p></td>
+<tr class='even'><td><a name='www.ApacheConfFragment_modifyOrder'></a><span class='ci-property-name'>modifyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order of the step in the step list for the modify operation.</p></td>
+<tr class='odd'><td><a name='www.ApacheConfFragment_modifyVerb'></a><span class='ci-property-name'>modifyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Modify</span><p class='ci-property-desc'>Modify Verb</p></td>
+<tr class='even'><td><a name='www.ApacheConfFragment_noopOrder'></a><span class='ci-property-name'>noopOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order of the step in the step list for the noop operation.</p></td>
+<tr class='odd'><td><a name='www.ApacheConfFragment_noopVerb'></a><span class='ci-property-name'>noopVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Modify</span><p class='ci-property-desc'>Noop Verb</p></td>
+<tr class='even'><td><a name='www.ApacheConfFragment_targetDirectory'></a><span class='ci-property-name'>targetDirectory</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>${deployed.container.configurationFragmentDirectory}</span><p class='ci-property-desc'>Target directory name</p></td>
+<tr class='odd'><td><a name='www.ApacheConfFragment_targetFile'></a><span class='ci-property-name'>targetFile</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>${deployed.name}.conf</span><p class='ci-property-desc'>Target file name</p></td>
+<tr class='even'><td><a name='www.ApacheConfFragment_template'></a><span class='ci-property-name'>template</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>www/apache/${deployed.type}.conf.ftl</span><p class='ci-property-desc'>Configuration fragment template file name.</p></td>
+<tr class='odd'><td><a name='www.ApacheConfFragment_createTargetDirectory'></a><span class='ci-property-name'>createTargetDirectory</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>Create the target directory on the generic server if it does not exist.</p></td>
+<tr class='even'><td><a name='www.ApacheConfFragment_restartRequired'></a><span class='ci-property-name'>restartRequired</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>Restart Required</p></td>
+<tr class='odd'><td><a name='www.ApacheConfFragment_restartRequiredForNoop'></a><span class='ci-property-name'>restartRequiredForNoop</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>The generic container requires a restart for the NOOP action performed by this deployed.</p></td>
+<tr class='even'><td><a name='www.ApacheConfFragment_targetDirectoryShared'></a><span class='ci-property-name'>targetDirectoryShared</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>Is the target directory shared by others on the generic server. When true, the target directory is not deleted during a destroy operation; only the artifacts copied to it.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='www.ApacheConfFragmentSpec'></a><h3 class='ci-detail-title'>www.ApacheConfFragmentSpec</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>generic.Resource</span><span> >> </span><span>udm.BaseDeployable</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.Deployable</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Specification for an Apache configuration fragment.</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='www.ApacheConfFragmentSpec_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='www.ApacheHttpdServer'></a><h3 class='ci-detail-title'>www.ApacheHttpdServer</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>generic.Container</span><span> >> </span><span>udm.BaseContainer</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>generic.GenericContainer</span><span>, </span><span>udm.Container</span><span>, </span><span>overthere.HostContainer</span></td></tr></table></div><p class='ci-description'>Apache HTTPD web server</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='www.ApacheHttpdServer_configurationFragmentDirectory'></a><span class='ci-property-name'>configurationFragmentDirectory</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The directory into which Apache configuration files (for virtual host definitions) should be written</p></td>
+<tr class='odd'><td><a name='www.ApacheHttpdServer_defaultDocumentRoot'></a><span class='ci-property-name'>defaultDocumentRoot</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The directory in which document roots for virtual hosts should be created. Web content deployed without a virtual host will also be copied into this directory</p></td>
+<tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='www.ApacheHttpdServer_host'></a><span class='ci-property-name'>host</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;overthere.Host&gt;</span><p class='ci-property-desc'>Host upon which the container resides</p></td>
+<tr class='odd'><td><a name='www.ApacheHttpdServer_restartWaitTime'></a><span class='ci-property-name'>restartWaitTime</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>10</span><p class='ci-property-desc'>Duration (in secs) to wait after the restart server step has been executed</p></td>
+<tr class='even'><td><a name='www.ApacheHttpdServer_startCommand'></a><span class='ci-property-name'>startCommand</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The command to start Apache. Arguments containing spaces are not supported</p></td>
+<tr class='odd'><td><a name='www.ApacheHttpdServer_startWaitTime'></a><span class='ci-property-name'>startWaitTime</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>10</span><p class='ci-property-desc'>Duration (in secs) to wait after the start server step has been executed</p></td>
+<tr class='even'><td><a name='www.ApacheHttpdServer_stopCommand'></a><span class='ci-property-name'>stopCommand</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The command to stop Apache. Arguments containing spaces are not supported</p></td>
+<tr class='odd'><td><a name='www.ApacheHttpdServer_stopWaitTime'></a><span class='ci-property-name'>stopWaitTime</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>10</span><p class='ci-property-desc'>Duration (in secs) to wait after the stop server step has been executed</p></td>
+<tr class='even'><td><a name='www.ApacheHttpdServer_envVars'></a><span class='ci-property-name'>envVars</span>&nbsp;:&nbsp;<span class='ci-property-kind'>MAP_STRING_STRING</span><p class='ci-property-desc'>Environment variables for container</p></td>
+<tr class='odd'><td><a name='www.ApacheHttpdServer_restartCommand'></a><span class='ci-property-name'>restartCommand</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The command to restart Apache. If left blank, reload command is used. If reload command is also blank than the sequence 'stop, start' is used. Arguments containing spaces are not supported</p></td>
+<tr class='even'><td><a name='www.ApacheHttpdServer_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='www.ApacheHttpdServer_restartOrder'></a><span class='ci-property-name'>restartOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>90</span><p class='ci-property-desc'>The order of the restart container step in the step list.</p></td>
+<tr class='odd'><td><a name='www.ApacheHttpdServer_restartScript'></a><span class='ci-property-name'>restartScript</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'><#assign restart=(container.restartCommand)!''><#if restart != ''>www/apache/restart</#if></span><p class='ci-property-desc'>The command to restart or reload Apache. If left blank, the sequence 'stop, start' is used. Arguments containing spaces are not supported</p></td>
+<tr class='even'><td><a name='www.ApacheHttpdServer_startOrder'></a><span class='ci-property-name'>startOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>90</span><p class='ci-property-desc'>The order of the start container step in the step list.</p></td>
+<tr class='odd'><td><a name='www.ApacheHttpdServer_startScript'></a><span class='ci-property-name'>startScript</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>www/apache/start</span><p class='ci-property-desc'>The command to start Apache. Arguments containing spaces are not supported</p></td>
+<tr class='even'><td><a name='www.ApacheHttpdServer_stopOrder'></a><span class='ci-property-name'>stopOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>10</span><p class='ci-property-desc'>The order of the stop container step in the step list.</p></td>
+<tr class='odd'><td><a name='www.ApacheHttpdServer_stopScript'></a><span class='ci-property-name'>stopScript</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>www/apache/stop</span><p class='ci-property-desc'>The command to stop Apache. Arguments containing spaces are not supported</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Control Tasks</th></tr><tr class='even'><td><a name='www.ApacheHttpdServer_restart'></a><span class='ci-property-name'>restart</span><p class='ci-property-desc'>Restart Apache</p></td>
+<tr class='odd'><td><a name='www.ApacheHttpdServer_start'></a><span class='ci-property-name'>start</span><p class='ci-property-desc'>Start Apache</p></td>
+<tr class='even'><td><a name='www.ApacheHttpdServer_stop'></a><span class='ci-property-name'>stop</span><p class='ci-property-desc'>Stop Apache</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='www.ApacheVirtualHost'></a><h3 class='ci-detail-title'>www.ApacheVirtualHost</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#www.ApacheConfFragment'>www.ApacheConfFragment</a><span> >> </span><span>generic.ProcessedTemplate</span><span> >> </span><span>generic.AbstractDeployedArtifact</span><span> >> </span><span>generic.AbstractDeployed</span><span> >> </span><span>udm.BaseDeployed</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Deployed</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Apache virtual host</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='www.ApacheVirtualHost_container'></a><span class='ci-property-name'>container</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Container&gt;</span><p class='ci-property-desc'>The container on which this deployed runs.</p></td>
+<tr class='odd'><td><a name='www.ApacheVirtualHost_host'></a><span class='ci-property-name'>host</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The virtual host name. Use '*' to match all hosts</p></td>
+<tr class='even'><td><a name='www.ApacheVirtualHost_port'></a><span class='ci-property-name'>port</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The virtual host port. Use '*' to match all ports</p></td>
+<tr class='odd'><td><a name='www.ApacheVirtualHost_deployable'></a><span class='ci-property-name'>deployable</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Deployable&gt;</span><p class='ci-property-desc'>The deployable that this deployed is derived from.</p></td>
+<tr class='even'><td><a name='www.ApacheVirtualHost_documentRoot'></a><span class='ci-property-name'>documentRoot</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The document root for web content using this virtual host. If left blank, a directory is created in the web server's document root</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='www.ApacheVirtualHost_createOrder'></a><span class='ci-property-name'>createOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order of the step in the step list for the create operation.</p></td>
+<tr class='odd'><td><a name='www.ApacheVirtualHost_createVerb'></a><span class='ci-property-name'>createVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Create</span><p class='ci-property-desc'>Create Verb</p></td>
+<tr class='even'><td><a name='www.ApacheVirtualHost_destroyOrder'></a><span class='ci-property-name'>destroyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>40</span><p class='ci-property-desc'>The order of the step in the step list for the destroy operation.</p></td>
+<tr class='odd'><td><a name='www.ApacheVirtualHost_destroyVerb'></a><span class='ci-property-name'>destroyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Destroy</span><p class='ci-property-desc'>Destroy Verb</p></td>
+<tr class='even'><td><a name='www.ApacheVirtualHost_modifyOrder'></a><span class='ci-property-name'>modifyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order of the step in the step list for the modify operation.</p></td>
+<tr class='odd'><td><a name='www.ApacheVirtualHost_modifyVerb'></a><span class='ci-property-name'>modifyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Modify</span><p class='ci-property-desc'>Modify Verb</p></td>
+<tr class='even'><td><a name='www.ApacheVirtualHost_noopOrder'></a><span class='ci-property-name'>noopOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order of the step in the step list for the noop operation.</p></td>
+<tr class='odd'><td><a name='www.ApacheVirtualHost_noopVerb'></a><span class='ci-property-name'>noopVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Modify</span><p class='ci-property-desc'>Noop Verb</p></td>
+<tr class='even'><td><a name='www.ApacheVirtualHost_targetDirectory'></a><span class='ci-property-name'>targetDirectory</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>${deployed.container.configurationFragmentDirectory}</span><p class='ci-property-desc'>Target directory name</p></td>
+<tr class='odd'><td><a name='www.ApacheVirtualHost_targetFile'></a><span class='ci-property-name'>targetFile</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>${deployed.name}.conf</span><p class='ci-property-desc'>Target file name</p></td>
+<tr class='even'><td><a name='www.ApacheVirtualHost_template'></a><span class='ci-property-name'>template</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>www/apache/${deployed.type}.conf.ftl</span><p class='ci-property-desc'>Configuration fragment template file name.</p></td>
+<tr class='odd'><td><a name='www.ApacheVirtualHost_createTargetDirectory'></a><span class='ci-property-name'>createTargetDirectory</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>Create the target directory on the generic server if it does not exist.</p></td>
+<tr class='even'><td><a name='www.ApacheVirtualHost_restartRequired'></a><span class='ci-property-name'>restartRequired</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>Restart Required</p></td>
+<tr class='odd'><td><a name='www.ApacheVirtualHost_restartRequiredForNoop'></a><span class='ci-property-name'>restartRequiredForNoop</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>The generic container requires a restart for the NOOP action performed by this deployed.</p></td>
+<tr class='even'><td><a name='www.ApacheVirtualHost_targetDirectoryShared'></a><span class='ci-property-name'>targetDirectoryShared</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>Is the target directory shared by others on the generic server. When true, the target directory is not deleted during a destroy operation; only the artifacts copied to it.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='www.ApacheVirtualHostSpec'></a><h3 class='ci-detail-title'>www.ApacheVirtualHostSpec</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>generic.Resource</span><span> >> </span><span>udm.BaseDeployable</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.Deployable</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Specification for an Apache virtual host</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='www.ApacheVirtualHostSpec_documentRoot'></a><span class='ci-property-name'>documentRoot</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The document root for web content using this virtual host. If left blank, a directory is created in the web server's document root</p></td>
+<tr class='odd'><td><a name='www.ApacheVirtualHostSpec_host'></a><span class='ci-property-name'>host</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The virtual host name. Use '*' to match all hosts</p></td>
+<tr class='even'><td><a name='www.ApacheVirtualHostSpec_port'></a><span class='ci-property-name'>port</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The virtual host port. Use '*' to match all ports</p></td>
+<tr class='odd'><td><a name='www.ApacheVirtualHostSpec_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='www.PublishedWebContent'></a><h3 class='ci-detail-title'>www.PublishedWebContent</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>generic.CopiedArtifact</span><span> >> </span><span>generic.AbstractDeployedArtifact</span><span> >> </span><span>generic.AbstractDeployed</span><span> >> </span><span>udm.BaseDeployed</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Artifact</span><span>, </span><span>udm.Deployed</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>udm.DerivedArtifact</span></td></tr></table></div><p class='ci-description'>Web content on the webserver</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='www.PublishedWebContent_container'></a><span class='ci-property-name'>container</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Container&gt;</span><p class='ci-property-desc'>The container on which this deployed runs.</p></td>
+<tr class='odd'><td><a name='www.PublishedWebContent_deployable'></a><span class='ci-property-name'>deployable</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Deployable&gt;</span><p class='ci-property-desc'>The deployable that this deployed is derived from.</p></td>
+<tr class='even'><td><a name='www.PublishedWebContent_placeholders'></a><span class='ci-property-name'>placeholders</span>&nbsp;:&nbsp;<span class='ci-property-kind'>MAP_STRING_STRING</span><p class='ci-property-desc'>A Map containing all the placeholders mapped to their values. Special values are &lt;ignore&gt; or &lt;empty&gt;</p></td>
+<tr class='odd'><td><a name='www.PublishedWebContent_virtualHost'></a><span class='ci-property-name'>virtualHost</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;www.ApacheVirtualHost&gt;</span><p class='ci-property-desc'>Virtual host which this web content maps to.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='www.PublishedWebContent_createOrder'></a><span class='ci-property-name'>createOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order of the step in the step list for the create operation.</p></td>
+<tr class='odd'><td><a name='www.PublishedWebContent_createVerb'></a><span class='ci-property-name'>createVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Create</span><p class='ci-property-desc'>Create Verb</p></td>
+<tr class='even'><td><a name='www.PublishedWebContent_destroyOrder'></a><span class='ci-property-name'>destroyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>40</span><p class='ci-property-desc'>The order of the step in the step list for the destroy operation.</p></td>
+<tr class='odd'><td><a name='www.PublishedWebContent_destroyVerb'></a><span class='ci-property-name'>destroyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Destroy</span><p class='ci-property-desc'>Destroy Verb</p></td>
+<tr class='even'><td><a name='www.PublishedWebContent_modifyOrder'></a><span class='ci-property-name'>modifyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order of the step in the step list for the modify operation.</p></td>
+<tr class='odd'><td><a name='www.PublishedWebContent_modifyVerb'></a><span class='ci-property-name'>modifyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Modify</span><p class='ci-property-desc'>Modify Verb</p></td>
+<tr class='even'><td><a name='www.PublishedWebContent_noopOrder'></a><span class='ci-property-name'>noopOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order of the step in the step list for the noop operation.</p></td>
+<tr class='odd'><td><a name='www.PublishedWebContent_noopVerb'></a><span class='ci-property-name'>noopVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Modify</span><p class='ci-property-desc'>Noop Verb</p></td>
+<tr class='even'><td><a name='www.PublishedWebContent_targetDirectory'></a><span class='ci-property-name'>targetDirectory</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'><#assign target=(deployed.virtualHost.documentRoot)!''/><#if target != ''>${target}<#else>${deployed.container.defaultDocumentRoot}</#if></span><p class='ci-property-desc'>Target directory name</p></td>
+<tr class='odd'><td><a name='www.PublishedWebContent_createTargetDirectory'></a><span class='ci-property-name'>createTargetDirectory</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>Create the target directory on the generic server if it does not exist.</p></td>
+<tr class='even'><td><a name='www.PublishedWebContent_restartRequired'></a><span class='ci-property-name'>restartRequired</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>Restart Required</p></td>
+<tr class='odd'><td><a name='www.PublishedWebContent_restartRequiredForNoop'></a><span class='ci-property-name'>restartRequiredForNoop</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>The generic container requires a restart for the NOOP action performed by this deployed.</p></td>
+<tr class='even'><td><a name='www.PublishedWebContent_targetDirectoryShared'></a><span class='ci-property-name'>targetDirectoryShared</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>Is the target directory shared by others on the generic server. When true, the target directory is not deleted during a destroy operation; only the artifacts copied to it.</p></td>
+<tr class='odd'><td><a name='www.PublishedWebContent_targetFile'></a><span class='ci-property-name'>targetFile</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Target File</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='www.WebContent'></a><h3 class='ci-detail-title'>www.WebContent</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>generic.Folder</span><span> >> </span><span>udm.BaseDeployableFolderArtifact</span><span> >> </span><span>udm.BaseDeployableArtifact</span><span> >> </span><span>udm.BaseDeployable</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.Deployable</span><span>, </span><span>udm.SourceArtifact</span><span>, </span><span>udm.Artifact</span><span>, </span><span>udm.DeployableArtifact</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>udm.FolderArtifact</span></td></tr></table></div><p class='ci-description'>Folder containing web content (HTML pages, images, etc)</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='www.WebContent_placeholders'></a><span class='ci-property-name'>placeholders</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Placeholders detected in this artifact</p></td>
+<tr class='odd'><td><a name='www.WebContent_scanPlaceholders'></a><span class='ci-property-name'>scanPlaceholders</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>Scan Placeholders</p></td>
+<tr class='even'><td><a name='www.WebContent_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='www.WebContent_textFileNamesRegex'></a><span class='ci-property-name'>textFileNamesRegex</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>.+\.(cfg | conf | config | ini | properties | props | txt | asp | aspx | htm | html | jsf | jsp | xht | xhtml | sql | xml | xsd | xsl | xslt)</span><p class='ci-property-desc'>Regular expression that matches file names of text files</p></td>
+</table>
+<hr class='ci-details-separator'/>
+</div>
+</body></html>

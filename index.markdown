@@ -11,7 +11,7 @@ Welcome to the Deployit product documentation.
 
 Frequently asked questions about Deployit can be found [here](faq).
 
-# Deployit release documentation #
+# Deployit documentation #
 
 * [3.0](/releases/3.0)
 * [3.0.1](/releases/3.0.1)
@@ -20,11 +20,13 @@ Frequently asked questions about Deployit can be found [here](faq).
 * [3.5.0](/releases/3.5.0)
 * [3.6.0](/releases/3.6.0)
 
-# Plugin release documentation #
+# Plugin documentation #
 
+##3.5.0##
 * [WAS plugin 3.5.0](/releases/was-plugin-3.5.0)
 * [WLS plugin 3.5.0](/releases/wls-plugin-3.5.0)
 
+##3.6.0##
 * [WAS plugin 3.6.0](/releases/was-plugin-3.6.0)
 * [WLS plugin 3.6.0](/releases/wls-plugin-3.6.0)
 * [Jboss plugin 3.6.0](/releases/jboss-plugin-3.6.0)

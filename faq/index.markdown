@@ -43,6 +43,19 @@ Note that the server needs to be restarted to activate the new log settings.
 
 See the [logback site](http://logback.qos.ch/) for more information.
 
+### How do I configure Deployit to use specific file encoding? ###
+
+Deployit uses file.encoding system property. To change file encoding other than system default set the following system property when starting the Deployit server:
+
+	For Oracle JDK:
+	-Dfile.encoding=<FileEncodingType>
+	e.g: -Dfile.encoding=UTF-8
+	
+	For IBM JDK:
+	-Dclient.encoding.override=<FileEncodingType>
+	e.g: -Dclient.encoding.override=UTF-8
+	
+
 ## Middleware Server Configuration - Windows ##
 
 ### Do I always need a CIFS connection to my Windows middleware hosts? ###

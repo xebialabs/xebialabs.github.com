@@ -6,7 +6,7 @@
 $(document).ready(function(){
     document.body.id = "top-toc";
     var title = $("<div class='manual-title'/>")
-    title.html("<div class='title'>Command Plugin Manual</div><div class='version'>Version <span class='version-number'>3.6.0</span></div>");
+    title.html("<div class='title'>Command Plugin Manual</div><div class='version'>Version <span class='version-number'>3.6.1</span></div>");
     $("body").css('width', '100%');
     $("body").prepend(title);
     $("body").prepend($("<ol id='toc'/>"));
@@ -205,7 +205,7 @@ CI-name: uninstall-tc-command
 <hr class='ci-details-separator'/>
 <a name='overthere.SshHost'></a><h3 class='ci-detail-title'>overthere.SshHost</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#overthere.Host'>overthere.Host</a><span> >> </span><span>udm.BaseContainer</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>udm.Container</span><span>, </span><a href='#overthere.HostContainer'>overthere.HostContainer</a></td></tr></table></div><p class='ci-description'>A machine that can be connected to using ssh.</p>
 <table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='overthere.SshHost_address'></a><span class='ci-property-name'>address</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Address of the host</p></td>
-<tr class='odd'><td><a name='overthere.SshHost_connectionType'></a><span class='ci-property-name'>connectionType</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>ENUM [SFTP, SCP, SUDO, INTERACTIVE_SUDO]</span>&nbsp;=&nbsp;<span class='ci-property-default'>SFTP</span><p class='ci-property-desc'>Type of SSH connection to create</p></td>
+<tr class='odd'><td><a name='overthere.SshHost_connectionType'></a><span class='ci-property-name'>connectionType</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>ENUM [SFTP, SFTP_CYGWIN, SFTP_WINSSHD, SCP, SUDO, INTERACTIVE_SUDO]</span>&nbsp;=&nbsp;<span class='ci-property-default'>SFTP</span><p class='ci-property-desc'>Type of SSH connection to create</p></td>
 <tr class='even'><td><a name='overthere.SshHost_os'></a><span class='ci-property-name'>os</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>ENUM [WINDOWS, UNIX]</span><p class='ci-property-desc'>Operating system</p></td>
 <tr class='odd'><td><a name='overthere.SshHost_port'></a><span class='ci-property-name'>port</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>22</span><p class='ci-property-desc'>Port on which the SSH server runs</p></td>
 <tr class='even'><td><a name='overthere.SshHost_username'></a><span class='ci-property-name'>username</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Username to connect with</p></td>

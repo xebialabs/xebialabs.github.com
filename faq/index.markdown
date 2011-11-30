@@ -61,3 +61,27 @@ Deployit uses file.encoding system property. To change file encoding other than 
 ### Do I always need a CIFS connection to my Windows middleware hosts? ###
 
 Yes. Deployit can use Telnet or WinRM to execute commands on the middleware hosts, but needs CIFS to transfer files to the middleware host.
+
+## CLI usage ##
+
+### How do I create the most common CIs in the CLI? ###
+
+The following snippet shows examples of creating common UDM CIs.
+
+		# Create a host
+		host = factory.configurationItem('Infrastructure/sampleHost', 'overthere.SshHost', { 'os': 'UNIX', 'address': 'localhost', 'username': 'scott' })
+		repository.create(host)                                                                                                                          
+		deployit.print(host)
+		
+		# Create a dictionary
+		dict = factory.configurationItem('Environments/myDict', 'udm.Dictionary')
+		dict.entries = { 'a': '1', 'b': '2' }
+		repository.create(dict)
+		deployit.print(dict)
+
+		# Create an environment
+		env = factory.configurationItem('Environments/sampleEnv', 'udm.Environment')
+		env.dictionaries = [ dict.id ]
+		env.members = [ host.id ]                                                                                                                        
+		repository.create(env)
+		deployit.print(env)

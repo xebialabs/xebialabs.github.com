@@ -345,7 +345,7 @@ Deployit supports the following permissions:
 * **deploy#upgrade**. The right to perform an upgrade of a package on an environment. This implies read and write access to the **Environments** and **Infrastructure** nodes. The permission can also be given for specific _Environment_ CIs.
 * **discovery**. The right to perform discovery. This implies read and write access to the **Infrastructure** node.
 * **repo#edit**. The right to edit (create and modify) CIs. This implies write access to the **Applications**, **Environments** and **Infrastructure** nodes. The user must also have read access to CIs to be able to edit them. The permission can also be given for specific CIs.
-* **undeploy**. The right to undeploy an application. This implies read and write access to the **Environments** and **Infrastructure** nodes. The permission can also be given for specific _Environment_ CIs.
+* **deploy#undeploy**. The right to undeploy an application. This implies read and write access to the **Environments** and **Infrastructure** nodes. The permission can also be given for specific _Environment_ CIs.
 
 ### Granting, Revoking and Denying ###
 
@@ -412,24 +412,34 @@ When authenticating a user, Deployit first tries to locate the user in the LDAP 
 
 To configure Deployit to use an LDAP repository, the built-in JCR repository, Jackrabbit, must defer to the LDAP server for authentication. This requires modification of the default Deployit Jackrabbit configuration. Follow these steps:
 
-1. **Create `jackrabbit_jaas.config` file**. The file must be accessible for the Deployit server. The following is a sample file:
+1. **Edit `conf/jackrabbit_jaas.config` file**.
 
-		Jackrabbit {
-			org.apache.jackrabbit.core.security.authentication.DefaultLoginModule 
-				sufficient adminId=admin anonymousId=anonymous;
-			com.sun.security.auth.module.LdapLoginModule required 
-				userProvider="ldap://localhost:14516/ou=system" 
-				userFilter="(&(uid={USERNAME})(objectClass=inetOrgPerson))" 
-				useSSL=false
-			principalProvider=com.xebialabs.deployit.security.LdapPrincipalProvider;
-		};
+	The file must be accessible for the Deployit server. The sample file can be adapted to suit your needs. The LdapLoginModule takes the following arguments:
 
-    Modify the LDAP settings (URL, port or user filter, etc.) to suit your needs.
+	* **userProvider**: The LDAP url to connect to, including the bind path (example: userProvider="ldap://localhost:389/ou=system")
+	* **userFilter**: The LDAP filter to determine the LDAP dn for the user that's logging in, {USERNAME} will be replaced with the username that's logging in (example: userFilter="(&(uid={USERNAME})(objectClass=inetOrgPerson))")
+	* **useSSL**: Whether or not we need to use SSL to connect to LDAP (example: useSSL=false)
+	* **groupFilter**: The LDAP filter to determine the group memberships for the user, {DN} will be replaced with the DN of the user (example: groupFilter="(member={DN})")
+	* **principalProvider**: The LDAP PrincipalProvider that will provide principals to Jackrabbit (example: principalProvider=com.xebialabs.deployit.security.LdapPrincipalProvider)
+	* **java.naming.security.authentication**: The security scheme to use to connect to LDAP (example: java.naming.security.authentication=simple)
+	* **java.naming.security.principal**: The DN of the user that you need to do the initial connect to search LDAP (example: java.naming.security.principal="cn=administrator,ou=users,ou=system")
+	* **java.naming.security.credentials**: The password matching the DN needed to connect to LDAP (example java.naming.security.credentials=secret)
 
-2. **Modify the Deployit server startup command**. Notify the Deployit server of the new configuration file by including the following parameter on the Java command line:
+2. **Modify the Deployit server startup command**. 
 
-		-Djava.security.auth.login.config=/path/to/jackrabbit_jaas.config
+	Notify the Deployit server of the new configuration file by uncommenting the SYSPROPS variable in the startup script.
 
+		#SYSPROPS=-Djava.security.auth.login.config="$DEPLOYIT_HOME/conf/jackrabbit_jaas.config"
+
+3. **Edit the `conf/jackrabbit-repository.xml`**
+
+	Change the jackrabbit-repository.xml by looking up the Security-block, and changing it to look like this:
+		
+		<Security appName="Jackrabbit">
+			<SecurityManager class="org.apache.jackrabbit.core.DefaultSecurityManager" workspaceName="security" />
+			<AccessManager class="org.apache.jackrabbit.core.security.DefaultAccessManager" />
+		</Security>
+		
 
 The class **LdapPrincipalProvider** is an example of how to connect Deployit to LDAP through Jackrabbit. If your LDAP server has a different structure or to connect Jackrabbit to another user store, see the information about Jackrabbit configuration on the [the Jackrabbit website](http://jackrabbit.apache.org/).
 

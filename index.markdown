@@ -9,15 +9,15 @@ Welcome to the Deployit product documentation.
 
 # FAQ #
 
-Frequently asked questions about Deployit can be found [here](faq).
+There is a list of [frequently asked questions](faq) about Deployit that is continuously updated and expanded. 
 
-# Deployit documentation #
+# Latest Deployit documentation #
 
 * [3.0](/releases/3.0)
 * [3.5](/releases/3.5)
 * [3.6](/releases/3.6)
 
-# Plugin documentation #
+# Latest Plugin documentation #
 
 ##3.5.0##
 * [WAS plugin 3.5.0](/releases/was-plugin-3.5.0)

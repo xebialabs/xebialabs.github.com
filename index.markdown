@@ -29,3 +29,8 @@ There is a list of [frequently asked questions](faq) about Deployit that is cont
 * [Jboss plugin 3.6.0](/releases/jboss-plugin-3.6)
 * [Tomcat plugin 3.6.0](/releases/tomcat-plugin-3.6)
 
+# Maven plugin documentation #
+
+* [3.5](http://tech.xebialabs.com/deployit-maven-plugin/3.5.2/)
+* [3.6](http://tech.xebialabs.com/deployit-maven-plugin/3.6.0/)
+

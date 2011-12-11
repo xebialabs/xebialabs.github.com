@@ -7,5 +7,5 @@ bundledPluginsVersion = '3.6.1'
 // deployitMaintenanceVersion = '3.6.x-maintenance'
 deployitMaintenanceVersion = '3.6.2-SNAPSHOT'
 
-apply from: '../common-build.gradle'
+apply from: '../common-deployit-build.gradle'
 

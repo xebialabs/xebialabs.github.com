@@ -1,0 +1,52 @@
+
+apply from: '../common-build.gradle'
+
+configurations {
+        documentation
+        standardPluginsDoc.transitive = false
+        bundledPluginsDoc.transitive = false
+}
+
+dependencies {
+        documentation "com.xebialabs.deployit:documentation:${deployitMaintenanceVersion}:documentation@zip"
+        standardPluginsDoc "com.xebialabs.deployit:documentation:${apiVersion}:standard-plugins@zip"
+        bundledPluginsDoc "com.xebialabs.deployit:documentation:${bundledPluginsVersion}:bundled-plugins@zip"
+}
+
+task updateDeployitDoc() << {
+    copy {
+        from zipTree(configurations.documentation.files.iterator().next())
+        include 'html/**/*'
+        into 'tmp'
+    }
+}
+
+task updateStandardPluginsDoc() << {
+    copy {
+        from zipTree(configurations.standardPluginsDoc.files.iterator().next())
+        include 'html/**/*'
+        into 'tmp'
+    }
+}
+
+task updateBundledPluginsDoc() << {
+    copy {
+        from zipTree(configurations.bundledPluginsDoc.files.iterator().next())
+        include 'html/**/*'
+        into 'tmp'
+    }
+}
+
+task update(dependsOn: [ updateStandardPluginsDoc, updateBundledPluginsDoc, updateDeployitDoc ]) << {
+    copy {
+        from 'tmp/html'
+        rename 'starthere.html', 'index.html'
+        into '.'
+    }
+
+    // Note: new files are not automatically added. Need to find a solution for that.
+    if(! project.hasProperty('dryRun') && execute(["git", "commit", "-a", "-m", "Automated update of online docs"]) == 0) {
+        execute("git push origin master")
+    }
+}
+

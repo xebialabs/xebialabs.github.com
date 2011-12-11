@@ -1,0 +1,5 @@
+plugin='was-plugin'
+pluginMaintenanceVersion='3.6.1-SNAPSHOT'
+
+apply from: '../common-plugin-build.gradle'
+

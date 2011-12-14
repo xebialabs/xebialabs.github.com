@@ -89,3 +89,52 @@ The following snippet shows examples of creating common UDM CIs.
 		env.members = [ host.id ]                                                                                                                        
 		repository.create(env)
 		deployit.print(env)
+
+# Packaging #
+
+### How do I refer to another CI in my manifest file? ###
+
+You must use the value of the _Name_ attribute of a CI to refer to another CI in the manifest. This is true, even if you use the _CI-Name_ property to provide a CI name that is different from the artifact name.
+
+For example, in the following manifest, the _wsdl_and_mapping_ CI has a reference to the _Strawberry-wsdls_ and _Strawberry-wsdls-mapping_ CIs:
+
+		Name: wsdl_and_mapping 
+		CI-Name: Strawberry-wsdls-and-mapping 
+		CI-Type: org.WsdlSource 
+		CI-Wsdls: wsdl 
+		CI-Mapping: wsdl/mapping/mapping.csv
+
+		Name: wsdl 
+		CI-Name: Strawberry-wsdls 
+		CI-Type: org.Wsdls
+
+		Name: wsdl/mapping/mapping.csv 
+		CI-Name: Strawberry-wsdls-mapping 
+		CI-Type: org.WsdlsMapping
+
+
+# Customization and extension #
+
+### Can I add a synthetic task to an existing type (e.g. SshHost) without modifying it? ###
+
+_Note that synthetic types are present from 3.6 onwards_
+
+At the moment it is not possible to synthetically (<type-modification>) add control tasks to an existing type such as _Host_. 
+However you could achieve the same functionality by using the Generic Model Plugin, which does support synthetic control tasks.
+
+Example :
+
+1. Define your custom container, that extends the generic container, which defines the control task and its associated script to run for the task. The scripts are freemarker templates that get render, copied to the target host and executed.
+
+		<type type="bdf.ConnectionTest" extends="generic.Container"> 
+			<!-- inherited hidden --> 
+			<property name="startProcessScript" default="bdf/connectiontest/start" hidden="true"/> 
+			<property name="stopProcessScript" default="bdf/connectiontest/stop" hidden="true"/> 
+			<!-- control tasks --> 
+			<method name="start" description="Start some process"/> 
+			<method name="stop" description="Stop some process"/> 
+		</type>
+
+2. Create the container under the host you wish to test in the repository editor.
+
+3. Execute the control task.

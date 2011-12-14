@@ -1,11 +1,11 @@
 ---
-layout: faq
+layout: default
 title: Deployit Frequently Asked Questions
 ---
 
 # Deployit Frequently Asked Questions #
 
-<a class="faqlink" href="#">Server Installation</a>
+# Server Installation #
 
 ### Can I perform an unattended install of Deployit, for instance using Puppet? ###
 
@@ -19,7 +19,7 @@ Another option is to run through the setup wizard automatically, accepting all t
 
 	yes yes | bin/server.sh -setup
 
-<a class="faqlink" href="#">Server configuration and startup</a>
+# Server configuration and startup #
 	
 ### How do I prevent Deployit from writing temporary files for imported packages? ###
 
@@ -56,7 +56,7 @@ Deployit uses file.encoding system property. To change file encoding other than 
 	e.g: -Dclient.encoding.override=UTF-8
 	
 
-<a class="faqlink" href="#">Middleware server configuration</a>
+# Middleware server configuration #
 
 ### Where can I find more information about configuring middleware for use with Deployit? ###
 
@@ -66,7 +66,7 @@ See the [documentation provided with the Overthere framework](https://github.com
 
 Yes. Deployit can use Telnet or WinRM to execute commands on the middleware hosts, but needs CIFS to transfer files to the middleware host.
 
-<a class="faqlink" href="#">CLI usage</a>
+# CLI usage #
 
 ### How do I create the most common CIs in the CLI? ###
 

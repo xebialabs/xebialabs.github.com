@@ -210,10 +210,12 @@ security.login(&#39;admin&#39;, &#39;newpassword&#39;)
 <ol>
   <li>Create a directory for the new Deployit server installation, including the new Deployit server version number in the directory name.</li>
   <li>Extract the server archive in this directory.</li>
-  <li>Copy the contents of the <strong>conf</strong>, <strong>repository</strong> and <strong>hotfix</strong> directories from the previous installation into the new installation directory.</li>
+  <li>Copy the contents of the <strong>conf</strong> directory from the previous installation into the new installation directory.</li>
+  <li>Copy the contents of the <strong>repository</strong> directory from the previous installation into the new installation directory.</li>
   <li>Copy the contents of the <strong>importablePackages</strong> directory from the previous installation into the new installation directory.</li>
   <li>Copy the contents of the <strong>plugins</strong> directory from the previous installation into the new installation directory.</li>
   <li>Copy the contents of the <strong>ext</strong> directory from the previous installation into the new installation directory.</li>
+  <li><strong>DO NOT</strong> copy the contents of the <strong>hotfix</strong> directory (unless instructed) because hotfixes are version specific.</li>
   <li>If you have made any changes to the Deployit server startup scripts (<em>server.sh</em> or <em>server.cmd</em>), copy these from the <strong>bin</strong> directory in the previous installation into the new installation directory.</li>
 </ol><p><strong>Note</strong>: please make sure that the plugins and extensions in the old Deployit installation are compatible with the new Deployit server version.</p><p>This completes upgrading of the Deployit server.</p><h2>Upgrading the CLI</h2><p>To upgrade an existing Deployit CLI installation, do the following:</p>
 <ol>
@@ -272,8 +274,16 @@ security.login(&#39;admin&#39;, &#39;newpassword&#39;)
     &lt;AccessManager class=&quot;org.apache.jackrabbit.core.security.DefaultAccessManager&quot; /&gt;
 &lt;/Security&gt;
 </code></pre></li>
-</ol><h2>Configuring the Repository</h2><h3>Using a Database</h3><p>Deployit can also use a database to store its repository. The built-in Jackrabit JCR implementation must be configured to make this possible. The two relevant components are Jackrabbit's <code>PersistenceManager</code> (used for storing nodes and revisions) and <code>DataStore</code> (optionally used for storing large binary objects). In the default Deployit configuration, the <a href="http://db.apache.org/derby/">Derby database</a> and file system DataStore are used.</p><p>Here are some examples of configuring Deployit to use a database for various database vendors. The XML snippets below must be put into the <code>conf/jackrabbit-repository.xml</code> file.</p><p><strong>Note:</strong> Deployit <strong>must</strong> initialize the repository before it can be used. Run Deployit's setup wizard after making any changes to the Jackrabbit configuration.</p><p>For more information about using a database with Jackrabbit, see it's <a href="http://wiki.apache.org/jackrabbit/PersistenceManagerFAQ">PersistenceManager FAQ</a> and <a href="http://wiki.apache.org/jackrabbit/DataStore">DataStore FAQ</a>.</p><p><strong>Using Deployit with <a href="http://www.mysql.com/">MySQL</a></strong></p>
-<pre><code>&lt;Workspace name=&quot;${wsp.name}&quot;&gt;
+</ol><h2>Configuring the Repository</h2><h3>Using a Database</h3><p>Deployit can also use a database to store its repository. The built-in Jackrabit JCR implementation must be configured to make this possible. </p><p>In order to store binary artifacts in a database, configuring the <em>DataStore</em> property is sufficient.</p><p>In order to store CIs and CI history in a database, configuring only the <em>PersistenceManager</em> and <em>FileSystem</em> properties is sufficient.</p><p>In order to store all data (binary artifacts and CIs and CI history) in a database, <em>DataStore</em>, <em>PersistenceManager</em> and <em>FileSystem</em> must all be configured.</p><p>Here are some examples of configuring Deployit to use a database for various database vendors. The XML snippets below must be put into the <code>conf/jackrabbit-repository.xml</code> file.</p><p><strong>Note:</strong> Deployit <strong>must</strong> initialize the repository before it can be used. Run Deployit's setup wizard after making any changes to the Jackrabbit configuration.</p><p>For more information about using a database with Jackrabbit, see it's <a href="http://wiki.apache.org/jackrabbit/PersistenceManagerFAQ">PersistenceManager FAQ</a> and <a href="http://wiki.apache.org/jackrabbit/DataStore">DataStore FAQ</a>.</p><p><strong>Using Deployit with <a href="http://www.mysql.com/">MySQL</a></strong></p>
+<pre><code>&lt;DataStore class=&quot;org.apache.jackrabbit.core.data.db.DbDataStore&quot;&gt;
+    &lt;param name=&quot;driver&quot; value=&quot;com.mysql.jdbc.Driver&quot;/&gt;
+    &lt;param name=&quot;url&quot; value=&quot;jdbc:mysql://localhost:3306/deployit&quot;/&gt;
+    &lt;param name=&quot;databaseType&quot; value=&quot;mysql&quot;/&gt;
+    &lt;param name=&quot;user&quot; value=&quot;deployit&quot; /&gt;
+    &lt;param name=&quot;password&quot; value=&quot;deployit&quot; /&gt;          
+&lt;/DataStore&gt;
+
+&lt;Workspace name=&quot;${wsp.name}&quot;&gt;
     &lt;FileSystem class=&quot;org.apache.jackrabbit.core.fs.local.LocalFileSystem&quot;&gt;
        &lt;param name=&quot;path&quot; value=&quot;${wsp.home}&quot; /&gt;
     &lt;/FileSystem&gt;
@@ -305,7 +315,15 @@ security.login(&#39;admin&#39;, &#39;newpassword&#39;)
       &lt;/PersistenceManager&gt;
 &lt;/Versioning&gt;
 </code></pre><p>Note: The MySQL database is not suited for storage of large binary objects, see <a href="http://bugs.mysql.com/bug.php?id=10859">the MySQL bug tracker</a>.</p><p><strong>Using Deployit with <a href="http://www-01.ibm.com/software/data/db2/">DB2</a></strong></p>
-<pre><code>&lt;Workspace name=&quot;${wsp.name}&quot;&gt;
+<pre><code>&lt;DataStore class=&quot;org.apache.jackrabbit.core.data.db.DbDataStore&quot;&gt;
+        &lt;param name=&quot;driver&quot; value=&quot;com.ibm.db2.jcc.DB2Driver&quot;/&gt;
+        &lt;param name=&quot;url&quot; value=&quot;jdbc:db2://localhost:50002/deployit&quot;/&gt;
+        &lt;param name=&quot;databaseType&quot; value=&quot;db2&quot;/&gt;
+        &lt;param name=&quot;user&quot; value=&quot;deployit&quot; /&gt;
+        &lt;param name=&quot;password&quot; value=&quot;deployit&quot; /&gt;          
+&lt;/DataStore&gt;
+
+&lt;Workspace name=&quot;${wsp.name}&quot;&gt;
     &lt;FileSystem class=&quot;org.apache.jackrabbit.core.fs.local.LocalFileSystem&quot;&gt;
        &lt;param name=&quot;path&quot; value=&quot;${wsp.home}&quot; /&gt;
     &lt;/FileSystem&gt;

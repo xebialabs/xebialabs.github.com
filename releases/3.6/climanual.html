@@ -265,9 +265,4 @@ deployit.executeControlTask(&#39;start&#39;, webserver)
     taskID = deployment.deploy(deploymentRef).taskId
     deployit.startTaskAndWait(taskID)
     print &quot;Done.&quot;
-</code></pre><h3>Deploying an Application</h3><p>Importing and deploying a package using the default mappings is easy using the CLI. The following commands perform a simple version of this scenario:</p>
-<pre><code>    importedPackage = deployit.importPackage(&quot;PetClinic-ear/1.0&quot;)
-    environment = repository.read(&#39;Environments/TEST&#39;)
-
-    taskId = deployit.deploy(importedPackage.id, environment.id)
-</code></pre><p>Note that the last command returns immediately, returning the <code>taskId</code> of the started task. The Deployit server will perform the deployment asynchronously in the background.</p></body></html>
+</code></pre></body></html>

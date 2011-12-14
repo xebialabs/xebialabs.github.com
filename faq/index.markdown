@@ -1,11 +1,11 @@
 ---
-layout: default
+layout: faq
 title: Deployit Frequently Asked Questions
 ---
 
 # Deployit Frequently Asked Questions #
 
-## Server Installation ##
+<a class="faqlink" href="#">Server Installation</a>
 
 ### Can I perform an unattended install of Deployit, for instance using Puppet? ###
 
@@ -19,8 +19,8 @@ Another option is to run through the setup wizard automatically, accepting all t
 
 	yes yes | bin/server.sh -setup
 
-## Server Configuration and Startup ##
-
+<a class="faqlink" href="#">Server configuration and startup</a>
+	
 ### How do I prevent Deployit from writing temporary files for imported packages? ###
 
 When uploading a package using the CLI, Deployit stores a temporary file on the server. This file is deleted only if you shut down the JVM. An alternative is to make Deployit read the archive in memory. To do this, use the following setting when starting the Deployit server:
@@ -56,13 +56,17 @@ Deployit uses file.encoding system property. To change file encoding other than 
 	e.g: -Dclient.encoding.override=UTF-8
 	
 
-## Middleware Server Configuration - Windows ##
+<a class="faqlink" href="#">Middleware server configuration</a>
+
+### Where can I find more information about configuring middleware for use with Deployit? ###
+
+See the [documentation provided with the Overthere framework](https://github.com/xebialabs/overthere).
 
 ### Do I always need a CIFS connection to my Windows middleware hosts? ###
 
 Yes. Deployit can use Telnet or WinRM to execute commands on the middleware hosts, but needs CIFS to transfer files to the middleware host.
 
-## CLI usage ##
+<a class="faqlink" href="#">CLI usage</a>
 
 ### How do I create the most common CIs in the CLI? ###
 

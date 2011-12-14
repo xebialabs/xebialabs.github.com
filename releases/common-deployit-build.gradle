@@ -13,6 +13,19 @@ dependencies {
         bundledPluginsDoc "com.xebialabs.deployit:documentation:${bundledPluginsVersion}:bundled-plugins@zip"
 }
 
+def execute(command) {
+    println "Executing: ${command}"
+    def proc = command.execute()                 // Call *execute* on the string
+    proc.waitFor()                               // Wait for the command to finish
+
+    // Obtain status and output
+    println "  return code: ${proc.exitValue()}"
+    println "  stderr: ${proc.err.text}"
+    println "  stdout: ${proc.in.text}" // *out* from the external program is *in* for groovy
+
+    return proc.exitValue()
+}
+
 task updateDeployitDoc() << {
     copy {
         from zipTree(configurations.documentation.files.iterator().next())

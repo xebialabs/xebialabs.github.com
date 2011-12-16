@@ -1,0 +1,305 @@
+<html><head><LINK REL=StyleSheet HREF="css/deployit.css" TYPE="text/css" MEDIA=screen>
+<LINK REL=StyleSheet HREF="css/ci-reference-api.css" TYPE="text/css" MEDIA=screen>
+<script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="js/jquery.tableofcontents.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+    $("body").attr('id', 'top-toc');
+    var title = $("<div class='manual-title'/>")
+    title.html("<div class='title'>IBM WebSphere MQ Plugin Manual</div><div class='version'>Version <span class='version-number'>3.6.0</span></div>");
+    $("body").css('width', '100%');
+    $("body").prepend(title);
+    $("body").prepend($("<ol id='toc'/>"));
+    $("#toc").tableOfContents("body", { topLinks: true, } );
+});
+
+</script>
+<title>IBM WebSphere MQ Plugin Manual</title>
+</head><body><h1>Preface</h1><p>This document describes the functionality provided by the Websphere MQ plugin.</p><p>See the <strong>Deployit Reference Manual</strong> for background information on Deployit and deployment concepts.</p><h1>Overview</h1><p>The WMQ plugin is a Deployit plugin that adds the capability to manage MQ resources on Websphere MQ environment. It works out of the box for deploying/ undeploying local queues and alias queues on a queue manager and can easily be extended to support management of other possible resources on a Websphere MQ environment.</p><h2>Features</h2>
+<ul>
+  <li>Resources
+  <ul>
+    <li>Local Queue</li>
+    <li>Alias Queue</li>
+  </ul></li>
+  <li>Control Taks
+  <ul>
+    <li>Start/Stop queue manager</li>
+  </ul></li>
+</ul><h1>Requirements</h1>
+<ul>
+  <li><p><strong>Deployit requirements</strong></p>
+  <ul>
+    <li><strong>Deployit</strong>: version 3.6+</li>
+    <li><strong>Websphere MQ</strong>: 7.x</li>
+    <li><strong>Other Deployit Plugins</strong>: None</li>
+  </ul></li>
+  <li><p><strong>Infrastructural requirements</strong></p>
+  <ul>
+    <li><strong>User credentials</strong> for accessing the Host running Websphere MQ, and should be having the rights to run WMQ commands.</li>
+  </ul></li>
+</ul><h1>Usage in Deployment Packages</h1><p>The plugin works with the standard deployment package DAR format. Please see the <em>Packaging Manual</em> for more details about the DAR format and the ways to compose one. </p><p>The following is a sample MANIFEST.MF file that can be used to create a WMQ specific deployment package. It contain declarations for a <a href="#wmq.LocalQueueSpec">LocalQueue</a>, and an <a href="#wmq.AliasQueueSpec">AliasQueue</a>.</p>
+<pre style="display:inline-block; nobreak"><code>
+Manifest-Version: 1.0
+Deployit-Package-Format-Version: 1.3
+CI-Application: wmqApp
+CI-Version: 1.0
+
+Name: testLocalQueue
+CI-Type: wmq.LocalQueueSpec
+CI-maxDepth: 3
+CI-boqname: testBackoutQueue
+CI-bothresh: 10
+
+Name: testAliasQueue
+CI-Type: wmq.AliasQueueSpec
+CI-target: testTargetQueue
+CI-cluster: QUEUE_CLUSTER
+</code></pre><h1>Using the deployables and deployeds</h1><p>The following table describes which deployable/container combinations are possible.</p><h2>Deployable vs. Container table</h2>
+<table class="deployed-matrix">
+<tr>
+	<th>Deployable</th>
+	<th>Container</th>
+	<th>Generated deployed</th>
+</tr>
+<tr>
+	<td>wmq.LocalQueueSpec</td>
+	<td>wmq.QueueManager</td>
+	<td>wmq.LocalQueue</td>
+</tr>
+<tr>
+	<td>wmq.AliasQueueSpec</td>
+	<td>wmq.QueueManager</td>
+	<td>wmq.AliasQueue</td>
+</tr>
+</table><p>The following table describes the effect a deployed has on it's container</p><h2>Deployed Actions Table</h2>
+<table class="deployed-matrix">
+<tr>
+	<th class="borderless-bottom">Deployed</th>
+	<th colspan="3">Actions performed for operations</th>
+</tr>
+<tr>
+	<th class="borderless-top">&nbsp;</th>
+	<th align="center">Create</th>
+	<th align="center">Destroy</th>
+	<th align="center">Modify</th>
+</tr>
+<tr>
+	<td>wmq.LocalQueue</td>
+	<td>
+		<ul>
+			<li>create local queue on queue manager</li>
+		</ul>
+      </td>
+	<td>
+		<ul>
+			<li>delete local queue</li>
+		</ul>
+	</td>
+	<td>
+		<ul>
+			<li>alter local queue</li>
+		</ul>
+</tr>
+<tr>
+	<td>wmq.AliasQueue</td>
+	<td>
+		<ul>
+			<li>create queue alias on queue manager</li>
+		</ul>
+	</td>
+	<td>
+		<ul>
+			<li>delete queue alias</li>
+		</ul>
+	</td>
+	<td>
+		<ul>
+			<li>alter queue alias</li>
+		</ul>
+	</td>
+</tr>
+</table><h1>Queue manager</h1><p>wmq.QueueManager is a container type which represents an existing queue manager running in the MQ environment, and the MQ resources like local queue or alias queue can be targeted to it. It has a containment relationship with Host, which means that it can only be created under a Host. Also, since a wmq.QueueManager is meant to represent an existing queue manager, the name of the CI should reflect the existing queue manager name. For example if the existing queue manager running in the MQ environment is called VENUS, the wmq.QueueManager CI should be called VENUS.</p><p>wmq.QueueManager also supports control tasks for starting and stopping the queue manager. Please refer to the CLI or GUI manual to know more on how to use control tasks.</p><h1>Extension points</h1><p>The WMQ plugin is designed to be extended through Deployit's Plugin API type system. Also, since the WMQ plugin is built on top of the generic-plugin, support for new types can be added using the generic plugin patterns. Refer to the <em>Generic Plugin Manual</em> for more details. Also, refer to the <em>Customization Manual</em> for an explanation of the type system.</p><p>The next section describes extensibility by examples:</p><h1>Extending the WMQ Plugin</h1><p><strong>Making an existing property hidden/visible or changing the default value</strong></p><p>The following synthetic.xml snippet shows how the <em>maxDepth</em> property can be made hidden with a default value set on it in the <em>wmq.LocalQueue</em> type:</p>
+<pre><code>&lt;type-modification type=&quot;wmq.LocalQueue&quot;&gt;
+  &lt;!-- make it hidden, and give a default value if all the local queues are always created with the maxDepth value of 3--&gt;
+  &lt;property name=&quot;maxDepth&quot; kind=&quot;integer&quot; default=&quot;3&quot; hidden=&quot;true&quot;/&gt;
+&lt;/type-modification&gt;
+</code></pre><p><strong>Adding a new property to a deployed/deployable</strong></p><p>The following synthetic.xml snippet shows how a new property 'DEFPRTY'(for specifying the default priority) can be added to the <em>wmq.LocalQueue</em> type:</p>
+<pre><code>&lt;type-modification type=&quot;wmq.LocalQueue&quot;&gt;
+    &lt;!-- adding new property for setting the default priority--&gt;
+    &lt;property name=&quot;defprty&quot; kind=&quot;integer&quot; default=&quot;3&quot; label=&quot;default priority&quot; 
+    description=&quot;The default priority of messages put on the queue. The value must be in the range zero 
+    (the lowest priority) through to the MAXPRTY queue manager parameter. (MAXPRTY is 9.)&quot;/&gt;
+&lt;/type-modification&gt;    
+</code></pre><p>Note that while adding a new property in the WMQ plugin, <em>the property name should match exactly with the the WMQ command parameter name</em>. Hence the property has been called <code>defprty</code> and not 'defaultProperty' or 'defPriority'. Also, a label can be specified for the property to give it a user-friendly name on the UI. In the example above, the property <code>defprty</code> will appear as <code>default priority</code> on the UI. </p><p><strong>Adding a new type</strong></p><p>New types can be added in WMQ plugin using the <code>Generic Plugin</code> patterns. For example, the following synthetic.xml snippet defines a new deployed type <em>wmq.ModelQueue</em> (and the corresponding deployable type <em>wmq.ModelQueueSpec</em>, which will be automatically generated from the deployed definition):</p>
+<pre><code>&lt;type type=&quot;wmq.ModelQueue&quot; extends=&quot;wmq.Resource&quot; deployable-type=&quot;wmq.ModelQueueSpec&quot; 
+                                     container-type=&quot;wmq.QueueManager&quot;&gt;
+    &lt;generate-deployable type=&quot;wmq.ModelQueueSpec&quot; extends=&quot;generic.Resource&quot;/&gt;
+    &lt;property name=&quot;createScript&quot; hidden=&quot;true&quot; default=&quot;wmq/create-qmodel&quot; /&gt;
+    &lt;property name=&quot;modifyScript&quot; hidden=&quot;true&quot; default=&quot;wmq/modify-qmodel&quot; /&gt;
+    &lt;property name=&quot;destroyScript&quot; hidden=&quot;true&quot; default=&quot;wmq/destroy-qmodel&quot; /&gt;
+    &lt;property name=&quot;maxDepth&quot; kind=&quot;integer&quot; description=&quot;The maximum number of messages allowed on the queue&quot;/&gt;
+&lt;/type&gt;
+</code></pre><p>Once this new type has been added in the synthetic.xml, the new types <em>wmq.ModelQueueSpec</em> and <em>wmq.ModelQueue</em> is readily available to the Deployit type system. But to make it usable completely, the corresponding scripts must be added at the specified path. This is how the create script <em>wmq/create-qmodel.sh</em> might look:</p>
+<pre><code>#!/bin/sh
+echo &quot;DEFINE QMODEL(${deployed.name}) ${deployed.parameters}&quot; 
+       | ${deployed.container.executablesDirectory}/runmqsc ${deployed.container.name}
+</code></pre><p>Similarly, below is an example destroy script <em>wmq/destroy-qmodel.sh</em> for the newly defined type:</p>
+<pre><code>#!/bin/sh
+echo &quot;DELETE QMODEL(${deployed.name})&quot; | ${deployed.container.executablesDirectory}/runmqsc ${deployed.container.name}
+</code></pre><p>On similar lines, the modify script can be specified containing the alter command for altering the model queue.</p><div style='width:100%; position:relative'>
+<h1 class='ci-toc-category'>CI Reference</h1><h2>Configuration Item Overview</h2><h3 class='ci-toc-category'>Deployable Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#wmq.AliasQueueSpec'>wmq.AliasQueueSpec</a></td><td>Specification of a alias queue</td>
+<tr class='odd'><td><a href='#wmq.LocalQueueSpec'>wmq.LocalQueueSpec</a></td><td>Specification of a local queue</td>
+</table>
+<h3 class='ci-toc-category'>Deployed Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#wmq.AliasQueue'>wmq.AliasQueue</a></td><td>An alias queue</td>
+<tr class='odd'><td><a href='#wmq.LocalQueue'>wmq.LocalQueue</a></td><td>A local queue</td>
+</table>
+<h3 class='ci-toc-category'>Topology Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#wmq.QueueManager'>wmq.QueueManager</a></td><td>A queue manager manages the resources associated with it, in particular the queues that it owns</td>
+</table>
+<h3 class='ci-toc-category'>Virtual Deployed Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#wmq.Resource'>wmq.Resource</a></td><td>A script executed on a generic container</td>
+</table>
+<h2 class='ci-details-title'>Configuration Item Details</h2><a name='wmq.AliasQueue'></a><h3 class='ci-detail-title'>wmq.AliasQueue</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#wmq.Resource'>wmq.Resource</a><span> >> </span><span>generic.ExecutedScript</span><span> >> </span><span>generic.AbstractDeployed</span><span> >> </span><span>udm.BaseDeployed</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Securable</span><span>, </span><span>udm.Deployed</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>An alias queue</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='wmq.AliasQueue_container'></a><span class='ci-property-name'>container</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Container&gt;</span><p class='ci-property-desc'>The container on which this deployed runs.</p></td>
+<tr class='odd'><td><a name='wmq.AliasQueue_target'></a><span class='ci-property-name'>target</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The name of the queue or topic object being aliased. The object can be a queue or a topic as defined by TARGTYPE. The maximum length is 48 characters.</p></td>
+<tr class='even'><td><a name='wmq.AliasQueue_cluster'></a><span class='ci-property-name'>cluster</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The name of the cluster to which the queue belongs</p></td>
+<tr class='odd'><td><a name='wmq.AliasQueue_deployable'></a><span class='ci-property-name'>deployable</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Deployable&gt;</span><p class='ci-property-desc'>The deployable that this deployed is derived from.</p></td>
+<tr class='even'><td><a name='wmq.AliasQueue_inheritPermissions'></a><span class='ci-property-name'>inheritPermissions</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>If enabled, inherit the permissions from the parent node, if disabled, use the explicitly set permissions on this node.</p></td>
+<tr class='odd'><td><a name='wmq.AliasQueue_securityPermissions'></a><span class='ci-property-name'>securityPermissions</span>&nbsp;:&nbsp;<span class='ci-property-kind'>MAP_STRING_STRING</span><p class='ci-property-desc'>Map of security permissions to users/groups.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='wmq.AliasQueue_createOrder'></a><span class='ci-property-name'>createOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>60</span><p class='ci-property-desc'>Create Order</p></td>
+<tr class='odd'><td><a name='wmq.AliasQueue_createScript'></a><span class='ci-property-name'>createScript</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>wmq/create-qalias</span><p class='ci-property-desc'>Create Script</p></td>
+<tr class='even'><td><a name='wmq.AliasQueue_createVerb'></a><span class='ci-property-name'>createVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Create</span><p class='ci-property-desc'>Create Verb</p></td>
+<tr class='odd'><td><a name='wmq.AliasQueue_destroyOrder'></a><span class='ci-property-name'>destroyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>40</span><p class='ci-property-desc'>Destroy Order</p></td>
+<tr class='even'><td><a name='wmq.AliasQueue_destroyScript'></a><span class='ci-property-name'>destroyScript</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>wmq/destroy-qalias</span><p class='ci-property-desc'>Destroy Script</p></td>
+<tr class='odd'><td><a name='wmq.AliasQueue_destroyVerb'></a><span class='ci-property-name'>destroyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Destroy</span><p class='ci-property-desc'>Destroy Verb</p></td>
+<tr class='even'><td><a name='wmq.AliasQueue_modifyOrder'></a><span class='ci-property-name'>modifyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>40</span><p class='ci-property-desc'>Modify Order</p></td>
+<tr class='odd'><td><a name='wmq.AliasQueue_modifyScript'></a><span class='ci-property-name'>modifyScript</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>wmq/modify-qalias</span><p class='ci-property-desc'>Modify Script</p></td>
+<tr class='even'><td><a name='wmq.AliasQueue_modifyVerb'></a><span class='ci-property-name'>modifyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Modify</span><p class='ci-property-desc'>Modify Verb</p></td>
+<tr class='odd'><td><a name='wmq.AliasQueue_noopOrder'></a><span class='ci-property-name'>noopOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order of the step in the step list for the noop operation.</p></td>
+<tr class='even'><td><a name='wmq.AliasQueue_noopVerb'></a><span class='ci-property-name'>noopVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Modify</span><p class='ci-property-desc'>Noop Verb</p></td>
+<tr class='odd'><td><a name='wmq.AliasQueue_standardPropertiesNotToExpose'></a><span class='ci-property-name'>standardPropertiesNotToExpose</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>deployable, container, createOrder, createScript, createVerb, modifyOrder, modifyScript, modifyVerb, destroyOrder, destroyScript, destroyVerb, startOrder, startScript, startVerb, stopOrder, stopScript, stopVerb, inspectScript, inspectVerb, securityPermissions, inheritPermissions</span><p class='ci-property-desc'>Standard properties that are not exposed to any python wsadmin script.</p></td>
+<tr class='even'><td><a name='wmq.AliasQueue_classpathResources'></a><span class='ci-property-name'>classpathResources</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Additional classpath resources that should be uploaded to the working directory before executing the script.</p></td>
+<tr class='odd'><td><a name='wmq.AliasQueue_inspectClasspathResources'></a><span class='ci-property-name'>inspectClasspathResources</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Additional classpath resources that should be uploaded to the working directory before executing the inspect script.</p></td>
+<tr class='even'><td><a name='wmq.AliasQueue_inspectScript'></a><span class='ci-property-name'>inspectScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script used to inspect the generic container.</p></td>
+<tr class='odd'><td><a name='wmq.AliasQueue_inspectTemplateClasspathResources'></a><span class='ci-property-name'>inspectTemplateClasspathResources</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Additional template classpath resources that should be uploaded to the working directory before executing the inspect script.The template is first rendered and the rendered content copied to a file, with the same name as the template, in the working directory.</p></td>
+<tr class='even'><td><a name='wmq.AliasQueue_noopScript'></a><span class='ci-property-name'>noopScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script that is uploaded and executed on the generic container for the noop operation.</p></td>
+<tr class='odd'><td><a name='wmq.AliasQueue_remoteWorkingDirectoryPath'></a><span class='ci-property-name'>remoteWorkingDirectoryPath</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Name of working directory on target host. Default is to create a temporary directory which is deleted when connection is closed.</p></td>
+<tr class='even'><td><a name='wmq.AliasQueue_restartRequired'></a><span class='ci-property-name'>restartRequired</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>The generic container requires a restart for the action performed by this deployed.</p></td>
+<tr class='odd'><td><a name='wmq.AliasQueue_restartRequiredForNoop'></a><span class='ci-property-name'>restartRequiredForNoop</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>The generic container requires a restart for the NOOP action performed by this deployed.</p></td>
+<tr class='even'><td><a name='wmq.AliasQueue_retainRemoteWorkingDirectory'></a><span class='ci-property-name'>retainRemoteWorkingDirectory</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>Retain the specified working directory on target host after completion.</p></td>
+<tr class='odd'><td><a name='wmq.AliasQueue_templateClasspathResources'></a><span class='ci-property-name'>templateClasspathResources</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Additional template classpath resources that should be uploaded to the working directory before executing the script.The template is first rendered and the rendered content copied to a file, with the same name as the template, in the working directory.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='wmq.AliasQueueSpec'></a><h3 class='ci-detail-title'>wmq.AliasQueueSpec</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>generic.Resource</span><span> >> </span><span>udm.BaseDeployable</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.Deployable</span><span>, </span><span>udm.Securable</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Specification of a alias queue</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='wmq.AliasQueueSpec_cluster'></a><span class='ci-property-name'>cluster</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The name of the cluster to which the queue belongs</p></td>
+<tr class='odd'><td><a name='wmq.AliasQueueSpec_inheritPermissions'></a><span class='ci-property-name'>inheritPermissions</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>If enabled, inherit the permissions from the parent node, if disabled, use the explicitly set permissions on this node.</p></td>
+<tr class='even'><td><a name='wmq.AliasQueueSpec_securityPermissions'></a><span class='ci-property-name'>securityPermissions</span>&nbsp;:&nbsp;<span class='ci-property-kind'>MAP_STRING_STRING</span><p class='ci-property-desc'>Map of security permissions to users/groups.</p></td>
+<tr class='odd'><td><a name='wmq.AliasQueueSpec_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+<tr class='even'><td><a name='wmq.AliasQueueSpec_target'></a><span class='ci-property-name'>target</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The name of the queue or topic object being aliased. The object can be a queue or a topic as defined by TARGTYPE. The maximum length is 48 characters.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='wmq.LocalQueue'></a><h3 class='ci-detail-title'>wmq.LocalQueue</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#wmq.Resource'>wmq.Resource</a><span> >> </span><span>generic.ExecutedScript</span><span> >> </span><span>generic.AbstractDeployed</span><span> >> </span><span>udm.BaseDeployed</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Securable</span><span>, </span><span>udm.Deployed</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>A local queue</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='wmq.LocalQueue_boqname'></a><span class='ci-property-name'>boqname</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The excessive backout requeue name</p></td>
+<tr class='odd'><td><a name='wmq.LocalQueue_bothresh'></a><span class='ci-property-name'>bothresh</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span><p class='ci-property-desc'>The backout threshold</p></td>
+<tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='wmq.LocalQueue_container'></a><span class='ci-property-name'>container</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Container&gt;</span><p class='ci-property-desc'>The container on which this deployed runs.</p></td>
+<tr class='odd'><td><a name='wmq.LocalQueue_maxDepth'></a><span class='ci-property-name'>maxDepth</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span><p class='ci-property-desc'>The maximum number of messages allowed on the queue</p></td>
+<tr class='even'><td><a name='wmq.LocalQueue_cluster'></a><span class='ci-property-name'>cluster</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The name of the cluster to which the queue belongs</p></td>
+<tr class='odd'><td><a name='wmq.LocalQueue_deployable'></a><span class='ci-property-name'>deployable</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Deployable&gt;</span><p class='ci-property-desc'>The deployable that this deployed is derived from.</p></td>
+<tr class='even'><td><a name='wmq.LocalQueue_inheritPermissions'></a><span class='ci-property-name'>inheritPermissions</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>If enabled, inherit the permissions from the parent node, if disabled, use the explicitly set permissions on this node.</p></td>
+<tr class='odd'><td><a name='wmq.LocalQueue_securityPermissions'></a><span class='ci-property-name'>securityPermissions</span>&nbsp;:&nbsp;<span class='ci-property-kind'>MAP_STRING_STRING</span><p class='ci-property-desc'>Map of security permissions to users/groups.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='wmq.LocalQueue_createOrder'></a><span class='ci-property-name'>createOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>60</span><p class='ci-property-desc'>Create Order</p></td>
+<tr class='odd'><td><a name='wmq.LocalQueue_createScript'></a><span class='ci-property-name'>createScript</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>wmq/create-qlocal</span><p class='ci-property-desc'>Create Script</p></td>
+<tr class='even'><td><a name='wmq.LocalQueue_createVerb'></a><span class='ci-property-name'>createVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Create</span><p class='ci-property-desc'>Create Verb</p></td>
+<tr class='odd'><td><a name='wmq.LocalQueue_destroyOrder'></a><span class='ci-property-name'>destroyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>40</span><p class='ci-property-desc'>Destroy Order</p></td>
+<tr class='even'><td><a name='wmq.LocalQueue_destroyScript'></a><span class='ci-property-name'>destroyScript</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>wmq/destroy-qlocal</span><p class='ci-property-desc'>Destroy Script</p></td>
+<tr class='odd'><td><a name='wmq.LocalQueue_destroyVerb'></a><span class='ci-property-name'>destroyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Destroy</span><p class='ci-property-desc'>Destroy Verb</p></td>
+<tr class='even'><td><a name='wmq.LocalQueue_modifyOrder'></a><span class='ci-property-name'>modifyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>40</span><p class='ci-property-desc'>Modify Order</p></td>
+<tr class='odd'><td><a name='wmq.LocalQueue_modifyScript'></a><span class='ci-property-name'>modifyScript</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>wmq/modify-qlocal</span><p class='ci-property-desc'>Modify Script</p></td>
+<tr class='even'><td><a name='wmq.LocalQueue_modifyVerb'></a><span class='ci-property-name'>modifyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Modify</span><p class='ci-property-desc'>Modify Verb</p></td>
+<tr class='odd'><td><a name='wmq.LocalQueue_noopOrder'></a><span class='ci-property-name'>noopOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order of the step in the step list for the noop operation.</p></td>
+<tr class='even'><td><a name='wmq.LocalQueue_noopVerb'></a><span class='ci-property-name'>noopVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Modify</span><p class='ci-property-desc'>Noop Verb</p></td>
+<tr class='odd'><td><a name='wmq.LocalQueue_standardPropertiesNotToExpose'></a><span class='ci-property-name'>standardPropertiesNotToExpose</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>deployable, container, createOrder, createScript, createVerb, modifyOrder, modifyScript, modifyVerb, destroyOrder, destroyScript, destroyVerb, startOrder, startScript, startVerb, stopOrder, stopScript, stopVerb, inspectScript, inspectVerb, securityPermissions, inheritPermissions</span><p class='ci-property-desc'>Standard properties that are not exposed to any python wsadmin script.</p></td>
+<tr class='even'><td><a name='wmq.LocalQueue_classpathResources'></a><span class='ci-property-name'>classpathResources</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Additional classpath resources that should be uploaded to the working directory before executing the script.</p></td>
+<tr class='odd'><td><a name='wmq.LocalQueue_inspectClasspathResources'></a><span class='ci-property-name'>inspectClasspathResources</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Additional classpath resources that should be uploaded to the working directory before executing the inspect script.</p></td>
+<tr class='even'><td><a name='wmq.LocalQueue_inspectScript'></a><span class='ci-property-name'>inspectScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script used to inspect the generic container.</p></td>
+<tr class='odd'><td><a name='wmq.LocalQueue_inspectTemplateClasspathResources'></a><span class='ci-property-name'>inspectTemplateClasspathResources</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Additional template classpath resources that should be uploaded to the working directory before executing the inspect script.The template is first rendered and the rendered content copied to a file, with the same name as the template, in the working directory.</p></td>
+<tr class='even'><td><a name='wmq.LocalQueue_noopScript'></a><span class='ci-property-name'>noopScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script that is uploaded and executed on the generic container for the noop operation.</p></td>
+<tr class='odd'><td><a name='wmq.LocalQueue_remoteWorkingDirectoryPath'></a><span class='ci-property-name'>remoteWorkingDirectoryPath</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Name of working directory on target host. Default is to create a temporary directory which is deleted when connection is closed.</p></td>
+<tr class='even'><td><a name='wmq.LocalQueue_restartRequired'></a><span class='ci-property-name'>restartRequired</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>The generic container requires a restart for the action performed by this deployed.</p></td>
+<tr class='odd'><td><a name='wmq.LocalQueue_restartRequiredForNoop'></a><span class='ci-property-name'>restartRequiredForNoop</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>The generic container requires a restart for the NOOP action performed by this deployed.</p></td>
+<tr class='even'><td><a name='wmq.LocalQueue_retainRemoteWorkingDirectory'></a><span class='ci-property-name'>retainRemoteWorkingDirectory</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>Retain the specified working directory on target host after completion.</p></td>
+<tr class='odd'><td><a name='wmq.LocalQueue_templateClasspathResources'></a><span class='ci-property-name'>templateClasspathResources</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Additional template classpath resources that should be uploaded to the working directory before executing the script.The template is first rendered and the rendered content copied to a file, with the same name as the template, in the working directory.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='wmq.LocalQueueSpec'></a><h3 class='ci-detail-title'>wmq.LocalQueueSpec</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>generic.Resource</span><span> >> </span><span>udm.BaseDeployable</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.Deployable</span><span>, </span><span>udm.Securable</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Specification of a local queue</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='wmq.LocalQueueSpec_boqname'></a><span class='ci-property-name'>boqname</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The excessive backout requeue name</p></td>
+<tr class='odd'><td><a name='wmq.LocalQueueSpec_bothresh'></a><span class='ci-property-name'>bothresh</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The backout threshold</p></td>
+<tr class='even'><td><a name='wmq.LocalQueueSpec_cluster'></a><span class='ci-property-name'>cluster</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The name of the cluster to which the queue belongs</p></td>
+<tr class='odd'><td><a name='wmq.LocalQueueSpec_inheritPermissions'></a><span class='ci-property-name'>inheritPermissions</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>If enabled, inherit the permissions from the parent node, if disabled, use the explicitly set permissions on this node.</p></td>
+<tr class='even'><td><a name='wmq.LocalQueueSpec_maxDepth'></a><span class='ci-property-name'>maxDepth</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The maximum number of messages allowed on the queue</p></td>
+<tr class='odd'><td><a name='wmq.LocalQueueSpec_securityPermissions'></a><span class='ci-property-name'>securityPermissions</span>&nbsp;:&nbsp;<span class='ci-property-kind'>MAP_STRING_STRING</span><p class='ci-property-desc'>Map of security permissions to users/groups.</p></td>
+<tr class='even'><td><a name='wmq.LocalQueueSpec_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='wmq.QueueManager'></a><h3 class='ci-detail-title'>wmq.QueueManager</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>generic.Container</span><span> >> </span><span>udm.BaseContainer</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.Securable</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>generic.GenericContainer</span><span>, </span><span>udm.Container</span><span>, </span><span>overthere.HostContainer</span></td></tr></table></div><p class='ci-description'>A queue manager manages the resources associated with it, in particular the queues that it owns. It provides queuing services to applications for Message Queuing Interface (MQI) calls and commands to create, modify, display, and delete WebSphere MQ objects</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='wmq.QueueManager_executablesDirectory'></a><span class='ci-property-name'>executablesDirectory</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>absolute path of the directory containing wmq commands like strmqm,runmqsc etc. e.g. /opt/mqm/bin</p></td>
+<tr class='odd'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='wmq.QueueManager_host'></a><span class='ci-property-name'>host</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;overthere.Host&gt;</span><p class='ci-property-desc'>Host upon which the container resides</p></td>
+<tr class='even'><td><a name='wmq.QueueManager_envVars'></a><span class='ci-property-name'>envVars</span>&nbsp;:&nbsp;<span class='ci-property-kind'>MAP_STRING_STRING</span><p class='ci-property-desc'>Environment variables for container</p></td>
+<tr class='odd'><td><a name='wmq.QueueManager_inheritPermissions'></a><span class='ci-property-name'>inheritPermissions</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>If enabled, inherit the permissions from the parent node, if disabled, use the explicitly set permissions on this node.</p></td>
+<tr class='even'><td><a name='wmq.QueueManager_securityPermissions'></a><span class='ci-property-name'>securityPermissions</span>&nbsp;:&nbsp;<span class='ci-property-kind'>MAP_STRING_STRING</span><p class='ci-property-desc'>Map of security permissions to users/groups.</p></td>
+<tr class='odd'><td><a name='wmq.QueueManager_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='wmq.QueueManager_restartOrder'></a><span class='ci-property-name'>restartOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>90</span><p class='ci-property-desc'>The order of the restart container step in the step list.</p></td>
+<tr class='odd'><td><a name='wmq.QueueManager_startOrder'></a><span class='ci-property-name'>startOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>90</span><p class='ci-property-desc'>The order of the start container step in the step list.</p></td>
+<tr class='even'><td><a name='wmq.QueueManager_startScript'></a><span class='ci-property-name'>startScript</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>wmq/qmgr/start</span><p class='ci-property-desc'>The command to start queue manager. Arguments containing spaces are not supported</p></td>
+<tr class='odd'><td><a name='wmq.QueueManager_startWaitTime'></a><span class='ci-property-name'>startWaitTime</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>0</span><p class='ci-property-desc'>The time to wait in seconds for a container start action.</p></td>
+<tr class='even'><td><a name='wmq.QueueManager_stopOrder'></a><span class='ci-property-name'>stopOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>10</span><p class='ci-property-desc'>The order of the stop container step in the step list.</p></td>
+<tr class='odd'><td><a name='wmq.QueueManager_stopScript'></a><span class='ci-property-name'>stopScript</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>wmq/qmgr/stop</span><p class='ci-property-desc'>The command to stop queue manager. Arguments containing spaces are not supported</p></td>
+<tr class='even'><td><a name='wmq.QueueManager_stopWaitTime'></a><span class='ci-property-name'>stopWaitTime</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>0</span><p class='ci-property-desc'>The time to wait in seconds for a container stop action.</p></td>
+<tr class='odd'><td><a name='wmq.QueueManager_inspectClasspathResources'></a><span class='ci-property-name'>inspectClasspathResources</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Additional classpath resources that should be uploaded to the working directory before executing the inspect script.</p></td>
+<tr class='even'><td><a name='wmq.QueueManager_inspectScript'></a><span class='ci-property-name'>inspectScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script used to inspect the generic container.</p></td>
+<tr class='odd'><td><a name='wmq.QueueManager_inspectTemplateClasspathResources'></a><span class='ci-property-name'>inspectTemplateClasspathResources</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Additional template classpath resources that should be uploaded to the working directory before executing the inspect script.The template is first rendered and the rendered content copied to a file, with the same name as the template, in the working directory.</p></td>
+<tr class='even'><td><a name='wmq.QueueManager_restartScript'></a><span class='ci-property-name'>restartScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script used to restart the generic container.</p></td>
+<tr class='odd'><td><a name='wmq.QueueManager_restartWaitTime'></a><span class='ci-property-name'>restartWaitTime</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>0</span><p class='ci-property-desc'>The time to wait in seconds for a container restart action.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Control Tasks</th></tr><tr class='even'><td><a name='wmq.QueueManager_start'></a><span class='ci-property-name'>start</span><p class='ci-property-desc'>Start queue manager</p></td>
+<tr class='odd'><td><a name='wmq.QueueManager_stop'></a><span class='ci-property-name'>stop</span><p class='ci-property-desc'>Stop queue manager</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='wmq.Resource'></a><h3 class='ci-detail-title'>wmq.Resource</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>generic.ExecutedScript</span><span> >> </span><span>generic.AbstractDeployed</span><span> >> </span><span>udm.BaseDeployed</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Securable</span><span>, </span><span>udm.Deployed</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>A script executed on a generic container</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='wmq.Resource_container'></a><span class='ci-property-name'>container</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Container&gt;</span><p class='ci-property-desc'>The container on which this deployed runs.</p></td>
+<tr class='odd'><td><a name='wmq.Resource_deployable'></a><span class='ci-property-name'>deployable</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Deployable&gt;</span><p class='ci-property-desc'>The deployable that this deployed is derived from.</p></td>
+<tr class='even'><td><a name='wmq.Resource_inheritPermissions'></a><span class='ci-property-name'>inheritPermissions</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>If enabled, inherit the permissions from the parent node, if disabled, use the explicitly set permissions on this node.</p></td>
+<tr class='odd'><td><a name='wmq.Resource_securityPermissions'></a><span class='ci-property-name'>securityPermissions</span>&nbsp;:&nbsp;<span class='ci-property-kind'>MAP_STRING_STRING</span><p class='ci-property-desc'>Map of security permissions to users/groups.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='wmq.Resource_createOrder'></a><span class='ci-property-name'>createOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>60</span><p class='ci-property-desc'>Create Order</p></td>
+<tr class='odd'><td><a name='wmq.Resource_createScript'></a><span class='ci-property-name'>createScript</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script that is uploaded and executed on the generic container for the create operation.</p></td>
+<tr class='even'><td><a name='wmq.Resource_createVerb'></a><span class='ci-property-name'>createVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Create</span><p class='ci-property-desc'>Create Verb</p></td>
+<tr class='odd'><td><a name='wmq.Resource_destroyOrder'></a><span class='ci-property-name'>destroyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>40</span><p class='ci-property-desc'>Destroy Order</p></td>
+<tr class='even'><td><a name='wmq.Resource_destroyVerb'></a><span class='ci-property-name'>destroyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Destroy</span><p class='ci-property-desc'>Destroy Verb</p></td>
+<tr class='odd'><td><a name='wmq.Resource_modifyOrder'></a><span class='ci-property-name'>modifyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>40</span><p class='ci-property-desc'>Modify Order</p></td>
+<tr class='even'><td><a name='wmq.Resource_modifyVerb'></a><span class='ci-property-name'>modifyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Modify</span><p class='ci-property-desc'>Modify Verb</p></td>
+<tr class='odd'><td><a name='wmq.Resource_noopOrder'></a><span class='ci-property-name'>noopOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order of the step in the step list for the noop operation.</p></td>
+<tr class='even'><td><a name='wmq.Resource_noopVerb'></a><span class='ci-property-name'>noopVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Modify</span><p class='ci-property-desc'>Noop Verb</p></td>
+<tr class='odd'><td><a name='wmq.Resource_standardPropertiesNotToExpose'></a><span class='ci-property-name'>standardPropertiesNotToExpose</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>deployable, container, createOrder, createScript, createVerb, modifyOrder, modifyScript, modifyVerb, destroyOrder, destroyScript, destroyVerb, startOrder, startScript, startVerb, stopOrder, stopScript, stopVerb, inspectScript, inspectVerb, securityPermissions, inheritPermissions</span><p class='ci-property-desc'>Standard properties that are not exposed to any python wsadmin script.</p></td>
+<tr class='even'><td><a name='wmq.Resource_classpathResources'></a><span class='ci-property-name'>classpathResources</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Additional classpath resources that should be uploaded to the working directory before executing the script.</p></td>
+<tr class='odd'><td><a name='wmq.Resource_destroyScript'></a><span class='ci-property-name'>destroyScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script that is uploaded and executed on the generic container for the destroy operation.</p></td>
+<tr class='even'><td><a name='wmq.Resource_inspectClasspathResources'></a><span class='ci-property-name'>inspectClasspathResources</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Additional classpath resources that should be uploaded to the working directory before executing the inspect script.</p></td>
+<tr class='odd'><td><a name='wmq.Resource_inspectScript'></a><span class='ci-property-name'>inspectScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script used to inspect the generic container.</p></td>
+<tr class='even'><td><a name='wmq.Resource_inspectTemplateClasspathResources'></a><span class='ci-property-name'>inspectTemplateClasspathResources</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Additional template classpath resources that should be uploaded to the working directory before executing the inspect script.The template is first rendered and the rendered content copied to a file, with the same name as the template, in the working directory.</p></td>
+<tr class='odd'><td><a name='wmq.Resource_modifyScript'></a><span class='ci-property-name'>modifyScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script that is uploaded and executed on the generic container for the modify operation.</p></td>
+<tr class='even'><td><a name='wmq.Resource_noopScript'></a><span class='ci-property-name'>noopScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script that is uploaded and executed on the generic container for the noop operation.</p></td>
+<tr class='odd'><td><a name='wmq.Resource_remoteWorkingDirectoryPath'></a><span class='ci-property-name'>remoteWorkingDirectoryPath</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Name of working directory on target host. Default is to create a temporary directory which is deleted when connection is closed.</p></td>
+<tr class='even'><td><a name='wmq.Resource_restartRequired'></a><span class='ci-property-name'>restartRequired</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>The generic container requires a restart for the action performed by this deployed.</p></td>
+<tr class='odd'><td><a name='wmq.Resource_restartRequiredForNoop'></a><span class='ci-property-name'>restartRequiredForNoop</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>The generic container requires a restart for the NOOP action performed by this deployed.</p></td>
+<tr class='even'><td><a name='wmq.Resource_retainRemoteWorkingDirectory'></a><span class='ci-property-name'>retainRemoteWorkingDirectory</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>Retain the specified working directory on target host after completion.</p></td>
+<tr class='odd'><td><a name='wmq.Resource_templateClasspathResources'></a><span class='ci-property-name'>templateClasspathResources</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Additional template classpath resources that should be uploaded to the working directory before executing the script.The template is first rendered and the rendered content copied to a file, with the same name as the template, in the working directory.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+</div>
+</body></html>

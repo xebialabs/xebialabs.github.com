@@ -217,7 +217,11 @@ security.login(&#39;admin&#39;, &#39;newpassword&#39;)
   <li>Copy the contents of the <strong>ext</strong> directory from the previous installation into the new installation directory.</li>
   <li><strong>DO NOT</strong> copy the contents of the <strong>hotfix</strong> directory (unless instructed) because hotfixes are version specific.</li>
   <li>If you have made any changes to the Deployit server startup scripts (<em>server.sh</em> or <em>server.cmd</em>), copy these from the <strong>bin</strong> directory in the previous installation into the new installation directory.</li>
-</ol><p><strong>Note</strong>: please make sure that the plugins and extensions in the old Deployit installation are compatible with the new Deployit server version.</p><p>This completes upgrading of the Deployit server.</p><h2>Upgrading the CLI</h2><p>To upgrade an existing Deployit CLI installation, do the following:</p>
+</ol><p><strong>Note</strong>: please make sure that the plugins and extensions in the old Deployit installation are compatible with the new Deployit server version.</p><p>This completes upgrading of the Deployit server.</p><h3>Upgrade notes</h3><p>Starting with Deployit 3.6, plugins are divided into two categories:</p>
+<ul>
+  <li>default plugins. These are distributed as part of Deployit and are installed in the <em>plugins</em> directory.</li>
+  <li>bundled plugins. These optional plugins are installed in the <em>available-plugins</em> directory.</li>
+</ul><p>The <em>command</em> and <em>file</em> plugins that were part of the standard plugins in Deployit 3.5, are now part of the bundled plugins and are not installed by default. To use them, copy the jar file into the <em>plugins</em> directory.</p><h2>Upgrading the CLI</h2><p>To upgrade an existing Deployit CLI installation, do the following:</p>
 <ol>
   <li>Create a directory for the new Deployit CLI installation, including the new Deployit CLI version number in the directory name.</li>
   <li>Extract the CLI archive in this directory.</li>

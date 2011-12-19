@@ -44,7 +44,11 @@ $(document).ready(function(){
   <li>Archive-type CIs</li>
 </ul><p><em>Property</em> placeholders are used in CI properties by specifying them in the package's manifest.</p><p>Deployit recognizes placeholders using the following format:</p>
 <pre><code>{{PLACEHOLDER_KEY}}
-</code></pre><p>Values for placeholders can be provided manually or filled in from a <em>dictionary</em>.</p><h2>Plugin</h2><p>A <em>plugin</em> is a self-contained piece of functionality that adds capabilities to the Deployit system. Plugins are packaged in a JAR file and installed in Deployit's plugins directory. Plugins can contain:</p>
+</code></pre><p>Values for placeholders can be provided manually or filled in from a <em>dictionary</em>.</p><p>There are two special placeholder values:</p>
+<ul>
+  <li><em>&lt;empty&gt;</em> which replaces the placeholder key with an empty string</li>
+  <li><em>&lt;ignore&gt;</em> which ignores the placeholder key, leaving it as-is</li>
+</ul><h2>Plugin</h2><p>A <em>plugin</em> is a self-contained piece of functionality that adds capabilities to the Deployit system. Plugins are packaged in a JAR file and installed in Deployit's plugins directory. Plugins can contain:</p>
 <ul>
   <li>functionality to connect to specific middleware</li>
   <li>a new method to connect to a host</li>

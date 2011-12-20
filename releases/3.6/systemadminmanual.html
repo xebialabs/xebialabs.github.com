@@ -259,7 +259,7 @@ security.login(&#39;admin&#39;, &#39;newpassword&#39;)
 <ol>
   <li><p><strong>Edit <code>conf/jackrabbit-jaas.config</code> file</strong>.</p><p>The file must be accessible for the Deployit server. The sample file can be adapted to suit your needs. The LdapLoginModule takes the following arguments:</p>
   <ul>
-    <li><strong>userProvider</strong>: The LDAP url to connect to, including the bind path (example: userProvider="ldap://localhost:389/ou=system")</li>
+    <li><strong>userProvider</strong>: The LDAP url to connect to. The last part is the search base in which users and groups are searched. (example: userProvider="ldap://localhost:389/ou=system")</li>
     <li><strong>userFilter</strong>: The LDAP filter to determine the LDAP dn for the user that's logging in, {USERNAME} will be replaced with the username that's logging in (example: userFilter="(&amp;(uid={USERNAME})(objectClass=inetOrgPerson))")</li>
     <li><strong>useSSL</strong>: Whether or not we need to use SSL to connect to LDAP (example: useSSL=false)</li>
     <li><strong>groupFilter</strong>: The LDAP filter to determine the group memberships for the user, {DN} will be replaced with the DN of the user (example: groupFilter="(member={DN})")</li>

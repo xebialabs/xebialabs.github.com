@@ -6,7 +6,7 @@
 $(document).ready(function(){
     $("body").attr('id', 'top-toc');
     var title = $("<div class='manual-title'/>")
-    title.html("<div class='title'>System Administration Manual</div><div class='version'>Version <span class='version-number'>3.6.2</span></div>");
+    title.html("<div class='title'>System Administration Manual</div><div class='version'>Version <span class='version-number'>3.6.4-SNAPSHOT</span></div>");
     $("body").css('width', '100%');
     $("body").prepend(title);
     $("body").prepend($("<ol id='toc'/>"));
@@ -293,6 +293,7 @@ security.login(&#39;admin&#39;, &#39;newpassword&#39;)
     &lt;/FileSystem&gt;
 
     &lt;PersistenceManager class=&quot;org.apache.jackrabbit.core.persistence.pool.MySqlPersistenceManager&quot;&gt;
+       &lt;param name=&quot;driver&quot; value=&quot;com.mysql.jdbc.Driver&quot;/&gt;
        &lt;param name=&quot;url&quot; value=&quot;jdbc:mysql://localhost:3306/deployit&quot; /&gt;
        &lt;param name=&quot;user&quot; value=&quot;deployit&quot; /&gt;
            &lt;param name=&quot;password&quot; value=&quot;deployit&quot; /&gt;
@@ -494,4 +495,6 @@ security.login(&#39;admin&#39;, &#39;newpassword&#39;)
   </ul></li>
   <li><strong>Configuration</strong>. Remove the <code>conf</code> directory in the DEPLOYIT_SERVER_HOME directory and replace it with the backup.</li>
   <li><strong>Customization</strong>. Remove the <code>ext</code> and <code>plugins</code> directories in the DEPLOYIT_SERVER_HOME directory and replace them with the backups.</li>
-</ul><p><strong>Note:</strong> Deployit <strong>must not</strong> be running when you are restoring a backup.</p></body></html>
+</ul><p><strong>Note:</strong> Deployit <strong>must not</strong> be running when you are restoring a backup.</p><h2>Freeing up disk space</h2><p>The repository is the place where Deployit stores all of it's data. If you deal with lots of large binary artifacts, this can be problematic since the disk space they consume is not reclaimed when the are deleted. To reclaim the disk space after deleting a CI, use the following CLI snippet:</p>
+<pre><code>    deployit.runGarbageCollector()
+</code></pre></body></html>

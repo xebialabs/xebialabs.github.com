@@ -5,7 +5,7 @@ bundledPluginsVersion = '3.6.1'
 
 // would like to use the following to retrieve the latest documentation zip:
 // deployitMaintenanceVersion = '3.6.x-maintenance'
-deployitMaintenanceVersion = '3.6.3-SNAPSHOT'
+deployitMaintenanceVersion = '3.6.4-SNAPSHOT'
 
 apply from: '../common-deployit-build.gradle'
 

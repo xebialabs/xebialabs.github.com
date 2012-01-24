@@ -42,7 +42,7 @@ $(document).ready(function(){
   <li>File-type CIs</li>
   <li>Folder-type CIs</li>
   <li>Archive-type CIs</li>
-</ul><p><em>Property</em> placeholders are used in CI properties by specifying them in the package's manifest.</p><p>Deployit recognizes placeholders using the following format:</p>
+</ul><p>Before a deployment can be performed, a value must be specified for <strong>all</strong> <em>file</em> placeholders in the deployment.</p><p><em>Property</em> placeholders are used in CI properties by specifying them in the package's manifest. In contrast to file placeholders, <em>property</em> placeholders do not necessarily need to have a value from a dictionary. If the placeholder can not be resolved from a dictionary, the placeholder is left as-is.</p><p>Deployit recognizes placeholders using the following format:</p>
 <pre><code>{{PLACEHOLDER_KEY}}
 </code></pre><p>Values for placeholders can be provided manually or filled in from a <em>dictionary</em>.</p><p>There are two special placeholder values:</p>
 <ul>

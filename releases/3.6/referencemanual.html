@@ -6,7 +6,7 @@
 $(document).ready(function(){
     $("body").attr('id', 'top-toc');
     var title = $("<div class='manual-title'/>")
-    title.html("<div class='title'>Reference Manual</div><div class='version'>Version <span class='version-number'>3.6.2</span></div>");
+    title.html("<div class='title'>Reference Manual</div><div class='version'>Version <span class='version-number'>3.6.4-SNAPSHOT</span></div>");
     $("body").css('width', '100%');
     $("body").prepend(title);
     $("body").prepend($("<ol id='toc'/>"));
@@ -42,7 +42,7 @@ $(document).ready(function(){
   <li>File-type CIs</li>
   <li>Folder-type CIs</li>
   <li>Archive-type CIs</li>
-</ul><p><em>Property</em> placeholders are used in CI properties by specifying them in the package's manifest.</p><p>Deployit recognizes placeholders using the following format:</p>
+</ul><p>Before a deployment can be performed, a value must be specified for <strong>all</strong> <em>file</em> placeholders in the deployment.</p><p><em>Property</em> placeholders are used in CI properties by specifying them in the package's manifest. In contrast to file placeholders, <em>property</em> placeholders do not necessarily need to have a value from a dictionary. If the placeholder can not be resolved from a dictionary, the placeholder is left as-is.</p><p>Deployit recognizes placeholders using the following format:</p>
 <pre><code>{{PLACEHOLDER_KEY}}
 </code></pre><p>Values for placeholders can be provided manually or filled in from a <em>dictionary</em>.</p><p>There are two special placeholder values:</p>
 <ul>
@@ -58,7 +58,7 @@ $(document).ready(function(){
   <li>Application CIs are stored under the <strong>/Applications</strong> folder.</li>
   <li>Environment and Dictionary CIs are stored under the <strong>/Environments</strong> folder.</li>
   <li>Middleware CIs (representing hosts, servers, etc.) are stored under the <strong>/Infrastructure</strong> folder.</li>
-</ul><h3>Containment and References</h3><p>Deployit's repository contains CIs that refer to other CIs. There are two ways in which CIs can refer to each other:</p>
+</ul><p>The repository acts as a version control system, that is, every change to every object in the repository is logged and stored. This makes it possible to compare a history of all changes to every CI in the repository. Deployit also retains the history of all changes to <em>deleted</em> CIs. Even if a CI is deleted, the storage it uses will not be freed up so that it is possible to retrieve the CI as it existed before the deletion. See the <strong>System Administration Manual</strong> for more information about managing the repository.</p><h3>Containment and References</h3><p>Deployit's repository contains CIs that refer to other CIs. There are two ways in which CIs can refer to each other:</p>
 <ul>
   <li><strong>Containment</strong>. In this case, one CI <em>contains</em> another CI. If the parent CI is removed, so is the child CI. An example of this type of reference is an Environment CI and it's deployed applications.</li>
   <li><strong>Reference</strong>. In this case, one CI <em>refers</em> to another CI. If the referring CI is removed, the referred CI is unchanged. Removing a CI when it is still being referred to is not allowed. An example of this type of reference is an Environment CI and it's middleware. The middleware exists in the <strong>/Infrastructure</strong> folder independently of the environments the middleware is in.</li>

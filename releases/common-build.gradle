@@ -1,10 +1,26 @@
 
 repositories {
-        mavenLocal()
-        mavenRepo urls: "${nexusBaseUrl}/groups/public/"
-        mavenRepo urls: "${nexusBaseUrl}/repositories/snapshots"
-        mavenRepo urls: "${nexusBaseUrl}/repositories/releases"
-        org.apache.ivy.util.url.CredentialsStore.INSTANCE.addCredentials("Sonatype Nexus Repository Manager", nexusHost, nexusUserName, nexusPassword);
+    maven {
+      credentials {
+        username nexusUserName
+        password nexusPassword
+      }
+      url "${nexusBaseUrl}/groups/public"
+    }
+    maven {
+      credentials {
+        username nexusUserName
+        password nexusPassword
+      }
+      url "${nexusBaseUrl}/repositories/snapshots"
+    }
+    maven {
+      credentials {
+        username nexusUserName
+        password nexusPassword
+      }
+      url "${nexusBaseUrl}/repositories/releases"
+    }
 }
 
 def execute(command) {

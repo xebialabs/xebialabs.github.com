@@ -6,7 +6,7 @@
 $(document).ready(function(){
     $("body").attr('id', 'top-toc');
     var title = $("<div class='manual-title'/>")
-    title.html("<div class='title'>System Administration Manual</div><div class='version'>Version <span class='version-number'>3.6.2</span></div>");
+    title.html("<div class='title'>System Administration Manual</div><div class='version'>Version <span class='version-number'>3.6.4-SNAPSHOT</span></div>");
     $("body").css('width', '100%');
     $("body").prepend(title);
     $("body").prepend($("<ol id='toc'/>"));
@@ -263,6 +263,8 @@ security.login(&#39;admin&#39;, &#39;newpassword&#39;)
     <li><strong>userFilter</strong>: The LDAP filter to determine the LDAP dn for the user that's logging in, {USERNAME} will be replaced with the username that's logging in (example: userFilter="(&amp;(uid={USERNAME})(objectClass=inetOrgPerson))")</li>
     <li><strong>useSSL</strong>: Whether or not we need to use SSL to connect to LDAP (example: useSSL=false)</li>
     <li><strong>groupFilter</strong>: The LDAP filter to determine the group memberships for the user, {DN} will be replaced with the DN of the user (example: groupFilter="(member={DN})")</li>
+    <li><strong>userSearchBase</strong>: The LDAP filter that is the base for searching for users (example: userSearchBase="dc=example,dc=com")</li>
+    <li><strong>groupSearchBase</strong>: The LDAP filter that is the base for searching for groups (example: groupSearchBase="ou=groups,dc=example,dc=com")</li>
     <li><strong>principalProvider</strong>: The LDAP PrincipalProvider that will provide principals to Jackrabbit (example: principalProvider=com.xebialabs.deployit.security.LdapPrincipalProvider)</li>
     <li><strong>java.naming.security.authentication</strong>: The security scheme to use to connect to LDAP (example: java.naming.security.authentication=simple)</li>
     <li><strong>java.naming.security.principal</strong>: The DN of the user that you need to do the initial connect to search LDAP (example: java.naming.security.principal="cn=administrator,ou=users,ou=system")</li>
@@ -293,6 +295,7 @@ security.login(&#39;admin&#39;, &#39;newpassword&#39;)
     &lt;/FileSystem&gt;
 
     &lt;PersistenceManager class=&quot;org.apache.jackrabbit.core.persistence.pool.MySqlPersistenceManager&quot;&gt;
+       &lt;param name=&quot;driver&quot; value=&quot;com.mysql.jdbc.Driver&quot;/&gt;
        &lt;param name=&quot;url&quot; value=&quot;jdbc:mysql://localhost:3306/deployit&quot; /&gt;
        &lt;param name=&quot;user&quot; value=&quot;deployit&quot; /&gt;
            &lt;param name=&quot;password&quot; value=&quot;deployit&quot; /&gt;
@@ -494,4 +497,6 @@ security.login(&#39;admin&#39;, &#39;newpassword&#39;)
   </ul></li>
   <li><strong>Configuration</strong>. Remove the <code>conf</code> directory in the DEPLOYIT_SERVER_HOME directory and replace it with the backup.</li>
   <li><strong>Customization</strong>. Remove the <code>ext</code> and <code>plugins</code> directories in the DEPLOYIT_SERVER_HOME directory and replace them with the backups.</li>
-</ul><p><strong>Note:</strong> Deployit <strong>must not</strong> be running when you are restoring a backup.</p></body></html>
+</ul><p><strong>Note:</strong> Deployit <strong>must not</strong> be running when you are restoring a backup.</p><h2>Freeing up disk space</h2><p>The repository is the place where Deployit stores all of it's data. If you deal with lots of large binary artifacts, this can be problematic since the disk space they consume is not reclaimed when the are deleted. To reclaim the disk space after deleting a CI, use the following CLI snippet:</p>
+<pre><code>    deployit.runGarbageCollector()
+</code></pre></body></html>

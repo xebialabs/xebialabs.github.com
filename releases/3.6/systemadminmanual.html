@@ -263,6 +263,8 @@ security.login(&#39;admin&#39;, &#39;newpassword&#39;)
     <li><strong>userFilter</strong>: The LDAP filter to determine the LDAP dn for the user that's logging in, {USERNAME} will be replaced with the username that's logging in (example: userFilter="(&amp;(uid={USERNAME})(objectClass=inetOrgPerson))")</li>
     <li><strong>useSSL</strong>: Whether or not we need to use SSL to connect to LDAP (example: useSSL=false)</li>
     <li><strong>groupFilter</strong>: The LDAP filter to determine the group memberships for the user, {DN} will be replaced with the DN of the user (example: groupFilter="(member={DN})")</li>
+    <li><strong>userSearchBase</strong>: The LDAP filter that is the base for searching for users (example: userSearchBase="dc=example,dc=com")</li>
+    <li><strong>groupSearchBase</strong>: The LDAP filter that is the base for searching for groups (example: groupSearchBase="ou=groups,dc=example,dc=com")</li>
     <li><strong>principalProvider</strong>: The LDAP PrincipalProvider that will provide principals to Jackrabbit (example: principalProvider=com.xebialabs.deployit.security.LdapPrincipalProvider)</li>
     <li><strong>java.naming.security.authentication</strong>: The security scheme to use to connect to LDAP (example: java.naming.security.authentication=simple)</li>
     <li><strong>java.naming.security.principal</strong>: The DN of the user that you need to do the initial connect to search LDAP (example: java.naming.security.principal="cn=administrator,ou=users,ou=system")</li>

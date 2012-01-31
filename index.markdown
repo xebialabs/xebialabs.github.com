@@ -13,9 +13,9 @@ There is a list of [frequently asked questions](faq) about Deployit that is cont
 
 # Latest Deployit documentation #
 
-* [3.0](/releases/3.0)
-* [3.5](/releases/3.5)
-* [3.6](/releases/3.6)
+* [Deployit 3.0](/releases/3.0)
+* [Deployit 3.5](/releases/3.5)
+* [Deployit 3.6](/releases/3.6)
 
 # Latest Plugin documentation #
 
@@ -27,11 +27,12 @@ There is a list of [frequently asked questions](faq) about Deployit that is cont
 * [WAS plugin 3.6.0](/releases/was-plugin-3.6)
 * [WMQ plugin 3.6.0](/releases/wmq-plugin-3.6)
 * [WLS plugin 3.6.0](/releases/wls-plugin-3.6)
+* [OSB plugin 3.6.0](/releases/osb-plugin-3.6)
 * [Jboss plugin 3.6.0](/releases/jboss-plugin-3.6)
 * [Tomcat plugin 3.6.0](/releases/tomcat-plugin-3.6)
 
 # Maven plugin documentation #
 
-* [3.5](http://tech.xebialabs.com/deployit-maven-plugin/3.5.2/)
-* [3.6](http://tech.xebialabs.com/deployit-maven-plugin/3.6.0/)
+* [Maven plugin 3.5](http://tech.xebialabs.com/deployit-maven-plugin/3.5.2/)
+* [Maven plugin 3.6](http://tech.xebialabs.com/deployit-maven-plugin/3.6.0/)
 

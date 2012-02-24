@@ -4,9 +4,9 @@
 <script type="text/javascript" src="js/jquery.tableofcontents.min.js"></script>
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function(){
-    document.body.id = "top-toc";
+    $("body").attr('id', 'top-toc');
     var title = $("<div class='manual-title'/>")
-    title.html("<div class='title'>Generic Model Plugin Manual</div><div class='version'>Version <span class='version-number'>3.6.1</span></div>");
+    title.html("<div class='title'>Generic Model Plugin Manual</div><div class='version'>Version <span class='version-number'>3.6.3</span></div>");
     $("body").css('width', '100%');
     $("body").prepend(title);
     $("body").prepend($("<ol id='toc'/>"));

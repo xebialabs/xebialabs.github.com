@@ -24,6 +24,7 @@ There is a list of [frequently asked questions](faq) about Deployit that is cont
 * [WAS plugin 3.7.0](/releases/was-plugin-3.7)
 * [WLS plugin 3.7.0](/releases/wls-plugin-3.7)
 * [JBoss plugin 3.7.0](/releases/jboss-plugin-3.7)
+* [Tomcat plugin 3.7.0](/releases/tomcat-plugin-3.7)
 
 ##3.6##
 * [WAS plugin 3.6.0](/releases/was-plugin-3.6)

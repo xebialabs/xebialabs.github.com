@@ -1,0 +1,372 @@
+<html><head><LINK REL=StyleSheet HREF="css/deployit.css" TYPE="text/css" MEDIA=screen>
+<LINK REL=StyleSheet HREF="css/ci-reference-api.css" TYPE="text/css" MEDIA=screen>
+<script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="js/jquery.tableofcontents.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+    $("body").attr('id', 'top-toc');
+    var title = $("<div class='manual-title'/>")
+    title.html("<div class='title'>Tomcat Plugin Manual</div><div class='version'>Version <span class='version-number'>3.7.0-beta-2-SNAPSHOT</span></div>");
+    $("body").css('width', '100%');
+    $("body").prepend(title);
+    $("body").prepend($("<ol id='toc'/>"));
+    $("#toc").tableOfContents("body", { topLinks: true, } );
+});
+
+</script>
+<title>Tomcat Plugin Manual</title>
+</head><body><h1>Preface</h1><p>This document describes the functionality provided by the Tomcat plugin.</p><p>See the <strong>Deployit Reference Manual</strong> for background information on Deployit and deployment concepts.</p><h1>Overview</h1><p>The Tomcat plugin is a Deployit plugin that adds capability for managing deployments and resources to a Tomcat Server. Standard support includes deploying/undeploying web applications, datasources, mail sessions, resource links, ActiveMQ and WebsphereMQFeatures resources. The plugin can easily be extended to support more deployment options or management of new artifacts/resources on Tomcat.</p><h2>Features</h2>
+<ul>
+  <li>Deployment of web applications (WAR) to a Tomcat virtual host.</li>
+  <li>Deployment of resources to an application context on a Tomcat virtual host.</li>
+  <li>Deployment of resources to the common Tomcat context ie. $TOMCAT_HOME/conf/context.xml.</li>
+  <li>Deployement of resource links.</li>
+  <li>Supported JEE Resources
+  <ul>
+    <li>Datasource</li>
+    <li>JMS Queue</li>
+    <li>JMS Queue Connection Factory</li>
+    <li>JMS Topic</li>
+    <li>JMS Topic Connection Factory</li>
+    <li>Mail Session</li>
+  </ul></li>
+  <li>Supported Messaging Middleware
+  <ul>
+    <li>Active MQ</li>
+    <li>Websphere MQ</li>
+  </ul></li>
+  <li>Support for Tomcat Database Connection Pool (DBCP) Configurations</li>
+  <li>Stopping and starting a Tomcat Server via control tasks.</li>
+</ul><h1>Requirements</h1>
+<ul>
+  <li><p><strong>Deployit requirements</strong></p>
+  <ul>
+    <li><strong>Deployit</strong>: version 3.6+</li>
+    <li><strong>Tomcat versions</strong>: 5.5.x, 6.x, 7.x (Unix and Windows)</li>
+  </ul></li>
+  <li><p><strong>Infrastructural requirements</strong></p>
+  <ul>
+    <li><strong>User credentials</strong> for accessing the Host running the Tomcat Server.</li>
+  </ul></li>
+</ul><h1>Usage in Deployment Packages</h1><p>The plugin works with the standard deployment package of DAR format. Please see the <em>Packaging Manual</em> for more details about the DAR format and the ways to compose one.</p><p>The following is a sample MANIFEST.MF file that can be used to create a Tomcat specific deployment package. It contain declarations for a <a href="#jee.War">war</a>, a <a href="#tomcat.DataSourceSpec">datasource</a> and a couple of JMS resources.</p>
+<pre style="display:inline-block;" class="nobreak"><code>
+Manifest-Version: 1.0
+Deployit-Package-Format-Version: 1.3
+CI-Application: SampleApp
+CI-Version: 1.0
+
+Name: SampleApp-1.0.war
+CI-Name: SampleApp
+CI-Type: jee.War
+
+Name: testDatasource
+CI-Type: tomcat.DataSourceSpec
+CI-jndiName: jdbc/sampleDatasource
+CI-url: jdbc:mysql://localhost/test
+CI-driverClassName: com.mysql.jdbc.Driver
+CI-username: {{DATABASE_USERNAME}}
+CI-password: {{DATABASE_PASSWORD}}
+
+Name: sampleQueue
+CI-Type: jee.QueueSpec
+CI-jndiNames: jms/testQueue
+
+Name: sampleQCf
+CI-Type: jee.QueueConnectionFactorySpec
+CI-jndiNames: jms/sampleQCf
+</code></pre><h1>Tomcat Topology</h1><p>The Tomcat plugin allows for the modelling of a Tomcat installation into the Deployit infrastructure as a hierarchical set of containers. <a href="#tomcat.Server">Tomcat Server</a>, <a href="#tomcat.CommonContext">Tomcat Common Context</a> and <a href="#tomcat.VirtualHost">Tomcat Virtual Hosts</a> containers can then be included into Deployit environment definitions, to which deployables can be deployed to.</p><h2><a href="#tomcat.Server">Tomcat Server</a></h2><p>Models a Tomcat installation running on a host. This container must be defined under any <a href="#overthere.Host">Host</a> in the Deployit infrastructure. The container supports OS specific stop and start commands used to control the stopping and starting of the Tomcat Server. In addition, stop and start wait times can be specified. Deployit will wait for the specified amount of time to elapse after the execution of a stop/start command.</p><h2><a href="#tomcat.CommonContext">Tomcat Common Context</a></h2><p>Models the context.xml file present in the $TOMCAT_HOME/conf directory. This container must be defined under a <a href="#tomcat.Server">Tomcat Server</a> container. Only a single instance should be defined. Any <a href="#tomcat.JndiContextElement">Tomcat Resource</a> can be deployed to this container.</p><h2><a href="#tomcat.VirtualHost">Tomcat Virtual Host</a></h2><p>Models a Tomcat virtual host definition, ie. $TOMCAT_HOME/conf/[enginename]/[hostname]. This container must be defined under a <a href="#tomcat.Server">Tomcat Server</a> container. Mutliple instances can be defined. <a href="#jee.War">Web Applications</a> and <a href="#tomcat.JndiContextElement">Tomcat Resource</a> can be deployed to this container.</p><h1>Using the deployables and deployeds</h1><p>The following table describes which deployable/container combinations are possible.</p><h2>Deployable vs. Container table</h2>
+<table class="deployed-matrix">
+<tr>
+	<th>Deployable</th>
+	<th>Container</th>
+	<th>Deployed</th>
+</tr>
+<tr>
+	<td>jee.War</td>
+	<td>tomcat.VirtualHost</td>
+	<td>tomcat.WarModule</td>
+</tr>
+<tr>
+	<td>tomcat.ResourceLinkSpec</td>
+	<td>tomcat.VirtualHost<br/>tomcat.CommonContext</td>
+	<td>tomcat.ResourceLink</td>
+</tr>
+<tr>
+	<td>tomcat.DataSourceLinkSpec</td>
+	<td>tomcat.VirtualHost<br/>tomcat.CommonContext</td>
+	<td>tomcat.DataSourceLink</td>
+</tr>
+<tr>
+	<td>jee.DataSourceSpec</td>
+	<td>tomcat.VirtualHost<br/>tomcat.CommonContext</td>
+	<td>tomcat.DataSource</td>
+</tr>
+<tr>
+	<td>jee.MailSessionSpec</td>
+	<td>tomcat.VirtualHost<br/>tomcat.CommonContext</td>
+	<td>tomcat.MailSession</td>
+</tr>
+<tr>
+	<td>jee.QueueConnectionFactorySpec<br/>tomcat.ActiveMqConnectionFactorySpec<br/>tomcat.WebsphereMqQueueConnectionFactorySpec</td>
+	<td>tomcat.VirtualHost<br/>tomcat.CommonContext</td>
+	<td><br/>tomcat.ActiveMqConnectionFactory<br/>tomcat.WebsphereMqQueueConnectionFactory</td>
+</tr>
+<tr>
+	<td>jee.TopicConnectionFactorySpec<br/>tomcat.WebsphereMqTopicConnectionFactorySpec</td>
+	<td>tomcat.VirtualHost<br/>tomcat.CommonContext</td>
+	<td><br/>tomcat.WebsphereMqTopicConnectionFactory</td>
+</tr>
+<tr>
+	<td>jee.QueueSpec<br/>tomcat.ActiveMqQueueSpec<br/>tomcat.WebsphereMqQueueSpec</td>
+	<td>tomcat.VirtualHost<br/>tomcat.CommonContext</td>
+	<td><br/>tomcat.ActiveMqQueue<br/>tomcat.WebsphereMqQueue</td>
+</tr>
+<tr>
+	<td>jee.TopicSpec<br/>tomcat.ActiveMqTopicSpec<br/>tomcat.WebsphereMqTopicSpec</td>
+	<td>tomcat.VirtualHost<br/>tomcat.CommonContext</td>
+	<td><br/>tomcat.ActiveMqTopic<br/>tomcat.WebsphereMqTopic</td>
+</tr>
+</table><p>The following table describes the effect a deployed has on it's container</p><h2>Deployed Actions Table</h2>
+<table class="deployed-matrix">
+<tr>
+	<th class="borderless-bottom">Deployed</th>
+	<th colspan="3">Actions performed for operations</th>
+</tr>
+<tr>
+	<th class="borderless-top">&nbsp;</th>
+	<th align="center">Create</th>
+	<th align="center">Destroy</th>
+	<th align="center">Modify</th>
+</tr>
+<tr>
+	<td>tomcat.WarModule</td>
+	<td>
+		<ul>
+			<li>Stop Tomcat</li>
+			<li>Create a context xml using the context root name specified on the war in the virtual host's directory. eg. $TOMCAT_HOME/conf/Catalina/localhost</li>
+			<li>Upload war to virtual host's application base directory. eg. $TOMCAT_HOME/webapps</li>
+			<li>Start Tomcat</li>
+		</ul>
+      </td>
+	<td>
+		<ul>
+			<li>Stop Tomcat</li>
+			<li>Delete war from  virtual host's application base directory.</li>
+			<li>Delete exploded war folder from  virtual host's application base directory.</li>
+			<li>Remove attributes, e.g. docBase, from the Context element in the application specific context xml</li>
+			<li>Start Tomcat</li>
+		</ul>
+	</td>
+	<td>
+		<ul>
+			<li>Stop Tomcat</li>
+            <li>Delete war from  virtual host's application base directory.</li>
+            <li>Delete exploded war folder from  virtual host's application base directory.</li>
+            <li>Remove attributes, e.g. docBase, from the Context element in the application specific context xml</li>
+            <li>If war context root changed; rename application specific context xml in the virtual host's directory to the new context root name.</li>
+            <li>Modify attributes, e.g. docBase, from the Context element in the application specific context xml</li>
+            <li>Upload war to virtual host's application base directory. eg. $TOMCAT_HOME/webapps</li>
+			<li>Start Tomcat</li>
+		</ul>
+</tr>
+<tr>
+	<td>Any tomcat.JndiContextElement (tomcat.DataSource, tomcat.ActiveMqQueue, tomcat.ResourceLink, etc)</td>
+	<td>
+		<ul>
+		    <li>Stop Tomcat</li>
+			<li>Create xml fragment, e.g. &lt;Resource name='mail/Session' auth='Container' type='javax.mail.Session' mail.smtp.host='localhost'/&gt;</li>
+			<li>Insert xml fragment into context xml</li>
+            <li>Start Tomcat</li>
+		</ul>
+	</td>
+	<td>
+		<ul>
+		    <li>Stop Tomcat</li>
+			<li>Find xml fragment in context xml using the name attribute</li>
+			<li>Delete xml fragment from context xml</li>
+            <li>Start Tomcat</li>
+		</ul>
+	</td>
+	<td>
+		<ul>
+		    <li>Stop Tomcat</li>
+			<li>Find xml fragment in context xml using the name attribute</li>
+			<li>Delete xml fragment from context xml</li>
+			<li>Create xml fragment, e.g. &lt;Resource name='mail/Session' auth='Container' type='javax.mail.Session' mail.smtp.host='localhost'/&gt;</li>
+			<li>Insert xml fragment into context xml</li>
+            <li>Start Tomcat</li>
+		</ul>
+	</td>
+</tr>
+</table><h1>Deploying Web Applications</h1><p><a href="#jee.War">Web Applications</a> can be deployed to a <a href="#tomcat.VirtualHost">Tomcat Virtual Host</a>. The context root must be specified. The context root is used to create the corresponding application specific context xml in the virtual host.</p><h1>Deploying Resources</h1><p><a href="#tomcat.JndiContextElement">Tomcat Resource</a> can be deployed to a <a href="#tomcat.VirtualHost">Tomcat Virtual Host</a> or <a href="#tomcat.CommonContext">Tomcat Common Context</a>. Every resource has an optional context property. This property is always set to <em>context</em> when the resource is deployed to <a href="#tomcat.CommonContext">Tomcat Common Context</a>. When the resource is deployed to a <a href="#tomcat.VirtualHost">Tomcat Virtual Host</a>, the user can specify the name of the context to which the resource must be defined. When left blank, the plugin can default the value to that of the war in the current deployment. There must only be a single war in the current deployment for the defaulting to work. Example : deploying a war with context root set to <em>sample</em>, and a datasource to a virtual host will automatically result in the <em>context</em> property of the datasource been set to <em>sample</em>.</p><h1>Extension points</h1><p>The Tomcat plugin is designed to be extended through Deployit's Plugin API type system. Refer to <em>Customization Manual</em> for an explanation of the type system.</p><h2>Adding additional context attributes</h2><p>Tomcat context's have serveral attributes that can be set for a war. By default, the Tomcat Plugin only sets the unpackWAR and docBase attributes. When additional attributes are required, performing a type modification on the corresponding tomcat.WarModule can be done. For example, adding support for the <code>antiResourceLocking</code> attribute in synthetic.xml:</p>
+<pre><code>&lt;type-modification type=&quot;tomcat.WarModule&quot;&gt;
+    &lt;property name=&quot;antiResourceLocking&quot; default=&quot;true&quot; hidden=&quot;true&quot;/&gt;
+    &lt;property name=&quot;contextElementPropertyMapping&quot; kind=&quot;map_string_string&quot; hidden=&quot;true&quot;
+              default=&quot;unpackWAR:, docBase:, antiResourceLocking:&quot;
+&lt;/type-modification&gt;
+</code></pre><p>An additional hidden property <code>antiResourceLocking</code> with a default value of "true" is added to the deployed. The property is added to the <code>contextElementPropertyMapping</code> property's default value. This property is used to translate properties on the deployed to their xml equivalent in the Tomcat context. The left hand represents the property name in the deployed, while the right hand side represents the attribute name in the xml. When the right hand side is blank, the property name and xml equivalent are the same.</p><p>The same technique can be used to add attributes to other Tomcat resources like datasource, queues, etc.</p><h2>Adding new context elements</h2><p>Tomcat context's have several nested components or special features (Context Parameters, Lifecycle Listeners, etc.), that can be defined in the xml.</p><p>It is possible to model these features in the Tomcat Plugin and perform subsequence deployments of these resources. For example, adding support for the Context Parameter feature.</p>
+<pre><code>&lt;Context&gt;
+  ...
+  &lt;Parameter name=&quot;companyName&quot; value=&quot;My Company, Incorporated&quot;
+         override=&quot;false&quot;/&gt;
+  ...
+&lt;/Context&gt;
+</code></pre><p>Add to synthetic.xml:</p>
+<pre><code>&lt;type type=&quot;tomcat.ContextParameter&quot; extends=&quot;tomcat.ContextElement&quot;
+            deployable-type=&quot;tomcat.ContextParameterSpec&quot;&gt;
+    &lt;generate-deployable type=&quot;tomcat.ContextParameterSpec&quot; extends=&quot;tomcat.ContextElement&quot;/&gt;
+    &lt;property name=&quot;paramName&quot; description=&quot;The name of the context parameter&quot;/&gt;
+    &lt;property name=&quot;value&quot;/&gt;
+    &lt;property name=&quot;override&quot; kind=&quot;boolean&quot; required=&quot;false&quot; default=&quot;false&quot;/&gt;
+
+    &lt;!--inherited hidden --&gt;
+    &lt;property name=&quot;elementTag&quot; default=&quot;Parameter&quot; hidden=&quot;true&quot;/&gt;
+    &lt;property name=&quot;elementName&quot; default=&quot;paramName&quot; hidden=&quot;true&quot;/&gt;
+    &lt;property name=&quot;elementPropertyMapping&quot; kind=&quot;map_string_string&quot; hidden=&quot;true&quot;
+              default=&quot;paramName:name, value:, override:&quot;/&gt;
+&lt;/type&gt;
+</code></pre><div style='width:100%; position:relative'>
+<h1 class='ci-toc-category'>CI Reference</h1><h2>Configuration Item Overview</h2><h3 class='ci-toc-category'>Deployable Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#jee.DataSourceSpec'>jee.DataSourceSpec</a></td><td>Deployable Java EE DataSource accessible via JNDI</td>
+<tr class='odd'><td><a href='#jee.Ear'>jee.Ear</a></td><td>Deployable EAR artifact</td>
+<tr class='even'><td><a href='#jee.EjbJar'>jee.EjbJar</a></td><td>Deployable EJB JAR artifact</td>
+<tr class='odd'><td><a href='#jee.MailSessionSpec'>jee.MailSessionSpec</a></td><td>Deployable Java EE Mail Session accessible via JNDI</td>
+<tr class='even'><td><a href='#jee.QueueConnectionFactorySpec'>jee.QueueConnectionFactorySpec</a></td><td>Deployable Java EE JMS QueueConnectionFactory accessible via JNDI</td>
+<tr class='odd'><td><a href='#jee.QueueSpec'>jee.QueueSpec</a></td><td>Deployable Java EE JMS Queue accessible via JNDI</td>
+<tr class='even'><td><a href='#jee.TopicConnectionFactorySpec'>jee.TopicConnectionFactorySpec</a></td><td>Deployable Java EE JMS TopicConnectionFactory accessible via JNDI</td>
+<tr class='odd'><td><a href='#jee.TopicSpec'>jee.TopicSpec</a></td><td>Deployable Jave EE JMS Topic accessible via JNDI</td>
+<tr class='even'><td><a href='#jee.War'>jee.War</a></td><td>Deployable WAR artifact</td>
+</table>
+<h3 class='ci-toc-category'>Virtual Deployable Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#jee.JndiResourceSpec'>jee.JndiResourceSpec</a></td><td>Deployable Java EE Resource accessible via JNDI</td>
+<tr class='odd'><td><a href='#jee.ResourceSpec'>jee.ResourceSpec</a></td><td>Description unavailable</td>
+</table>
+<h3 class='ci-toc-category'>Virtual Deployed Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#tomcat.ContextElement'>tomcat.ContextElement</a></td><td>Base type for all Tomcat resources</td>
+<tr class='odd'><td><a href='#tomcat.ContextWarModule'>tomcat.ContextWarModule</a></td><td>War Module that has an associated context</td>
+</table>
+<h2 class='ci-details-title'>Configuration Item Details</h2><a name='jee.DataSourceSpec'></a><h3 class='ci-detail-title'>jee.DataSourceSpec</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#jee.JndiResourceSpec'>jee.JndiResourceSpec</a><span> >> </span><a href='#jee.ResourceSpec'>jee.ResourceSpec</a><span> >> </span><span>udm.BaseDeployable</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.Deployable</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Deployable Java EE DataSource accessible via JNDI.</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='jee.DataSourceSpec_jndiName'></a><span class='ci-property-name'>jndiName</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Name used to lookup this resource in JNDI</p></td>
+<tr class='odd'><td><a name='jee.DataSourceSpec_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='jee.Ear'></a><h3 class='ci-detail-title'>jee.Ear</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>udm.BaseDeployableArchiveArtifact</span><span> >> </span><span>udm.BaseDeployableFileArtifact</span><span> >> </span><span>udm.BaseDeployableArtifact</span><span> >> </span><span>udm.BaseDeployable</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.Deployable</span><span>, </span><span>udm.SourceArtifact</span><span>, </span><span>udm.ArchiveArtifact</span><span>, </span><span>udm.Artifact</span><span>, </span><span>udm.DeployableArtifact</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>udm.FileArtifact</span></td></tr></table></div><p class='ci-description'>Deployable EAR artifact.</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='jee.Ear_excludeFileNamesRegex'></a><span class='ci-property-name'>excludeFileNamesRegex</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Regular expression that matches file names that must be excluded from scanning</p></td>
+<tr class='odd'><td><a name='jee.Ear_placeholders'></a><span class='ci-property-name'>placeholders</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Placeholders detected in this artifact</p></td>
+<tr class='even'><td><a name='jee.Ear_scanPlaceholders'></a><span class='ci-property-name'>scanPlaceholders</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>Scan Placeholders</p></td>
+<tr class='odd'><td><a name='jee.Ear_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='jee.Ear_textFileNamesRegex'></a><span class='ci-property-name'>textFileNamesRegex</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>.+\.(cfg | conf | config | ini | properties | props | txt | asp | aspx | htm | html | jsf | jsp | xht | xhtml | sql | xml | xsd | xsl | xslt)</span><p class='ci-property-desc'>Regular expression that matches file names of text files</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='jee.EjbJar'></a><h3 class='ci-detail-title'>jee.EjbJar</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>udm.BaseDeployableArchiveArtifact</span><span> >> </span><span>udm.BaseDeployableFileArtifact</span><span> >> </span><span>udm.BaseDeployableArtifact</span><span> >> </span><span>udm.BaseDeployable</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.Deployable</span><span>, </span><span>udm.SourceArtifact</span><span>, </span><span>udm.ArchiveArtifact</span><span>, </span><span>udm.Artifact</span><span>, </span><span>udm.DeployableArtifact</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>udm.FileArtifact</span></td></tr></table></div><p class='ci-description'>Deployable EJB JAR artifact.</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='jee.EjbJar_excludeFileNamesRegex'></a><span class='ci-property-name'>excludeFileNamesRegex</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Regular expression that matches file names that must be excluded from scanning</p></td>
+<tr class='odd'><td><a name='jee.EjbJar_placeholders'></a><span class='ci-property-name'>placeholders</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Placeholders detected in this artifact</p></td>
+<tr class='even'><td><a name='jee.EjbJar_scanPlaceholders'></a><span class='ci-property-name'>scanPlaceholders</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>Scan Placeholders</p></td>
+<tr class='odd'><td><a name='jee.EjbJar_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='jee.EjbJar_textFileNamesRegex'></a><span class='ci-property-name'>textFileNamesRegex</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>.+\.(cfg | conf | config | ini | properties | props | txt | asp | aspx | htm | html | jsf | jsp | xht | xhtml | sql | xml | xsd | xsl | xslt)</span><p class='ci-property-desc'>Regular expression that matches file names of text files</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='jee.JndiResourceSpec'></a><h3 class='ci-detail-title'>jee.JndiResourceSpec</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#jee.ResourceSpec'>jee.ResourceSpec</a><span> >> </span><span>udm.BaseDeployable</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.Deployable</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Deployable Java EE Resource accessible via JNDI.</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='jee.JndiResourceSpec_jndiName'></a><span class='ci-property-name'>jndiName</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Name used to lookup this resource in JNDI</p></td>
+<tr class='odd'><td><a name='jee.JndiResourceSpec_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='jee.MailSessionSpec'></a><h3 class='ci-detail-title'>jee.MailSessionSpec</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#jee.JndiResourceSpec'>jee.JndiResourceSpec</a><span> >> </span><a href='#jee.ResourceSpec'>jee.ResourceSpec</a><span> >> </span><span>udm.BaseDeployable</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.Deployable</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Deployable Java EE Mail Session accessible via JNDI.</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='jee.MailSessionSpec_jndiName'></a><span class='ci-property-name'>jndiName</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Name used to lookup this resource in JNDI</p></td>
+<tr class='odd'><td><a name='jee.MailSessionSpec_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='jee.QueueConnectionFactorySpec'></a><h3 class='ci-detail-title'>jee.QueueConnectionFactorySpec</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#jee.JndiResourceSpec'>jee.JndiResourceSpec</a><span> >> </span><a href='#jee.ResourceSpec'>jee.ResourceSpec</a><span> >> </span><span>udm.BaseDeployable</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.Deployable</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Deployable Java EE JMS QueueConnectionFactory accessible via JNDI.</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='jee.QueueConnectionFactorySpec_jndiName'></a><span class='ci-property-name'>jndiName</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Name used to lookup this resource in JNDI</p></td>
+<tr class='odd'><td><a name='jee.QueueConnectionFactorySpec_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='jee.QueueSpec'></a><h3 class='ci-detail-title'>jee.QueueSpec</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#jee.JndiResourceSpec'>jee.JndiResourceSpec</a><span> >> </span><a href='#jee.ResourceSpec'>jee.ResourceSpec</a><span> >> </span><span>udm.BaseDeployable</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.Deployable</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Deployable Java EE JMS Queue accessible via JNDI.</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='jee.QueueSpec_jndiName'></a><span class='ci-property-name'>jndiName</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Name used to lookup this resource in JNDI</p></td>
+<tr class='odd'><td><a name='jee.QueueSpec_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='jee.ResourceSpec'></a><h3 class='ci-detail-title'>jee.ResourceSpec</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>udm.BaseDeployable</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.Deployable</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Description unavailable</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='jee.ResourceSpec_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='jee.TopicConnectionFactorySpec'></a><h3 class='ci-detail-title'>jee.TopicConnectionFactorySpec</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#jee.JndiResourceSpec'>jee.JndiResourceSpec</a><span> >> </span><a href='#jee.ResourceSpec'>jee.ResourceSpec</a><span> >> </span><span>udm.BaseDeployable</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.Deployable</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Deployable Java EE JMS TopicConnectionFactory accessible via JNDI.</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='jee.TopicConnectionFactorySpec_jndiName'></a><span class='ci-property-name'>jndiName</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Name used to lookup this resource in JNDI</p></td>
+<tr class='odd'><td><a name='jee.TopicConnectionFactorySpec_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='jee.TopicSpec'></a><h3 class='ci-detail-title'>jee.TopicSpec</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#jee.JndiResourceSpec'>jee.JndiResourceSpec</a><span> >> </span><a href='#jee.ResourceSpec'>jee.ResourceSpec</a><span> >> </span><span>udm.BaseDeployable</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.Deployable</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Deployable Jave EE JMS Topic accessible via JNDI.</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='jee.TopicSpec_jndiName'></a><span class='ci-property-name'>jndiName</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Name used to lookup this resource in JNDI</p></td>
+<tr class='odd'><td><a name='jee.TopicSpec_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='jee.War'></a><h3 class='ci-detail-title'>jee.War</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>udm.BaseDeployableArchiveArtifact</span><span> >> </span><span>udm.BaseDeployableFileArtifact</span><span> >> </span><span>udm.BaseDeployableArtifact</span><span> >> </span><span>udm.BaseDeployable</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.Deployable</span><span>, </span><span>udm.SourceArtifact</span><span>, </span><span>udm.ArchiveArtifact</span><span>, </span><span>udm.Artifact</span><span>, </span><span>udm.DeployableArtifact</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>udm.FileArtifact</span></td></tr></table></div><p class='ci-description'>Deployable WAR artifact.</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='jee.War_excludeFileNamesRegex'></a><span class='ci-property-name'>excludeFileNamesRegex</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Regular expression that matches file names that must be excluded from scanning</p></td>
+<tr class='odd'><td><a name='jee.War_placeholders'></a><span class='ci-property-name'>placeholders</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Placeholders detected in this artifact</p></td>
+<tr class='even'><td><a name='jee.War_scanPlaceholders'></a><span class='ci-property-name'>scanPlaceholders</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>Scan Placeholders</p></td>
+<tr class='odd'><td><a name='jee.War_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='jee.War_textFileNamesRegex'></a><span class='ci-property-name'>textFileNamesRegex</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>.+\.(cfg | conf | config | ini | properties | props | txt | asp | aspx | htm | html | jsf | jsp | xht | xhtml | sql | xml | xsd | xsl | xslt)</span><p class='ci-property-desc'>Regular expression that matches file names of text files</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='tomcat.ContextElement'></a><h3 class='ci-detail-title'>tomcat.ContextElement</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>generic.ProcessedTemplate</span><span> >> </span><span>generic.AbstractDeployedArtifact</span><span> >> </span><span>generic.AbstractDeployed</span><span> >> </span><span>udm.BaseDeployed</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Deployed</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Base type for all Tomcat resources</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='tomcat.ContextElement_container'></a><span class='ci-property-name'>container</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Container&gt;</span><p class='ci-property-desc'>The container on which this deployed runs.</p></td>
+<tr class='odd'><td><a name='tomcat.ContextElement_context'></a><span class='ci-property-name'>context</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The name of the context that this resource is associated with</p></td>
+<tr class='even'><td><a name='tomcat.ContextElement_deployable'></a><span class='ci-property-name'>deployable</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Deployable&gt;</span><p class='ci-property-desc'>The deployable that this deployed is derived from.</p></td>
+<tr class='odd'><td><a name='tomcat.ContextElement_targetFile'></a><span class='ci-property-name'>targetFile</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Name of the artifact on the generic server.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='tomcat.ContextElement_createOrder'></a><span class='ci-property-name'>createOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order of the step in the step list for the create operation.</p></td>
+<tr class='odd'><td><a name='tomcat.ContextElement_createVerb'></a><span class='ci-property-name'>createVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Create</span><p class='ci-property-desc'>Create Verb</p></td>
+<tr class='even'><td><a name='tomcat.ContextElement_destroyOrder'></a><span class='ci-property-name'>destroyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>40</span><p class='ci-property-desc'>The order of the step in the step list for the destroy operation.</p></td>
+<tr class='odd'><td><a name='tomcat.ContextElement_destroyVerb'></a><span class='ci-property-name'>destroyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Destroy</span><p class='ci-property-desc'>Destroy Verb</p></td>
+<tr class='even'><td><a name='tomcat.ContextElement_modifyOrder'></a><span class='ci-property-name'>modifyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order of the step in the step list for the modify operation.</p></td>
+<tr class='odd'><td><a name='tomcat.ContextElement_modifyVerb'></a><span class='ci-property-name'>modifyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Modify</span><p class='ci-property-desc'>Modify Verb</p></td>
+<tr class='even'><td><a name='tomcat.ContextElement_noopOrder'></a><span class='ci-property-name'>noopOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order of the step in the step list for the noop operation.</p></td>
+<tr class='odd'><td><a name='tomcat.ContextElement_noopVerb'></a><span class='ci-property-name'>noopVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Modify</span><p class='ci-property-desc'>Noop Verb</p></td>
+<tr class='even'><td><a name='tomcat.ContextElement_targetDirectory'></a><span class='ci-property-name'>targetDirectory</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Path to which artifact must be copied to on the generic server.</p></td>
+<tr class='odd'><td><a name='tomcat.ContextElement_template'></a><span class='ci-property-name'>template</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the freemarker template used to generate the content of the final text base artifact.</p></td>
+<tr class='even'><td><a name='tomcat.ContextElement_createTargetDirectory'></a><span class='ci-property-name'>createTargetDirectory</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>Create the target directory on the generic server if it does not exist.</p></td>
+<tr class='odd'><td><a name='tomcat.ContextElement_inspectClasspathResources'></a><span class='ci-property-name'>inspectClasspathResources</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Additional classpath resources that should be uploaded to the working directory before executing the inspect script.</p></td>
+<tr class='even'><td><a name='tomcat.ContextElement_inspectScript'></a><span class='ci-property-name'>inspectScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script used to inspect the generic container.</p></td>
+<tr class='odd'><td><a name='tomcat.ContextElement_inspectTemplateClasspathResources'></a><span class='ci-property-name'>inspectTemplateClasspathResources</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Additional template classpath resources that should be uploaded to the working directory before executing the inspect script.The template is first rendered and the rendered content copied to a file, with the same name as the template, in the working directory.</p></td>
+<tr class='even'><td><a name='tomcat.ContextElement_restartRequired'></a><span class='ci-property-name'>restartRequired</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>The generic container requires a restart for the action performed by this deployed.</p></td>
+<tr class='odd'><td><a name='tomcat.ContextElement_restartRequiredForNoop'></a><span class='ci-property-name'>restartRequiredForNoop</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>The generic container requires a restart for the NOOP action performed by this deployed.</p></td>
+<tr class='even'><td><a name='tomcat.ContextElement_targetDirectoryShared'></a><span class='ci-property-name'>targetDirectoryShared</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>Is the target directory shared by others on the generic server. When true, the target directory is not deleted during a destroy operation; only the artifacts copied to it.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='tomcat.ContextWarModule'></a><h3 class='ci-detail-title'>tomcat.ContextWarModule</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>generic.CopiedArtifact</span><span> >> </span><span>generic.AbstractDeployedArtifact</span><span> >> </span><span>generic.AbstractDeployed</span><span> >> </span><span>udm.BaseDeployed</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Artifact</span><span>, </span><span>udm.Deployed</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>udm.DerivedArtifact</span></td></tr></table></div><p class='ci-description'>War Module that has an associated context.xml</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='tomcat.ContextWarModule_container'></a><span class='ci-property-name'>container</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Container&gt;</span><p class='ci-property-desc'>The container on which this deployed runs.</p></td>
+<tr class='odd'><td><a name='tomcat.ContextWarModule_contextRoot'></a><span class='ci-property-name'>contextRoot</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>${deployed.name}</span><p class='ci-property-desc'>Context root under which the web application can be access</p></td>
+<tr class='even'><td><a name='tomcat.ContextWarModule_deployable'></a><span class='ci-property-name'>deployable</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Deployable&gt;</span><p class='ci-property-desc'>The deployable that this deployed is derived from.</p></td>
+<tr class='odd'><td><a name='tomcat.ContextWarModule_placeholders'></a><span class='ci-property-name'>placeholders</span>&nbsp;:&nbsp;<span class='ci-property-kind'>MAP_STRING_STRING</span><p class='ci-property-desc'>A Map containing all the placeholders mapped to their values. Special values are &lt;ignore&gt; or &lt;empty&gt;</p></td>
+<tr class='even'><td><a name='tomcat.ContextWarModule_targetFile'></a><span class='ci-property-name'>targetFile</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Name of the artifact on the generic server.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='tomcat.ContextWarModule_contextSubject'></a><span class='ci-property-name'>contextSubject</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>war settings</span><p class='ci-property-desc'>Context Subject</p></td>
+<tr class='odd'><td><a name='tomcat.ContextWarModule_contextTemplate'></a><span class='ci-property-name'>contextTemplate</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Freemarker template used to create the context xml for the War</p></td>
+<tr class='even'><td><a name='tomcat.ContextWarModule_contextXmlTargetDirectory'></a><span class='ci-property-name'>contextXmlTargetDirectory</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Target directory to which the context xml must to copied to on the target system</p></td>
+<tr class='odd'><td><a name='tomcat.ContextWarModule_createOrder'></a><span class='ci-property-name'>createOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order of the step in the step list for the create operation.</p></td>
+<tr class='even'><td><a name='tomcat.ContextWarModule_createOrderOfContextXml'></a><span class='ci-property-name'>createOrderOfContextXml</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>60</span><p class='ci-property-desc'>The order of the create context step in the step list for the create operation.</p></td>
+<tr class='odd'><td><a name='tomcat.ContextWarModule_createVerb'></a><span class='ci-property-name'>createVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Create</span><p class='ci-property-desc'>Create Verb</p></td>
+<tr class='even'><td><a name='tomcat.ContextWarModule_destroyOrder'></a><span class='ci-property-name'>destroyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>40</span><p class='ci-property-desc'>The order of the step in the step list for the destroy operation.</p></td>
+<tr class='odd'><td><a name='tomcat.ContextWarModule_destroyOrderOfContextXml'></a><span class='ci-property-name'>destroyOrderOfContextXml</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>40</span><p class='ci-property-desc'>The order of the destroy context step in the step list for the create operation.</p></td>
+<tr class='even'><td><a name='tomcat.ContextWarModule_destroyVerb'></a><span class='ci-property-name'>destroyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Destroy</span><p class='ci-property-desc'>Destroy Verb</p></td>
+<tr class='odd'><td><a name='tomcat.ContextWarModule_modifyOrder'></a><span class='ci-property-name'>modifyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order of the step in the step list for the modify operation.</p></td>
+<tr class='even'><td><a name='tomcat.ContextWarModule_modifyOrderOfContextXml'></a><span class='ci-property-name'>modifyOrderOfContextXml</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>60</span><p class='ci-property-desc'>The order of the rename context root step in the step list for the modify operation.</p></td>
+<tr class='odd'><td><a name='tomcat.ContextWarModule_modifyVerb'></a><span class='ci-property-name'>modifyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Modify</span><p class='ci-property-desc'>Modify Verb</p></td>
+<tr class='even'><td><a name='tomcat.ContextWarModule_noopOrder'></a><span class='ci-property-name'>noopOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order of the step in the step list for the noop operation.</p></td>
+<tr class='odd'><td><a name='tomcat.ContextWarModule_noopVerb'></a><span class='ci-property-name'>noopVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Modify</span><p class='ci-property-desc'>Noop Verb</p></td>
+<tr class='even'><td><a name='tomcat.ContextWarModule_targetDirectory'></a><span class='ci-property-name'>targetDirectory</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Path to which artifact must be copied to on the generic server.</p></td>
+<tr class='odd'><td><a name='tomcat.ContextWarModule_createTargetDirectory'></a><span class='ci-property-name'>createTargetDirectory</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>Create the target directory on the generic server if it does not exist.</p></td>
+<tr class='even'><td><a name='tomcat.ContextWarModule_deleteGeneratedResources'></a><span class='ci-property-name'>deleteGeneratedResources</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Absolute paths to files on the target system that was generated and must be clean up during a destroy operation</p></td>
+<tr class='odd'><td><a name='tomcat.ContextWarModule_inspectClasspathResources'></a><span class='ci-property-name'>inspectClasspathResources</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Additional classpath resources that should be uploaded to the working directory before executing the inspect script.</p></td>
+<tr class='even'><td><a name='tomcat.ContextWarModule_inspectScript'></a><span class='ci-property-name'>inspectScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Classpath to the script used to inspect the generic container.</p></td>
+<tr class='odd'><td><a name='tomcat.ContextWarModule_inspectTemplateClasspathResources'></a><span class='ci-property-name'>inspectTemplateClasspathResources</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>Additional template classpath resources that should be uploaded to the working directory before executing the inspect script.The template is first rendered and the rendered content copied to a file, with the same name as the template, in the working directory.</p></td>
+<tr class='even'><td><a name='tomcat.ContextWarModule_restartRequired'></a><span class='ci-property-name'>restartRequired</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>The generic container requires a restart for the action performed by this deployed.</p></td>
+<tr class='odd'><td><a name='tomcat.ContextWarModule_restartRequiredForNoop'></a><span class='ci-property-name'>restartRequiredForNoop</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>The generic container requires a restart for the NOOP action performed by this deployed.</p></td>
+<tr class='even'><td><a name='tomcat.ContextWarModule_targetDirectoryShared'></a><span class='ci-property-name'>targetDirectoryShared</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>Is the target directory shared by others on the generic server. When true, the target directory is not deleted during a destroy operation; only the artifacts copied to it.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+</div>
+</body></html>

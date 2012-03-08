@@ -1,0 +1,550 @@
+<html><head><LINK REL=StyleSheet HREF="css/deployit.css" TYPE="text/css" MEDIA=screen>
+<LINK REL=StyleSheet HREF="css/ci-reference-api.css" TYPE="text/css" MEDIA=screen>
+<script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="js/jquery.tableofcontents.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+    $("body").attr('id', 'top-toc');
+    var title = $("<div class='manual-title'/>")
+    title.html("<div class='title'>IBM WebSphere Application Server Plugin Manual</div><div class='version'>Version <span class='version-number'>3.7.0-beta-1</span></div>");
+    $("body").css('width', '100%');
+    $("body").prepend(title);
+    $("body").prepend($("<ol id='toc'/>"));
+    $("#toc").tableOfContents("body", { topLinks: true, } );
+});
+
+</script>
+<title>IBM WebSphere Application Server Plugin Manual</title>
+</head><body><h1>Preface</h1><p>This document describes the functionality provided by the IBM WebSphere Application Server (WAS) plugin.</p><p>Refer to <strong>Deployit Reference Manual</strong> for background information on Deployit and deployment concepts.</p><h1>Overview</h1><p>The WAS plugin is a Deployit plugin that adds capability for managing deployments and resources on an existing WebSphere application server. It offers out of the box support for deploying/undeploying application artifacts, datasources, JMS resources and other Java EE resources and WAS configurations. See the <em>Features</em> section below for details. It can easily be extended to support more deployment options or management of new artifacts/resources on WAS.</p><h2>Features</h2>
+<ul>
+  <li>Deploys and undeploys Java EE application artifacts:
+  <ul>
+    <li>Enterprise applications (EAR)</li>
+    <li>Web applications (WAR)</li>
+    <li>Enterprise JavaBeans (EJB JAR)</li>
+    <li>Creates and removes Java EE resources:
+    <ul>
+      <li>Oracle datasources</li>
+      <li>DB2 datasources (type 2 and type 4)</li>
+      <li>V5 default JMS resources: queues, topics and connection factories.</li>
+      <li>WebSphere MQ JMS resources: queues, topics and connection factories.</li>
+      <li>SIB JMS resources: queues, topics, connection factories and destinations.</li>
+    </ul></li>
+  </ul></li>
+  <li>Creates and removes WAS configuration elements:
+  <ul>
+    <li>Shared libraries</li>
+    <li>Virtual hosts</li>
+  </ul></li>
+  <li>Discovers WAS topologies: cells, nodes, clusters, server, web servers.</li>
+</ul><h1>Requirements</h1>
+<ul>
+  <li><strong>Deployit requirements</strong>
+  <ul>
+    <li><strong>Deployit</strong>: version 3.6+</li>
+    <li><strong>IBM WebSphere Application Server Standard and Network Deployment</strong>: 6.1, 7.0 and 8.0 (Unix and Windows)</li>
+    <li><strong>Other Deployit Plugins</strong>: None</li>
+  </ul></li>
+</ul><h1>Usage in Deployment Packages</h1><p>The plugin works with the standard deployment package of DAR format. Please see the <em>Packaging Manual</em> for more details about the DAR format and the ways to compose one. </p><p>The following is a sample MANIFEST.MF file that can be used to create a WebSphere specific deployment package. It contain declarations for an <a href="#jee.Ear">Ear</a>, an <a href="#was.OracleDatasourceSpec">Oracle datasource spec</a> and a couple of JMS resources.</p>
+<pre style="display:inline-block; nobreak"><code>
+Manifest-Version: 1.0
+Deployit-Package-Format-Version: 1.3
+CI-Application: PetClinic-ear
+CI-Version: 1.0-was
+
+Name: PetClinic-1.0.ear
+CI-Name: PetClinic
+CI-Type: jee.Ear
+
+Name: sampleOracleDatasource
+CI-Type: was.OracleDatasourceSpec
+CI-jndiName: jdbc/sampleOracleDatasource
+CI-jdbcProvider: Oracle JDBC Driver
+CI-datasourceHelperClassname: com.ibm.websphere.rsadapter.Oracle10gDataStoreHelper
+CI-username: {{DATABASE_USERNAME}}
+CI-password: {{DATABASE_PASSWORD}}
+
+Name: sampleSibQueueDestination
+CI-Type: was.SibQueueDestinationSpec
+CI-busName: sampleSIBus
+
+Name: sampleSibQueue
+CI-Type: was.SibQueueSpec
+CI-queueName: sampleSibQueueDestination
+CI-busName: sampleSIBus
+CI-description: sample sib queue
+</code></pre><h1>Using the deployables and deployeds</h1><p>The following table shows the possible containers a deployable can be targeted to and the deployed that will be created as a result of that.</p>
+<div style="width:100%; display:table-row-group">
+<h2>Deployable vs. containers table</h2>
+<table class="deployed-matrix nobreak">
+<tr>
+	<th>Deployable</th>
+	<th>Containers</th>
+	<th>Deployed</th>
+<tr>
+	<td>jee.Ear or was.Ear<br/>jee.War or was.War<br/>jee.EjbJar or was.EjbJar</td>
+	<td>was.UnmanagedServer<br/>was.ManagedServer<br/>was.Cluster</td>
+	<td>was.EarModule<br/>was.WarModule<br/>was.EjbJarModule</td>
+</tr>
+<tr>
+	<td>was.SharedLibrarySpec</td>
+	<td>was.UnmanagedServer<br/>was.ManagedServer<br/>was.Cluster<br/>was.NodeAgent<br/>was.DeploymentManager</td>
+	<td>was.SharedLibrary</td>
+</tr>
+<tr>
+	<td>was.VirtualHostSpec</td>
+	<td>was.UnmanagedServer<br/>was.DeploymentManager</td>
+	<td>was.VirtualHost</td>
+</tr>
+<tr>
+	<td>was.V5DefaultQueueSpec<br/>was.V5DefaultQueueConnectionFactorySpec<br/>was.V5DefaultTopicSpec<br/>was.V5DefaultTopicConnectionFactorySpec</td>
+	<td>was.UnmanagedServer<br/>was.ManagedServer<br/>was.Cluster<br/>was.NodeAgent<br/>was.DeploymentManager</td>
+	<td>was.V5DefaultQueue<br/>was.V5DefaultTopic<br/>was.V5DefaultQueueConnectionFactory<br/>was.V5DefaultTopicConnectionFactory</td>
+</tr>
+<tr>
+	<td>was.WmqQueueSpec<br/>was.WmqQueueConnectionFactorySpec<br/>was.WmqTopicSpec<br/>was.WmqTopicConnectionFactorySpec</td>
+	<td>was.UnmanagedServer<br/>was.ManagedServer<br/>was.Cluster<br/>was.NodeAgent<br/>was.DeploymentManager</td>
+	<td>was.WmqQueue<br/>was.WmqQueueConnectionFactory<br/>was.WmqTopic<br/>was.WmqTopicConnectionFactory</td>
+</tr>
+<tr>
+	<td>was.SibQueueSpec<br/>was.SibQueueConnectionFactorySpec<br/>was.SibQueueDestinationSpec<br/>was.SibTopicSpec<br/>was.SibTopicConnectionFactorySpec<br/>was.SibTopicSpaceDestinationSpec</td>
+	<td>was.UnmanagedServer<br/>was.ManagedServer<br/>was.Cluster<br/>was.NodeAgent<br/>was.DeploymentManager</td>
+	<td>was.SibQueue<br/>was.SibQueueConnectionFactory<br/>was.SibQueueDestination<br/>was.SibTopic<br/>was.SibTopicConnectionFactory<br/>was.SibTopicSpaceDestination</td>
+</tr>
+</table>
+</div><h2>Deployed actions table</h2><p>The following table shows the actions taken when creating, modifying or destroying a deployed.</p>
+<table class="deployed-matrix nobreak">
+	<th>Deployed</th>
+	<th>Create</th>
+	<th>Modify</th>
+	<th>Destroy</th>
+</tr>
+<tr>
+	<td>was.EarModule<br/>was.WarModule<br/>was.EjbJarModule</td>
+	<td>
+		<ul>
+			<li>deploy application</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+			<li>start application</li>
+		</ul>
+    </td>
+	<td>
+		<ul>
+			<li>stop application</li>
+			<li>undeploy application</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+			<li>deploy application</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+			<li>start application</li>
+		</ul>
+	</td>
+	<td>
+		<ul>
+			<li>stop application</li>
+			<li>undeploy application</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+		</ul>
+	</td>
+</tr>
+<tr>
+	<td>was.SharedLibrary</td>
+	<td>
+		<ul>
+			<li>create shared library</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+		</ul>
+    </td>
+	<td>
+		<ul>
+			<li>destroy shared library</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+			<li>create shared library</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+		</ul>
+	</td>
+	<td>
+		<ul>
+			<li>destroy shared library</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+		</ul>
+	</td>
+</tr>
+<tr>
+	<td>was.VirtualHost</td>
+	<td>
+		<ul>
+			<li>create virtual host</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+		</ul>
+    </td>
+	<td>
+		<ul>
+			<li>destroy virtual host</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+			<li>create virtual host</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+		</ul>
+	</td>
+	<td>
+		<ul>
+			<li>destroy virtual host</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+		</ul>
+	</td>
+</tr>
+<tr>
+	<td>was.V5DefaultQueue<br/>was.V5DefaultTopic<br/>was.V5DefaultQueueConnectionFactory<br/>was.V5DefaultTopicConnectionFactory</td>
+	<td>
+		<ul>
+			<li>create V5 JMS resource</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+		</ul>
+    </td>
+	<td>
+		<ul>
+			<li>destroy V5 JMS resource</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+			<li>create V5 JMS resource</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+		</ul>
+	</td>
+	<td>
+		<ul>
+			<li>destroy V5 JMS resource</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+		</ul>
+	</td>
+</tr>
+<tr>
+	<td>was.WmqQueue<br/>was.WmqQueueConnectionFactory<br/>was.WmqTopic<br/>was.WmqTopicConnectionFactory</td>
+	<td>
+		<ul>
+			<li>create WebSphere MQ JMS resource</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+		</ul>
+    </td>
+	<td>
+		<ul>
+			<li>destroy WebSphere MQ JMS resource</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+			<li>create WebSphere MQ JMS resource</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+		</ul>
+	</td>
+	<td>
+		<ul>
+			<li>destroy WebSphere MQ JMS resource</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+		</ul>
+	</td>
+</tr>
+<tr>
+	<td>was.SibQueue<br/>was.SibQueueConnectionFactory<br/>was.SibQueueDestination<br/>was.SibTopic<br/>was.SibTopicConnectionFactory<br/>was.SibTopicSpaceDestination</td>
+	<td>
+		<ul>
+			<li>create WebSphere SIB JMS resource</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+		</ul>
+    </td>
+	<td>
+		<ul>
+			<li>destroy WebSphere MQ JMS resource</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+			<li>create WebSphere SIB JMS resource</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+		</ul>
+	</td>
+	<td>
+		<ul>
+			<li>destroy WebSphere SIB JMS resource</li>
+			<li>WAS ND only: synchronize applicable nodes</li>
+		</ul>
+	</td>
+</tr>
+</table><h1>Discovering WAS middleware</h1><p>Deployit can scan your environment for as far as possible and create Configuration Items in its repository based on the configurations it encounters during the scan. This process is knows as <em>discovery</em>.</p><p>The CIs discovered during <em>discovery</em> will help you in setting up your infrastructure in an easy way. However, they need not be complete: some CIs contain properties that can not be automatically discovered, like passwords. These specific kind of properties will still need to be entered manually. </p><p>Because <em>discovery</em> is part of the Deployit plugin suite, the exact discovery functionality available varies depending on the middleware platforms present in your environment.</p><p>The following steps comprehend <em>discovery</em>:</p>
+<ol>
+  <li>Create a CI representing the starting point for <em>discovery</em> (often a <em>Host</em> CI).</li>
+  <li>Start <em>discovery</em> passing this CI.</li>
+  <li>Store the discoverd CIs in the repository.</li>
+  <li>Complete the discovered CIs manually by providing missing needed properties.</li>
+  <li>Add the discovered CIs to an environment.</li>
+</ol><p>Note however that the last step of <em>discovery</em> is optional. The discovered CIs will be stored under the <code>Infrastructure</code> root node in the repository and may be added to an environment at some later time.</p><h2>Create a Configuration Item starting point</h2><p>The first step taken in <em>discovery</em> is to create a starting point to kick off the process from. This starting point consists of a Configuration Item specifying at least the host that <em>discovery</em> should start at. Depending on the middleware you are trying to discover, additional parameters may be needed. </p><p>Following is an example of how to start <em>discovery</em> in case of a <em>WebSphere Application Server</em> (WAS). First a CI is created for the host itself and next a Configuration Item is created for the deployment manager running on that host. The deployment manager CI will be the starting point for <em>discovery</em>.</p>
+<pre><code>    # Create a CI with the required discovery parameters filled in
+    wasHost = factory.configurationItem(&#39;Infrastructure/rs94asob.k94.corp.com&#39;, &#39;overthere.SshHost&#39;, {
+            &#39;address&#39;:&#39;was-61&#39;,
+            &#39;username&#39;:&#39;root&#39;,
+            &#39;password&#39;:&#39;rootpwd&#39;,
+            &#39;os&#39;:&#39;UNIX&#39;,
+            &#39;accessMethod&#39;:&#39;SSH_SFTP&#39;
+        })
+
+    repository.create(wasHost)
+
+    # Now create a WAS deployment manager
+    dmManager = factory.configurationItem(wasHost.id + &#39;/wasDM&#39;, &#39;was.DeploymentManager&#39;, {
+            &#39;host&#39;:&#39;Infrastructure/rs94asob.k94.corp.com&#39;,
+            &#39;version&#39;:&#39;WAS_61&#39;,
+            &#39;wasHome&#39;:&#39;/opt/ws/6.1/profiles/dmgr&#39;,
+            &#39;username&#39;:&#39;wsadmin&#39;,
+            &#39;password&#39;:&#39;wsadmin&#39;})
+</code></pre><h2>Start discovery passing a Configuration Item</h2><p>After the CI starting point has been created, it can be used to perform <em>discovery</em>. The <em>Deployit</em> CLI <em>discovery</em> functionality is synchronous, which means that the CLI will wait until the <em>discovery</em> process finishes.</p><p>The process of <em>discovery</em> works exactly like a regular task in that it executes a number of steps behind the scenes. Whenever one of these steps fails, the entire <em>discovery</em> fails and aborts. It is not possible to continue an interrupted <em>discovery</em> process.</p><p>The command to start discovery is:</p>
+<pre><code>    discoveredCIs = deployit.discover(dmManager)
+</code></pre><p>Note there are no single- or double quotes around <code>dmManager</code>, because it's an object and not a string. The result of this command will be an object containing a list of discovered CIs.</p><h2>Store the CIs in the repository</h2><p>Deployit returns a list of discovered middleware CIs. Note that these are not yet persisted. To store them in the repository, use the following code:</p>
+<pre><code>    repository.create(discoveredCIs)
+</code></pre><h2>Complete discovered middleware CIs</h2><p>The easiest way to find out which of the discovered CIs require additional information is by printing them. Any CIs that contain passwords (displayed as '********') will need to be completed. To print the stored CIs, the following code can be used:</p>
+<pre><code>    for ci in discoveredCIs.objects: deployit.print(repository.read(ci.id));
+</code></pre><p>Note: the created CIs can also be edited in the GUI using the Repository Browser.</p><h2>Adding CIs to Environments</h2><p>Middleware that is used as a deployment target must be grouped together in an environment. Environments are CIs and like all CIs, they can be created from the CLI. The following command can be used for this:</p>
+<pre><code>    env = factory.configurationItem(&#39;Environments/DiscoveredEnv&#39;, &#39;udm.Environment&#39;) 
+</code></pre><p>Add the discovered CIs to the environment:</p>
+<pre><code>    env.values[&#39;members&#39;] = [ci.id for ci in discoveredCIs.objects]
+</code></pre><p>Note that not all of the discovered CIs should necessarily be stored in an environment. For example, in the case of WAS, some nested CIs may be discovered of which only the top-level one must be stored.</p><p>Store the new environment:</p>
+<pre><code>    repository.create(env)
+</code></pre><p>The newly created environment can now be used as a deployment target.</p><p>Note: the user needs specific permission to store CIs in the database. See the <em>Deployit System Administration Manual</em>.</p><h1>Extending the WAS plugin</h1><p>The WAS plugin is designed to be extended through <em>Deployit</em>'s <em>Plugin API</em> type system and through the use of custom, user defined WAS Python scripts. </p><p>The WAS plugin associates <strong>Create</strong>, <strong>Modify</strong>, <strong>Destroy</strong> and <strong>Inspect</strong> operations received from <em>Deployit</em> with WAS Python scripts that need to be executed for the specific operation to be performed. The operation specific script is given a Python object representation of the <code>Deployed</code> that triggered the operation. The script is then executed using <strong>wsadmin</strong>.</p><p>There also exists an advanced method to extend the WAS plugin, but the implementation of this form of extension needs to be written in the Java programming language and consists of writing so-called <code>Deployed contributors</code>, <code>PlanPreProcessors</code> and <code>Contributers</code>.</p><p>Please refer to the <em>Customization Manual</em> for a detailed explanation of the type system and advanced methods of customization of plugins.</p><h2>Extending using XML and Python scripts</h2><p>The easiest way of extending the WAS plugin is by using XML and Python scripts. In this way no Java code needs to be written. Extending the behaviour of the plugin is done by simply defining the necessary deployables and deployeds for the specific environment. When Deployit starts up, it reads a file called <em>synthetic.xml</em> from the server class-path, i.e. the <code>ext</code> directory of the server.</p><p>This file contains the type definitions of the deployables and the deployeds, i.e. the information about the types and their properties. In addition to that, it defines which Python scripts should be executed for a particular operation, as mentioned above. The scripts have all the information from the <code>Deployed</code> at their disposal to perform their work.</p><p>As an example, this is the type definition of a virtual host as it appears in <code>synthetic.xml</code>:</p>
+<pre><code>&lt;type type=&quot;was.VirtualHost&quot; extends=&quot;was.Resource&quot; deployable-type=&quot;was.VirtualHostSpec&quot; container-type=&quot;was.Cell&quot;&gt;
+    &lt;generate-deployable type=&quot;was.VirtualHostSpec&quot; extends=&quot;was.Deployable&quot; /&gt;
+    &lt;property name=&quot;createScript&quot; default=&quot;was/virtualhost/create-virtual-host.py&quot; hidden=&quot;true&quot; /&gt;     
+    &lt;property name=&quot;destroyScript&quot; default=&quot;was/virtualhost/destroy-virtual-host.py&quot; hidden=&quot;true&quot; /&gt;
+    &lt;property name=&quot;inspectScript&quot; default=&quot;was/virtualhost/inspect-virtual-host.py&quot; hidden=&quot;true&quot; /&gt;   
+    &lt;property name=&quot;aliases&quot; kind=&quot;set_of_string&quot; description=&quot;Virtual host aliases - enter alias as: hostname:port&quot; /&gt;
+&lt;/type&gt;
+</code></pre><p>Looking at this type definition more closely, it indicates that a virtual host, the type of which is <code>was.VirtualHost</code> will be created on its target infrastructure, called container, with a <code>container-type</code> of <code>was.Cell</code>; On WAS a virtual host may be created on a cell and that is exactly what this definition means.</p><p>The attribute <code>extends</code> tells the plugin what resource is extended by this definition. In this case it's a simple basic resource so it extends the type <code>was.Resource</code>. Since multiple virtual hosts may be created this way, each with its own set of properties, a specification of what will be deployed is created, a so-called <code>deployable-type</code>, and is itself of type <code>was.VirtualHostSpec</code>.</p><p>Within the type definition, there is the possibility of specifying properties of exactly how the virtual host is to be created. The first property is called <code>createScript</code> and specifies the script to be executed by <strong>wsadmin</strong> for the creation of the virtual host. An extension of this plugin could specify a different creation script. The plugin comes with a default creation script (<code>createScript</code>):</p><p><strong>create-virtual-host.py</strong></p>
+<pre><code>import re
+
+pattern = re.compile(&#39;^[^:]+:\d{,5}&#39;)
+virtualHostParent = AdminConfig.getid(&#39;/Cell:%s/&#39; % (deployed.container.cellName))
+attributes = [[&#39;name&#39;, deployed.name]]
+attributes.append([&#39;aliases&#39;, [[[&#39;hostname&#39;, alias.split(&#39;:&#39;)[0]], [&#39;port&#39;, alias.split(&#39;:&#39;)[1]]] 
+                    for alias in deployed.aliases if pattern.match(alias) != None]])
+re.purge()
+
+print &quot;Creating virtual host %s on target scope %s with attribute(s) %s&quot; % (deployed.name, virtualHostParent, attributes)
+AdminConfig.create(&#39;VirtualHost&#39;, virtualHostParent, attributes)
+</code></pre><p>This script also shows that <code>aliases</code> are also created for the specified virtual host. Aliases may be specified using the property <code>aliases</code> and it takes a set of strings. An example of this property is:</p>
+<pre><code>&lt;property name=&#39;aliases&#39; kind=&#39;set_of_string&#39; value=&#39;www.my-domain.com:80,www.proxy-domain.com:8443&#39;/&gt;
+</code></pre><p>In addition to a creation script, a destruction script (<code>destroyScript</code>) must also be specified:</p><p><strong>destroy-virtual-host.py</strong></p>
+<pre><code>virtualHostContainmentPath = &#39;/Cell:%s/VirtualHost:%s&#39; % (deployed.container.cellName, deployed.name)
+virtualHostId = validateNotEmpty(AdminConfig.getid(virtualHostContainmentPath),
+&quot;Cannot find virtual host with id: %s&quot; % (virtualHostContainmentPath))
+
+print &quot;Destroying virtual host %s&quot; % (deployed.name)
+AdminConfig.remove(virtualHostId)
+</code></pre><p>Finally, a modification script (<code>modifyScript</code>) may also be specified. If that is not present, the destruction script is invoked to remove the resource with the old settings and then the creation script is invoked to create the resource with the new settings.</p><h3>Adding a property</h3><p>The architecture of the WAS plugin enables the tranfer of properties from the deployed - <code>was.VirtualHost</code> in this example - to the accompanying Python scripts defined with the properties <code>createScript</code> and <code>destroyScript</code>. In order for this to be possible, the properties are bound to an object called <code>deployed</code> and can be accessed as <code>deployed.&lt;property-name&gt;</code>. This can be seen in the creation script, where the property <code>aliases</code> is available as <code>deployed.aliases</code> and the name of the virtual host as <code>deployed.name</code>. Using this convention as many properties as needed by the scripts can be bound to the type definition. Care should be taken that the scripts use the same type as specified in the definition, so if a property defines a <code>kind=integer</code>, the script should also treat the value of this property as being of type <code>integer</code>.</p><p>An example of adding another property is:</p>
+<pre><code>&lt;property name=&#39;index-range&#39; kind=&#39;integer&#39; value=&#39;999&#39; description=&#39;maximum index of an array of 1000 items&#39;/&gt;
+</code></pre><h3>Fixing a property</h3><p>In the case where it is necessary that a specific property should always contain a fixed predefined value, the attribute <code>hidden=true</code> should be used on the definition of the property. This way an end-user, who is performing the deployment using the <em>Deployit</em> user interface, won't be able to see this property and therefore not have the possibility of modifying it. Usually this is done for the Python scripts which once written are not allowed to be changed by an end-user.</p><p>Using the example of the previous section and wanting to fix the maximum range, the example becomes:</p>
+<pre><code>&lt;property name=&#39;index-range&#39; kind=&#39;integer&#39; value=&#39;999&#39; hidden=&#39;true&#39; description=&#39;maximum index of an array of 1000 items&#39;/&gt;
+</code></pre><h3>Inspection</h3><p>One thing left to be mentioned is the property called <code>inspectScript</code>. When the Domain manager of WAS is known, it is possible for <em>Deployit</em> to discover on its own most of the WAS topology automatically. This specific script is called upon by <em>Deployit</em> when it's trying, in our example, to discover a virtual host on a WAS cell. Following is the default script implementation shipped with the WAS plugin:</p><p><strong>inspect-virtual-host.py</strong></p>
+<pre><code>print &quot;Inspecting virtual host %s&quot; % (deployed.name)
+
+virtualHostContainmentPath = &#39;/Cell:%s/VirtualHost:%s&#39; % (deployed.container.cellName, deployed.name)
+virtualHostId = validateNotEmpty(AdminConfig.getid(virtualHostContainmentPath),
+&quot;Cannot find virtual host %s&quot; % (virtualHostContainmentPath))
+
+inspected(&#39;name&#39;, AdminConfig.showAttribute(virtualHostId, &#39;name&#39;))
+aliases = AdminConfig.getid(virtualHostContainmentPath + &#39;/HostAlias:/&#39;).split()
+inspected(&#39;aliases&#39;, [AdminConfig.showAttribute(alias,&#39;hostname&#39;) + &#39;:&#39; +
+AdminConfig.showAttribute(alias,&#39;port&#39;) for alias in aliases if alias != &quot;&quot;])
+</code></pre><p>In the above script, discovered information is handed back to the plugin by use of the <code>inspected</code> method. This method takes two parameters, the first one being the name of the discovered item or property and the second one the actual value. The value should be representable as either a string, or a list of strings. The declaration of this method can be found in the <em>Plugin API</em> in the file <em>base.py</em>.</p><p>More information about the process of discovery and how to use it can be found in the <em>Command Line Interface</em> (CLI) manual.</p><h3>Execution order</h3><p>A deployment process consists of a series of steps that are executed sequentially. Plugins offer the ability to influence the order of execution of the steps contributed to the deployment process in relation to other contributed steps and operations, not necessarily contributed by the same plugin(s), that are part of the deployment process.</p><p>The order of execution allows for the chaining of scripts or operations to create a logical sequence of events. In order to specify the order, properties with the name of <code>createOrder</code> and <code>destroyOrder</code> may be used with an attibute called <code>default</code> to specify the order ordinal. For example, the following <em>synthetic.xml</em> snippet says that creation of the virtual host, <code>default=60</code>, will happen before any step with a higher order, for example <code>default=70</code>, but after any step with a lower order, i.e. lower than <code>default=60</code>.</p>
+<pre><code>&lt;type type=&quot;was.VirtualHost&quot; extends=&quot;was.Resource&quot; deployable-type=&quot;was.VirtualHostSpec&quot; container-type=&quot;was.Cell&quot;&gt;
+    &lt;generate-deployable type=&quot;was.VirtualHostSpec&quot; extends=&quot;was.Deployable&quot; /&gt;
+
+    &lt;property name=&quot;createScript&quot; default=&quot;was/virtualhost/create-virtual-host.py&quot; hidden=&quot;true&quot; /&gt;
+    &lt;property name=&quot;createVerb&quot; default=&quot;Deploy&quot; hidden=&quot;true&quot; /&gt;
+    &lt;property name=&quot;createOrder&quot; kind=&quot;integer&quot; default=&quot;60&quot; hidden=&quot;true&quot; /&gt;
+
+    &lt;property name=&quot;destroyScript&quot; default=&quot;was/virtualhost/destroy-virtual-host.py&quot; hidden=&quot;true&quot; /&gt;
+    &lt;property name=&quot;destroyVerb&quot; default=&quot;Undeploy&quot; hidden=&quot;true&quot; /&gt;
+    &lt;property name=&quot;destroyOrder&quot; kind=&quot;integer&quot; default=&quot;30&quot; hidden=&quot;true&quot; /&gt;
+
+    &lt;property name=&quot;inspectScript&quot; default=&quot;was/virtualhost/inspect-virtual-host.py&quot; hidden=&quot;true&quot; /&gt;   
+    &lt;property name=&quot;aliases&quot; kind=&quot;set_of_string&quot; description=&quot;Virtual host aliases - enter alias as: hostname:port&quot; /&gt;
+&lt;/type&gt;
+</code></pre><p>Notice that the <code>destroyOrder</code> has a low order, because when executing a deployment the virtual host should be destroyed before it can be created again.</p><div style='width:100%; position:relative'>
+<h1 class='ci-toc-category'>CI Reference</h1><h2>Configuration Item Overview</h2><h3 class='ci-toc-category'>Topology Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#was.Cluster'>was.Cluster</a></td><td>A WebSphere cluster managed by a deployment manager (WAS ND)</td>
+<tr class='odd'><td><a href='#was.DeploymentManager'>was.DeploymentManager</a></td><td>A WebSphere Application Server deployment manager (WAS ND)</td>
+<tr class='even'><td><a href='#was.ManagedServer'>was.ManagedServer</a></td><td>A WebSphere server managed by a node that is part of a deployment manager (WAS ND)</td>
+<tr class='odd'><td><a href='#was.ManagedWebServer'>was.ManagedWebServer</a></td><td>An HTTP server managed by a node that is part of a deployment manager (WAS ND)</td>
+<tr class='even'><td><a href='#was.NodeAgent'>was.NodeAgent</a></td><td>A WebSphere node agent</td>
+<tr class='odd'><td><a href='#was.UnmanagedServer'>was.UnmanagedServer</a></td><td>An unmanaged WebSphere Applicaton Server (WAS Base/SA)</td>
+</table>
+<h3 class='ci-toc-category'>Virtual Deployable Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#was.Deployable'>was.Deployable</a></td><td>Base class for all deployable configutation items</td>
+</table>
+<h3 class='ci-toc-category'>Virtual Deployed Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#was.ExtensibleDeployed'>was.ExtensibleDeployed</a></td><td>Base class for all extensible deployed configuration items</td>
+<tr class='odd'><td><a href='#was.ExtensibleDeployedArtifact'>was.ExtensibleDeployedArtifact</a></td><td>Base class for all extensible deployed artifact configuration items</td>
+<tr class='even'><td><a href='#was.ExtensibleDeployedResource'>was.ExtensibleDeployedResource</a></td><td>Base class for all extensible deployed resource configuration items</td>
+</table>
+<h3 class='ci-toc-category'>Virtual Topology Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#was.BaseCell'>was.BaseCell</a></td><td>Base class for a Webshpere Cell</td>
+<tr class='odd'><td><a href='#was.Cell'>was.Cell</a></td><td></td>
+<tr class='even'><td><a href='#was.Node'>was.Node</a></td><td></td>
+<tr class='odd'><td><a href='#was.Server'>was.Server</a></td><td></td>
+<tr class='even'><td><a href='#was.WasAppContainer'>was.WasAppContainer</a></td><td></td>
+<tr class='odd'><td><a href='#was.WasContainer'>was.WasContainer</a></td><td></td>
+</table>
+<h2 class='ci-details-title'>Configuration Item Details</h2><a name='was.BaseCell'></a><h3 class='ci-detail-title'>was.BaseCell</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>udm.BaseContainer</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>python.PythonManagingContainer</span><span>, </span><span>python.PythonManagedContainer</span><span>, </span><a href='#was.WasContainer'>was.WasContainer</a><span>, </span><span>udm.ConfigurationItem</span><span>, </span><a href='#was.Cell'>was.Cell</a><span>, </span><span>udm.Container</span></td></tr></table></div><p class='ci-description'>Base class for a Webshpere Cell</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><img title='Inspection property.' class='inspectImg' src='image/inspect.png'/><a name='was.BaseCell_host'></a><span class='ci-property-name'>host</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;overthere.Host&gt;</span><p class='ci-property-desc'>Host on which the unmanaged WAS server runs</p></td>
+<tr class='odd'><td><a name='was.BaseCell_version'></a><span class='ci-property-name'>version</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>ENUM [WAS_61, WAS_70, WAS_80]</span><p class='ci-property-desc'>Version of WebSphere Application Server.</p></td>
+<tr class='even'><td><img title='Inspection property.' class='inspectImg' src='image/inspect.png'/><a name='was.BaseCell_wasHome'></a><span class='ci-property-name'>wasHome</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Root path of the WebSphere installation path. e.g. /opt/ws/6.1/appserver/profiles/AppSrv01</p></td>
+<tr class='odd'><td><img title='Inspection property.' class='inspectImg' src='image/inspect.png'/><a name='was.BaseCell_password'></a><span class='ci-property-name'>password</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Password which is used to login to the WebSphere Administration.</p></td>
+<tr class='even'><td><img title='Inspection property.' class='inspectImg' src='image/inspect.png'/><a name='was.BaseCell_port'></a><span class='ci-property-name'>port</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span><p class='ci-property-desc'>TCP port which is used to login to the WebSphere Administration, default is 8880</p></td>
+<tr class='odd'><td><a name='was.BaseCell_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+<tr class='even'><td><img title='Inspection property.' class='inspectImg' src='image/inspect.png'/><a name='was.BaseCell_username'></a><span class='ci-property-name'>username</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Username which is used to login to the WebSphere Administration.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='was.BaseCell_runWithDaemon'></a><span class='ci-property-name'>runWithDaemon</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>Set to true to execute commands with the Python daemon</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='was.Cell'></a><h3 class='ci-detail-title'>was.Cell</h3><p class='ci-description'>null</p>
+<hr class='ci-details-separator'/>
+<a name='was.Cluster'></a><h3 class='ci-detail-title'>was.Cluster</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>udm.BaseContainer</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><a href='#was.WasAppContainer'>was.WasAppContainer</a><span>, </span><span>python.PythonManagedContainer</span><span>, </span><a href='#was.WasContainer'>was.WasContainer</a><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>udm.Container</span></td></tr></table></div><p class='ci-description'>A WebSphere cluster managed by a deployment manager (WAS ND)</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='was.Cluster_cell'></a><span class='ci-property-name'>cell</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;was.DeploymentManager&gt;</span><p class='ci-property-desc'>Deployment manager that manages this this cluster</p></td>
+<tr class='odd'><td><a name='was.Cluster_servers'></a><span class='ci-property-name'>servers</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_CI&lt;was.ManagedServer&gt;</span><p class='ci-property-desc'>Servers that are part of this cluster</p></td>
+<tr class='even'><td><a name='was.Cluster_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='was.Deployable'></a><h3 class='ci-detail-title'>was.Deployable</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>udm.BaseDeployable</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.Deployable</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Base class for all deployable configutation items.</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='was.Deployable_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='was.DeploymentManager'></a><h3 class='ci-detail-title'>was.DeploymentManager</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#was.BaseCell'>was.BaseCell</a><span> >> </span><span>udm.BaseContainer</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>python.PythonManagingContainer</span><span>, </span><span>python.PythonManagedContainer</span><span>, </span><a href='#was.WasContainer'>was.WasContainer</a><span>, </span><span>udm.ConfigurationItem</span><span>, </span><a href='#was.Cell'>was.Cell</a><span>, </span><span>udm.Container</span></td></tr></table></div><p class='ci-description'>A WebSphere Application Server deployment manager (WAS ND)</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><img title='Inspection property.' class='inspectImg' src='image/inspect.png'/><a name='was.DeploymentManager_host'></a><span class='ci-property-name'>host</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;overthere.Host&gt;</span><p class='ci-property-desc'>Host on which the unmanaged WAS server runs</p></td>
+<tr class='odd'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='was.DeploymentManager_nodeAgents'></a><span class='ci-property-name'>nodeAgents</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_CI&lt;was.NodeAgent&gt;</span><p class='ci-property-desc'>WebSphere nodes belonging to cell</p></td>
+<tr class='even'><td><a name='was.DeploymentManager_version'></a><span class='ci-property-name'>version</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>ENUM [WAS_61, WAS_70, WAS_80]</span><p class='ci-property-desc'>Version of WebSphere Application Server.</p></td>
+<tr class='odd'><td><img title='Inspection property.' class='inspectImg' src='image/inspect.png'/><a name='was.DeploymentManager_wasHome'></a><span class='ci-property-name'>wasHome</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Root path of the WebSphere installation path. e.g. /opt/ws/6.1/appserver/profiles/AppSrv01</p></td>
+<tr class='even'><td><img title='Inspection property.' class='inspectImg' src='image/inspect.png'/><a name='was.DeploymentManager_password'></a><span class='ci-property-name'>password</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Password which is used to login to the WebSphere Administration.</p></td>
+<tr class='odd'><td><img title='Inspection property.' class='inspectImg' src='image/inspect.png'/><a name='was.DeploymentManager_port'></a><span class='ci-property-name'>port</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span><p class='ci-property-desc'>TCP port which is used to login to the WebSphere Administration, default is 8880</p></td>
+<tr class='even'><td><a name='was.DeploymentManager_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+<tr class='odd'><td><img title='Inspection property.' class='inspectImg' src='image/inspect.png'/><a name='was.DeploymentManager_username'></a><span class='ci-property-name'>username</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Username which is used to login to the WebSphere Administration.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='was.DeploymentManager_runWithDaemon'></a><span class='ci-property-name'>runWithDaemon</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>Set to true to execute commands with the Python daemon</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='was.ExtensibleDeployed'></a><h3 class='ci-detail-title'>was.ExtensibleDeployed</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>python.PythonManagedDeployed</span><span> >> </span><span>udm.BaseDeployed</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Deployed</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Base class for all extensible deployed configuration items.</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='was.ExtensibleDeployed_container'></a><span class='ci-property-name'>container</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Container&gt;</span><p class='ci-property-desc'>The container on which this deployed runs.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployed_deployable'></a><span class='ci-property-name'>deployable</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Deployable&gt;</span><p class='ci-property-desc'>The deployable that this deployed is derived from.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='was.ExtensibleDeployed_createOrder'></a><span class='ci-property-name'>createOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>60</span><p class='ci-property-desc'>The order in which a create step will be executed.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployed_createVerb'></a><span class='ci-property-name'>createVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Create</span><p class='ci-property-desc'>The word is used to prefix a step description for the create operation.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployed_destroyOrder'></a><span class='ci-property-name'>destroyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>40</span><p class='ci-property-desc'>The order in which a destroy step will be executed.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployed_destroyVerb'></a><span class='ci-property-name'>destroyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Destroy</span><p class='ci-property-desc'>The word is used to prefix a step description for the destroy operation.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployed_inspectVerb'></a><span class='ci-property-name'>inspectVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Inspect</span><p class='ci-property-desc'>The word is used to prefix a step description for the inspect operation.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployed_modifyOrder'></a><span class='ci-property-name'>modifyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>60</span><p class='ci-property-desc'>The order in which a modify step will be executed.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployed_modifyVerb'></a><span class='ci-property-name'>modifyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Modify</span><p class='ci-property-desc'>The word is used to prefix a step description for the modify operation.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployed_standardPropertiesNotToExpose'></a><span class='ci-property-name'>standardPropertiesNotToExpose</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>id, type, properties, deployable, container, createOrder, createScript, createVerb, syncAfterCreateOrder, modifyOrder, modifyScript, modifyVerb, syncAfterModifyOrder, destroyOrder, destroyScript, securityPermissions, inheritPermissions, exposeDeployedApplication, destroyVerb, syncAfterDestroyOrder, startOrder, startScript, startVerb, stopOrder, stopScript, stopVerb, inspectScript, inspectVerb</span><p class='ci-property-desc'>Standard properties that are not exposed to any python wsadmin script.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployed_startOrder'></a><span class='ci-property-name'>startOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order in which a start step will be executed.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployed_startVerb'></a><span class='ci-property-name'>startVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Start</span><p class='ci-property-desc'>The word is used to prefix a step description for the start operation.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployed_stopOrder'></a><span class='ci-property-name'>stopOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order in which a synchronize after modify stop will be executed.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployed_stopVerb'></a><span class='ci-property-name'>stopVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Stop</span><p class='ci-property-desc'>The word is used to prefix a step description for the stop operation.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployed_syncAfterCreateOrder'></a><span class='ci-property-name'>syncAfterCreateOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>65</span><p class='ci-property-desc'>The order in which a synchronize after create step will be executed.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployed_syncAfterDestroyOrder'></a><span class='ci-property-name'>syncAfterDestroyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>45</span><p class='ci-property-desc'>The order in which a synchronize after destroy step will be executed.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployed_syncAfterModifyOrder'></a><span class='ci-property-name'>syncAfterModifyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>65</span><p class='ci-property-desc'>The order in which a synchronize after modify step will be executed.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployed_createScript'></a><span class='ci-property-name'>createScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Python script invoked to deploy a Java EE artifact or create a Java EE resource</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployed_destroyScript'></a><span class='ci-property-name'>destroyScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Python script invoked to undeploy a Java EE artifact or destroy a Java EE resource</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployed_exposeDeployedApplication'></a><span class='ci-property-name'>exposeDeployedApplication</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>flag to indicate whether the deployed application CI is to be injected to the python script execution context.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployed_inspectScript'></a><span class='ci-property-name'>inspectScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Python script invoked to inspect a Java EE artifact or Java EE resource</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployed_modifyScript'></a><span class='ci-property-name'>modifyScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Python script invoked to upgrade a Java EE artifact or modify a Java EE resource</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployed_startScript'></a><span class='ci-property-name'>startScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Python script invoked to start a Java EE artifact or Java EE resource</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployed_stopScript'></a><span class='ci-property-name'>stopScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Python script invoked to stop a Java EE artifact or Java EE resource</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='was.ExtensibleDeployedArtifact'></a><h3 class='ci-detail-title'>was.ExtensibleDeployedArtifact</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#was.ExtensibleDeployed'>was.ExtensibleDeployed</a><span> >> </span><span>python.PythonManagedDeployed</span><span> >> </span><span>udm.BaseDeployed</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Artifact</span><span>, </span><span>udm.Deployed</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>udm.DerivedArtifact</span></td></tr></table></div><p class='ci-description'>Base class for all extensible deployed artifact configuration items.</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='was.ExtensibleDeployedArtifact_container'></a><span class='ci-property-name'>container</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Container&gt;</span><p class='ci-property-desc'>The container on which this deployed runs.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedArtifact_deployable'></a><span class='ci-property-name'>deployable</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Deployable&gt;</span><p class='ci-property-desc'>The deployable that this deployed is derived from.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployedArtifact_placeholders'></a><span class='ci-property-name'>placeholders</span>&nbsp;:&nbsp;<span class='ci-property-kind'>MAP_STRING_STRING</span><p class='ci-property-desc'>A Map containing all the placeholders mapped to their values. Special values are <ignore> or <empty></p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='was.ExtensibleDeployedArtifact_createOrder'></a><span class='ci-property-name'>createOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>60</span><p class='ci-property-desc'>The order in which a create step will be executed.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedArtifact_createVerb'></a><span class='ci-property-name'>createVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Create</span><p class='ci-property-desc'>The word is used to prefix a step description for the create operation.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployedArtifact_destroyOrder'></a><span class='ci-property-name'>destroyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>40</span><p class='ci-property-desc'>The order in which a destroy step will be executed.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedArtifact_destroyVerb'></a><span class='ci-property-name'>destroyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Destroy</span><p class='ci-property-desc'>The word is used to prefix a step description for the destroy operation.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployedArtifact_inspectVerb'></a><span class='ci-property-name'>inspectVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Inspect</span><p class='ci-property-desc'>The word is used to prefix a step description for the inspect operation.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedArtifact_modifyOrder'></a><span class='ci-property-name'>modifyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>60</span><p class='ci-property-desc'>The order in which a modify step will be executed.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployedArtifact_modifyVerb'></a><span class='ci-property-name'>modifyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Modify</span><p class='ci-property-desc'>The word is used to prefix a step description for the modify operation.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedArtifact_standardPropertiesNotToExpose'></a><span class='ci-property-name'>standardPropertiesNotToExpose</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>id, type, properties, deployable, container, createOrder, createScript, createVerb, syncAfterCreateOrder, modifyOrder, modifyScript, modifyVerb, syncAfterModifyOrder, destroyOrder, destroyScript, securityPermissions, inheritPermissions, exposeDeployedApplication, destroyVerb, syncAfterDestroyOrder, startOrder, startScript, startVerb, stopOrder, stopScript, stopVerb, inspectScript, inspectVerb</span><p class='ci-property-desc'>Standard properties that are not exposed to any python wsadmin script.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployedArtifact_startOrder'></a><span class='ci-property-name'>startOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order in which a start step will be executed.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedArtifact_startVerb'></a><span class='ci-property-name'>startVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Start</span><p class='ci-property-desc'>The word is used to prefix a step description for the start operation.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployedArtifact_stopOrder'></a><span class='ci-property-name'>stopOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order in which a synchronize after modify stop will be executed.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedArtifact_stopVerb'></a><span class='ci-property-name'>stopVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Stop</span><p class='ci-property-desc'>The word is used to prefix a step description for the stop operation.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployedArtifact_syncAfterCreateOrder'></a><span class='ci-property-name'>syncAfterCreateOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>65</span><p class='ci-property-desc'>The order in which a synchronize after create step will be executed.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedArtifact_syncAfterDestroyOrder'></a><span class='ci-property-name'>syncAfterDestroyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>45</span><p class='ci-property-desc'>The order in which a synchronize after destroy step will be executed.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployedArtifact_syncAfterModifyOrder'></a><span class='ci-property-name'>syncAfterModifyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>65</span><p class='ci-property-desc'>The order in which a synchronize after modify step will be executed.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedArtifact_createScript'></a><span class='ci-property-name'>createScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Python script invoked to deploy a Java EE artifact or create a Java EE resource</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployedArtifact_destroyScript'></a><span class='ci-property-name'>destroyScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Python script invoked to undeploy a Java EE artifact or destroy a Java EE resource</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedArtifact_exposeDeployedApplication'></a><span class='ci-property-name'>exposeDeployedApplication</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>flag to indicate whether the deployed application CI is to be injected to the python script execution context.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployedArtifact_inspectScript'></a><span class='ci-property-name'>inspectScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Python script invoked to inspect a Java EE artifact or Java EE resource</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedArtifact_modifyScript'></a><span class='ci-property-name'>modifyScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Python script invoked to upgrade a Java EE artifact or modify a Java EE resource</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployedArtifact_startScript'></a><span class='ci-property-name'>startScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Python script invoked to start a Java EE artifact or Java EE resource</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedArtifact_stopScript'></a><span class='ci-property-name'>stopScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Python script invoked to stop a Java EE artifact or Java EE resource</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='was.ExtensibleDeployedResource'></a><h3 class='ci-detail-title'>was.ExtensibleDeployedResource</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#was.ExtensibleDeployed'>was.ExtensibleDeployed</a><span> >> </span><span>python.PythonManagedDeployed</span><span> >> </span><span>udm.BaseDeployed</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Deployed</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Base class for all extensible deployed resource configuration items.</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='was.ExtensibleDeployedResource_container'></a><span class='ci-property-name'>container</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Container&gt;</span><p class='ci-property-desc'>The container on which this deployed runs.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedResource_deployable'></a><span class='ci-property-name'>deployable</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Deployable&gt;</span><p class='ci-property-desc'>The deployable that this deployed is derived from.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='was.ExtensibleDeployedResource_createOrder'></a><span class='ci-property-name'>createOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>60</span><p class='ci-property-desc'>The order in which a create step will be executed.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedResource_createVerb'></a><span class='ci-property-name'>createVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Create</span><p class='ci-property-desc'>The word is used to prefix a step description for the create operation.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployedResource_destroyOrder'></a><span class='ci-property-name'>destroyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>40</span><p class='ci-property-desc'>The order in which a destroy step will be executed.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedResource_destroyVerb'></a><span class='ci-property-name'>destroyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Destroy</span><p class='ci-property-desc'>The word is used to prefix a step description for the destroy operation.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployedResource_inspectVerb'></a><span class='ci-property-name'>inspectVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Inspect</span><p class='ci-property-desc'>The word is used to prefix a step description for the inspect operation.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedResource_modifyOrder'></a><span class='ci-property-name'>modifyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>60</span><p class='ci-property-desc'>The order in which a modify step will be executed.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployedResource_modifyVerb'></a><span class='ci-property-name'>modifyVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Modify</span><p class='ci-property-desc'>The word is used to prefix a step description for the modify operation.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedResource_standardPropertiesNotToExpose'></a><span class='ci-property-name'>standardPropertiesNotToExpose</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>id, type, properties, deployable, container, createOrder, createScript, createVerb, syncAfterCreateOrder, modifyOrder, modifyScript, modifyVerb, syncAfterModifyOrder, destroyOrder, destroyScript, securityPermissions, inheritPermissions, exposeDeployedApplication, destroyVerb, syncAfterDestroyOrder, startOrder, startScript, startVerb, stopOrder, stopScript, stopVerb, inspectScript, inspectVerb</span><p class='ci-property-desc'>Standard properties that are not exposed to any python wsadmin script.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployedResource_startOrder'></a><span class='ci-property-name'>startOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order in which a start step will be executed.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedResource_startVerb'></a><span class='ci-property-name'>startVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Start</span><p class='ci-property-desc'>The word is used to prefix a step description for the start operation.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployedResource_stopOrder'></a><span class='ci-property-name'>stopOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>The order in which a synchronize after modify stop will be executed.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedResource_stopVerb'></a><span class='ci-property-name'>stopVerb</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>Stop</span><p class='ci-property-desc'>The word is used to prefix a step description for the stop operation.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployedResource_syncAfterCreateOrder'></a><span class='ci-property-name'>syncAfterCreateOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>65</span><p class='ci-property-desc'>The order in which a synchronize after create step will be executed.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedResource_syncAfterDestroyOrder'></a><span class='ci-property-name'>syncAfterDestroyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>45</span><p class='ci-property-desc'>The order in which a synchronize after destroy step will be executed.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployedResource_syncAfterModifyOrder'></a><span class='ci-property-name'>syncAfterModifyOrder</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>65</span><p class='ci-property-desc'>The order in which a synchronize after modify step will be executed.</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedResource_createScript'></a><span class='ci-property-name'>createScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Python script invoked to deploy a Java EE artifact or create a Java EE resource</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployedResource_destroyScript'></a><span class='ci-property-name'>destroyScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Python script invoked to undeploy a Java EE artifact or destroy a Java EE resource</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedResource_exposeDeployedApplication'></a><span class='ci-property-name'>exposeDeployedApplication</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>flag to indicate whether the deployed application CI is to be injected to the python script execution context.</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployedResource_inspectScript'></a><span class='ci-property-name'>inspectScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Python script invoked to inspect a Java EE artifact or Java EE resource</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedResource_modifyScript'></a><span class='ci-property-name'>modifyScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Python script invoked to upgrade a Java EE artifact or modify a Java EE resource</p></td>
+<tr class='even'><td><a name='was.ExtensibleDeployedResource_startScript'></a><span class='ci-property-name'>startScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Python script invoked to start a Java EE artifact or Java EE resource</p></td>
+<tr class='odd'><td><a name='was.ExtensibleDeployedResource_stopScript'></a><span class='ci-property-name'>stopScript</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Python script invoked to stop a Java EE artifact or Java EE resource</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='was.ManagedServer'></a><h3 class='ci-detail-title'>was.ManagedServer</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>udm.BaseContainer</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><a href='#was.WasAppContainer'>was.WasAppContainer</a><span>, </span><a href='#was.Server'>was.Server</a><span>, </span><span>python.PythonManagedContainer</span><span>, </span><a href='#was.WasContainer'>was.WasContainer</a><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>udm.Container</span></td></tr></table></div><p class='ci-description'>A WebSphere server managed by a node that is part of a deployment manager (WAS ND)</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='was.ManagedServer_node'></a><span class='ci-property-name'>node</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;was.NodeAgent&gt;</span><p class='ci-property-desc'>Node on which the server runs</p></td>
+<tr class='odd'><td><a name='was.ManagedServer_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='was.ManagedServer_restartServerScript'></a><span class='ci-property-name'>restartServerScript</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>was/server/restart-server.py</span><p class='ci-property-desc'>Restart Server Script</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='was.ManagedWebServer'></a><h3 class='ci-detail-title'>was.ManagedWebServer</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>An HTTP server managed by a node that is part of a deployment manager (WAS ND)</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='was.ManagedWebServer_node'></a><span class='ci-property-name'>node</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;was.NodeAgent&gt;</span><p class='ci-property-desc'>Node on which the http server runs</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='was.Node'></a><h3 class='ci-detail-title'>was.Node</h3><p class='ci-description'>null</p>
+<hr class='ci-details-separator'/>
+<a name='was.NodeAgent'></a><h3 class='ci-detail-title'>was.NodeAgent</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>udm.BaseContainer</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>python.PythonManagedContainer</span><span>, </span><a href='#was.WasContainer'>was.WasContainer</a><span>, </span><span>udm.ConfigurationItem</span><span>, </span><a href='#was.Node'>was.Node</a><span>, </span><span>udm.Container</span></td></tr></table></div><p class='ci-description'>A WebSphere node agent.</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='was.NodeAgent_cell'></a><span class='ci-property-name'>cell</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;was.DeploymentManager&gt;</span><p class='ci-property-desc'>Deployment manager that manages this node agent</p></td>
+<tr class='odd'><td><a name='was.NodeAgent_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='was.NodeAgent_synchronizeScript'></a><span class='ci-property-name'>synchronizeScript</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>was/base/synchronize-node.py</span><p class='ci-property-desc'>Synchronize Script</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='was.Server'></a><h3 class='ci-detail-title'>was.Server</h3><p class='ci-description'>null</p>
+<hr class='ci-details-separator'/>
+<a name='was.UnmanagedServer'></a><h3 class='ci-detail-title'>was.UnmanagedServer</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#was.BaseCell'>was.BaseCell</a><span> >> </span><span>udm.BaseContainer</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><a href='#was.WasAppContainer'>was.WasAppContainer</a><span>, </span><span>udm.Taggable</span><span>, </span><span>python.PythonManagingContainer</span><span>, </span><a href='#was.Server'>was.Server</a><span>, </span><span>python.PythonManagedContainer</span><span>, </span><a href='#was.WasContainer'>was.WasContainer</a><span>, </span><span>udm.ConfigurationItem</span><span>, </span><a href='#was.Cell'>was.Cell</a><span>, </span><a href='#was.Node'>was.Node</a><span>, </span><span>udm.Container</span></td></tr></table></div><p class='ci-description'>An unmanaged WebSphere Applicaton Server (WAS Base/SA)</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='was.UnmanagedServer_cellName'></a><span class='ci-property-name'>cellName</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Name of the WebSphere cell, e.g. MyCell, WASCell, Cell01</p></td>
+<tr class='odd'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><img title='Inspection property.' class='inspectImg' src='image/inspect.png'/><a name='was.UnmanagedServer_host'></a><span class='ci-property-name'>host</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;overthere.Host&gt;</span><p class='ci-property-desc'>Host on which the unmanaged WAS server runs</p></td>
+<tr class='even'><td><a name='was.UnmanagedServer_nodeName'></a><span class='ci-property-name'>nodeName</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Name of the WebSphere node</p></td>
+<tr class='odd'><td><a name='was.UnmanagedServer_version'></a><span class='ci-property-name'>version</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>ENUM [WAS_61, WAS_70, WAS_80]</span><p class='ci-property-desc'>Version of WebSphere Application Server.</p></td>
+<tr class='even'><td><img title='Inspection property.' class='inspectImg' src='image/inspect.png'/><a name='was.UnmanagedServer_wasHome'></a><span class='ci-property-name'>wasHome</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Root path of the WebSphere installation path. e.g. /opt/ws/6.1/appserver/profiles/AppSrv01</p></td>
+<tr class='odd'><td><img title='Inspection property.' class='inspectImg' src='image/inspect.png'/><a name='was.UnmanagedServer_password'></a><span class='ci-property-name'>password</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Password which is used to login to the WebSphere Administration.</p></td>
+<tr class='even'><td><img title='Inspection property.' class='inspectImg' src='image/inspect.png'/><a name='was.UnmanagedServer_port'></a><span class='ci-property-name'>port</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span><p class='ci-property-desc'>TCP port which is used to login to the WebSphere Administration, default is 8880</p></td>
+<tr class='odd'><td><a name='was.UnmanagedServer_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+<tr class='even'><td><img title='Inspection property.' class='inspectImg' src='image/inspect.png'/><a name='was.UnmanagedServer_username'></a><span class='ci-property-name'>username</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Username which is used to login to the WebSphere Administration.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='was.UnmanagedServer_restartServerScript'></a><span class='ci-property-name'>restartServerScript</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>was/server/restart-server.py</span><p class='ci-property-desc'>Restart Server Script</p></td>
+<tr class='odd'><td><a name='was.UnmanagedServer_runWithDaemon'></a><span class='ci-property-name'>runWithDaemon</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>Set to true to execute commands with the Python daemon</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='was.WasAppContainer'></a><h3 class='ci-detail-title'>was.WasAppContainer</h3><p class='ci-description'>null</p>
+<hr class='ci-details-separator'/>
+<a name='was.WasContainer'></a><h3 class='ci-detail-title'>was.WasContainer</h3><p class='ci-description'>null</p>
+<hr class='ci-details-separator'/>
+</div>
+</body></html>

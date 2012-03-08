@@ -16,6 +16,7 @@ There is a list of [frequently asked questions](faq) about Deployit that is cont
 * [Deployit 3.0](/releases/3.0)
 * [Deployit 3.5](/releases/3.5)
 * [Deployit 3.6](/releases/3.6)
+* [Deployit 3.7](/releases/3.7)
 
 # Latest Plugin documentation #
 

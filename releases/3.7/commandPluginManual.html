@@ -1,0 +1,259 @@
+<html><head><LINK REL=StyleSheet HREF="css/deployit.css" TYPE="text/css" MEDIA=screen>
+<LINK REL=StyleSheet HREF="css/ci-reference-api.css" TYPE="text/css" MEDIA=screen>
+<script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="js/jquery.tableofcontents.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+    $("body").attr('id', 'top-toc');
+    var title = $("<div class='manual-title'/>")
+    title.html("<div class='title'>Command Plugin Manual</div><div class='version'>Version <span class='version-number'>3.7.0-beta-4</span></div>");
+    $("body").css('width', '100%');
+    $("body").prepend(title);
+    $("body").prepend($("<ol id='toc'/>"));
+    $("#toc").tableOfContents("body", { topLinks: true, } );
+});
+
+</script>
+<title>Command Plugin Manual</title>
+</head><body><h1>Preface</h1><p>This document describes the functionality provided by the Command Plugin.</p><p>Refer to the <em>Deployit Reference Manual</em> for background information on Deployit and deployment concepts.</p><h1>Overview</h1><p>As a system administrator, the need occasionally arises to execute adhoc scripts or OS commands on remote systems. The process usually entails having to manually login to each system, copy any required resources to said system and finally executing scripts/commands to process the resources or configure the remote system. The process is acceptable for a single system, but tends not to scale when performing the tasks on entire server farms. The manual intensive process becomes tedious and error prone. The Command Plugin helps with these tedious processes and significantly reduces the chances of errors.</p><p>A system administrator could also use the Command Plugin to reuse existing deployment scripts with Deployit, before choosing to move the deployment logic to a more reusable, easily maintainable plugin form.</p><h1>Features</h1>
+<ul>
+  <li>Execute an OS (Unix, Windows) command on a host</li>
+  <li>Execute a script on a host</li>
+  <li>Associate undo commands</li>
+  <li>Copy associated command resources to a host</li>
+</ul><h1>Plugin Concepts</h1><h2>Command</h2><p>A Command encapsulates an OS specific command, as one would enter at the command prompt of a native OS command shell. The OS command is captured in the Command's <code>commandLine</code> property; e.g. 'echo hello &gt;&gt; /tmp/hello.txt'. The Command also has the capability of uploading any dependent files to the target system and make those available to the <code>commandLine</code> with the use of a placeholder; e.g. 'cat ${uploadedHello.txt} &gt;&gt; /tmp/hello.txt'.</p><h2>Undo Command</h2><p>An undo Command has the same characteristics as a Command, except that it reverses the effect of the original Command it is associated with. An undo Command usually runs when the associated Command is undeployed or upgraded.</p><h2>Command Order</h2><p>The order in which the Command is run in relation to other commands. The order allows for the chaining of commands to create a logical sequence of events. For example, an install tomcat command would execute before an install web application command, while a start tomcat command would be the last in the sequence.</p><h1>Requirements</h1><p>This plugin requires:</p>
+<ul>
+  <li><strong>Deployit</strong>: version 3.5+</li>
+</ul><h1>Usage in Deployment Packages</h1><p>Please refer to <em>Packaging Manual</em> for more details about the DAR packaging format.</p><p>Sample DAR MANIFEST.MF entries defining a package that can (un)provision a tomcat server using an install and uninstall script</p>
+<pre><code>Manifest-Version: 1.0
+Deployit-Package-Format-Version: 1.3
+CI-Application: CommandPluginSample
+CI-Version: 1.0
+
+Name: install-tc-command
+CI-type: cmd.Command
+CI-order: 50
+CI-commandLine: /bin/sh ${install-tc.sh} ${tomcat.zip}
+CI-undoCommand: uninstall-tc-command
+CI-dependencies-EntryValue-1: install-tc.sh
+CI-dependencies-EntryValue-2: tomcat.zip
+CI-name: install-tc-command
+
+Name: uninstall-tc-command
+CI-type: cmd.Command
+CI-order: 45
+CI-commandLine: /bin/sh ${uninstall-tc.sh}
+CI-dependencies-EntryValue-1: uninstall-tc.sh
+CI-name: uninstall-tc-command
+
+Name: tomcat-6.0.32.zip
+CI-name: tomcat.zip
+CI-type: file.File
+
+Name: install-tc.sh
+CI-type: file.File
+CI-name: install-tc.sh
+
+Name: uninstall-tc.sh
+CI-type: file.File
+CI-name: uninstall-tc.sh
+</code></pre><h1>Using the deployables and deployeds</h1><h2>Deployable vs. Container Table</h2><p>The following table describes which deployable / container combinations are possible. Note that the CIs can only be targeted to containers derived from <a href="#overthere.Host">Host</a>.</p>
+<table class="deployed-matrix">
+<tr>
+	<th>Deployables</th> <th>Containers</th> <th>Generated Deployed</th>
+</tr>
+<tr>
+	<td>cmd.Command</td> <td>overthere.Host</td> <td>cmd.DeployedCommand</td>
+</tr>
+</table><h2>Deployed Actions Table</h2><p>The following table describes the effect a deployed has on its container.</p>
+<table class="deployed-matrix">
+<tr>
+	<th>Deployed</th><th align="center">Create</th> <th align="center">Destroy</th> <th align="center">Modify</th>
+</tr>
+<tr>
+	<td>cmd.DeployedCommand</td>
+	<td>
+	    <ul>
+	        <li>Upload command resources to host</li>
+	        <li>Resolve command line placeholder references with absolute paths to the uploaded resource files on host</li>
+	        <li>Execute command line on host</li>
+	    </ul>
+	</td>
+	<td>
+	    <ul>
+	        <li>Run the undo command associated with the deployed command, if exists. Actions are same as described for <em>Create</em></li>
+	    </ul>
+	</td>
+	<td>
+	    <ul>
+	        <li>Run the undo command associated with the deployed command, if exists. Actions are same as described for <em>Create</em></li>
+	        <li>Run the modified command. Actions are same as described for <em>Create</em></li>
+	    </ul>
+	</td>
+</tr>
+</table><h1>Sample Usage Senario - Provision a Tomcat server</h1><p>For illustration purposes, we take a simplistic view of installing Tomcat. In reality however, your installation of Tomcat would take on a far more comprehensive form.</p><p>Tomcat is distributed as a zip. For this example, we create an installation script to unzip the distribution on the host. The uninstall script simply shuts down a running Tomcat and deletes the installation directory.</p><p><strong>Create the installation script (install-tc.sh)</strong></p>
+<pre><code>#!/bin/sh
+set -e
+if [ -e &quot;/apache-tomcat-6.0.32&quot; ]
+then
+    echo &quot;/apache-tomcat-6.0.32 already exists. remove to continue.&quot;
+    exit 1
+fi
+unzip $1 -d /
+chmod +x /apache-tomcat-6.0.32/bin/*.sh
+</code></pre><p><strong>Create the uninstall script (uninstall-tc.sh)</strong></p>
+<pre><code>#!/bin/sh
+set -e
+/apache-tomcat-6.0.32/bin/shutdown.sh
+rm -rf /apache-tomcat-6.0.32
+</code></pre><p><strong>MANIFEST snippet defining the command to trigger the execution of the install script for the initial deployment</strong></p><p>The following command will be executed at order 50 in the generated step list. '/bin/sh' is used on the host to execute the install script which takes a single parameter, the absolute path to the tomcat.zip on the host. When the command is undeployed, uninstall-tc-command will be executed.</p>
+<pre><code>Name: install-tc-command
+CI-type: cmd.Command
+CI-order: 50
+CI-commandLine: /bin/sh ${install-tc.sh} ${tomcat.zip}
+CI-undoCommand: uninstall-tc-command
+CI-dependencies-EntryValue-1: install-tc.sh
+CI-dependencies-EntryValue-2: tomcat.zip
+CI-name: install-tc-command
+</code></pre><p><strong>MANIFEST snippet defining the undo command to trigger the execution of the uninstall script for the undeploy</strong></p><p>The undo command will be executed at order 45 in the generated step list. Note that it has a lower order than the install-tc-command. This ensures that the undo command will always run before the install-tc-command during an upgrade.</p>
+<pre><code>Name: uninstall-tc-command
+CI-type: cmd.Command
+CI-order: 45
+CI-commandLine: /bin/sh ${uninstall-tc.sh}
+CI-dependencies-EntryValue-1: uninstall-tc.sh
+CI-name: uninstall-tc-command
+</code></pre><p>See the Usage in Deployment Packages section for the complete MANIFEST.MF</p><div style='width:100%; position:relative'>
+<h1 class='ci-toc-category'>CI Reference</h1><h2>Configuration Item Overview</h2><h3 class='ci-toc-category'>Deployable Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#cmd.Command'>cmd.Command</a></td><td>Command specification that is executed on a host</td>
+</table>
+<h3 class='ci-toc-category'>Deployed Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#cmd.DeployedCommand'>cmd.DeployedCommand</a></td><td>Command deployed to a Host</td>
+</table>
+<h3 class='ci-toc-category'>Topology Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#overthere.CifsHost'>overthere.CifsHost</a></td><td>A machine that can be connected to using either WinRM or Telnet and can perform file manipulation via the CIFS protocol</td>
+<tr class='odd'><td><a href='#overthere.Jumpstation'>overthere.Jumpstation</a></td><td>Description unavailable</td>
+<tr class='even'><td><a href='#overthere.LocalHost'>overthere.LocalHost</a></td><td>The machine on which the Deployit Server is running on</td>
+<tr class='odd'><td><a href='#overthere.SshHost'>overthere.SshHost</a></td><td>A machine that can be connected to using ssh</td>
+</table>
+<h3 class='ci-toc-category'>Virtual Topology Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
+<tr class='even'><td><a href='#overthere.Host'>overthere.Host</a></td><td>A machine that runs middleware, on which scripts can be executed, etc</td>
+<tr class='odd'><td><a href='#overthere.HostContainer'>overthere.HostContainer</a></td><td></td>
+</table>
+<h2 class='ci-details-title'>Configuration Item Details</h2><a name='cmd.Command'></a><h3 class='ci-detail-title'>cmd.Command</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>udm.BaseDeployable</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.Deployable</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Command specification that is executed on a host</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='cmd.Command_order'></a><span class='ci-property-name'>order</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>Order of the command</p></td>
+<tr class='odd'><td><a name='cmd.Command_commandLine'></a><span class='ci-property-name'>commandLine</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Command line to execute on host. Dependent artifacts can be referred to using ${artifact name}.</p></td>
+<tr class='even'><td><a name='cmd.Command_dependencies'></a><span class='ci-property-name'>dependencies</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_CI&lt;file.File&gt;</span><p class='ci-property-desc'>Artifacts that the command depends on</p></td>
+<tr class='odd'><td><a name='cmd.Command_runUndoCommandOnUpgrade'></a><span class='ci-property-name'>runUndoCommandOnUpgrade</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>Indicates whether the undoCommand should be run on an upgrade</p></td>
+<tr class='even'><td><a name='cmd.Command_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+<tr class='odd'><td><a name='cmd.Command_undoCommand'></a><span class='ci-property-name'>undoCommand</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;cmd.Command&gt;</span><p class='ci-property-desc'>Command to execute when undeploying command</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='cmd.DeployedCommand'></a><h3 class='ci-detail-title'>cmd.DeployedCommand</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>udm.BaseDeployed</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Deployed</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Command deployed to a Host</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><img title='Containment relationship' class='containerImg' src='image/container.png'/><a name='cmd.DeployedCommand_container'></a><span class='ci-property-name'>container</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Container&gt;</span><p class='ci-property-desc'>The container on which this deployed runs.</p></td>
+<tr class='odd'><td><a name='cmd.DeployedCommand_order'></a><span class='ci-property-name'>order</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>50</span><p class='ci-property-desc'>Order of the command</p></td>
+<tr class='even'><td><a name='cmd.DeployedCommand_commandLine'></a><span class='ci-property-name'>commandLine</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Command line to execute on host. Dependent artifacts can be referred to using ${artifact name}.</p></td>
+<tr class='odd'><td><a name='cmd.DeployedCommand_dependencies'></a><span class='ci-property-name'>dependencies</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_CI&lt;file.File&gt;</span><p class='ci-property-desc'>Artifacts that the command depends on</p></td>
+<tr class='even'><td><a name='cmd.DeployedCommand_deployable'></a><span class='ci-property-name'>deployable</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;udm.Deployable&gt;</span><p class='ci-property-desc'>The deployable that this deployed is derived from.</p></td>
+<tr class='odd'><td><a name='cmd.DeployedCommand_rerunCommand'></a><span class='ci-property-name'>rerunCommand</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span><p class='ci-property-desc'>Forces the command to be rerun.</p></td>
+<tr class='even'><td><a name='cmd.DeployedCommand_runUndoCommandOnUpgrade'></a><span class='ci-property-name'>runUndoCommandOnUpgrade</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span><p class='ci-property-desc'>Indicates whether the undoCommand should be run on an upgrade</p></td>
+<tr class='odd'><td><a name='cmd.DeployedCommand_undoCommand'></a><span class='ci-property-name'>undoCommand</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;cmd.Command&gt;</span><p class='ci-property-desc'>Command to execute when undeploying command</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='overthere.CifsHost'></a><h3 class='ci-detail-title'>overthere.CifsHost</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#overthere.Host'>overthere.Host</a><span> >> </span><span>udm.BaseContainer</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>udm.Container</span><span>, </span><a href='#overthere.HostContainer'>overthere.HostContainer</a></td></tr></table></div><p class='ci-description'>A machine that can be connected to using either WinRM or Telnet and can perform file manipulation via the CIFS protocol.</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='overthere.CifsHost_address'></a><span class='ci-property-name'>address</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Address of the host</p></td>
+<tr class='odd'><td><a name='overthere.CifsHost_connectionType'></a><span class='ci-property-name'>connectionType</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>ENUM [TELNET, WINRM_HTTP, WINRM_HTTPS]</span>&nbsp;=&nbsp;<span class='ci-property-default'>TELNET</span><p class='ci-property-desc'>Connection Type</p></td>
+<tr class='even'><td><a name='overthere.CifsHost_os'></a><span class='ci-property-name'>os</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>ENUM [WINDOWS, UNIX]</span><p class='ci-property-desc'>Operating system</p></td>
+<tr class='odd'><td><a name='overthere.CifsHost_password'></a><span class='ci-property-name'>password</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Password to use for authentication</p></td>
+<tr class='even'><td><a name='overthere.CifsHost_username'></a><span class='ci-property-name'>username</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Username to connect with</p></td>
+<tr class='odd'><td><a name='overthere.CifsHost_cifsPort'></a><span class='ci-property-name'>cifsPort</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>445</span><p class='ci-property-desc'>Port on which the CIFS server runs</p></td>
+<tr class='even'><td><a name='overthere.CifsHost_jumpstation'></a><span class='ci-property-name'>jumpstation</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;overthere.Jumpstation&gt;</span><p class='ci-property-desc'>Jumpstation</p></td>
+<tr class='odd'><td><a name='overthere.CifsHost_port'></a><span class='ci-property-name'>port</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span><p class='ci-property-desc'>Port on which the Telnet or WinRM server runs</p></td>
+<tr class='even'><td><a name='overthere.CifsHost_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+<tr class='odd'><td><a name='overthere.CifsHost_temporaryDirectoryPath'></a><span class='ci-property-name'>temporaryDirectoryPath</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Directory into which temporary files are stored. Will be cleaned up when the connection is closed.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='overthere.CifsHost_connectionTimeoutMillis'></a><span class='ci-property-name'>connectionTimeoutMillis</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>1200000</span><p class='ci-property-desc'>Connection Timeout Millis</p></td>
+<tr class='odd'><td><a name='overthere.CifsHost_protocol'></a><span class='ci-property-name'>protocol</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>cifs</span><p class='ci-property-desc'>Protocol</p></td>
+<tr class='even'><td><a name='overthere.CifsHost_tmpFileCreationRetries'></a><span class='ci-property-name'>tmpFileCreationRetries</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>1000</span><p class='ci-property-desc'>Tmp File Creation Retries</p></td>
+<tr class='odd'><td><a name='overthere.CifsHost_winrmContext'></a><span class='ci-property-name'>winrmContext</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>/wsman</span><p class='ci-property-desc'>Winrm Context</p></td>
+<tr class='even'><td><a name='overthere.CifsHost_winrmEnvelopSize'></a><span class='ci-property-name'>winrmEnvelopSize</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>153600</span><p class='ci-property-desc'>Winrm Envelop Size</p></td>
+<tr class='odd'><td><a name='overthere.CifsHost_winrmLocale'></a><span class='ci-property-name'>winrmLocale</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>en-US</span><p class='ci-property-desc'>Winrm Locale</p></td>
+<tr class='even'><td><a name='overthere.CifsHost_winrmTimeout'></a><span class='ci-property-name'>winrmTimeout</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>PT60.000S</span><p class='ci-property-desc'>Winrm Timeout</p></td>
+<tr class='odd'><td><a name='overthere.CifsHost_tmpDeleteOnDisconnect'></a><span class='ci-property-name'>tmpDeleteOnDisconnect</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>Whether to delete the temporary connection directory when the connection is closed</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Control Tasks</th></tr><tr class='even'><td><a name='overthere.CifsHost_checkConnection'></a><span class='ci-property-name'>checkConnection</span><p class='ci-property-desc'>Check connection</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='overthere.Host'></a><h3 class='ci-detail-title'>overthere.Host</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>udm.BaseContainer</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>udm.Container</span><span>, </span><a href='#overthere.HostContainer'>overthere.HostContainer</a></td></tr></table></div><p class='ci-description'>A machine that runs middleware, on which scripts can be executed, etc.</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='overthere.Host_os'></a><span class='ci-property-name'>os</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>ENUM [WINDOWS, UNIX]</span><p class='ci-property-desc'>Operating system</p></td>
+<tr class='odd'><td><a name='overthere.Host_jumpstation'></a><span class='ci-property-name'>jumpstation</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;overthere.Jumpstation&gt;</span><p class='ci-property-desc'>Jumpstation</p></td>
+<tr class='even'><td><a name='overthere.Host_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+<tr class='odd'><td><a name='overthere.Host_temporaryDirectoryPath'></a><span class='ci-property-name'>temporaryDirectoryPath</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Directory into which temporary files are stored. Will be cleaned up when the connection is closed.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='overthere.Host_connectionTimeoutMillis'></a><span class='ci-property-name'>connectionTimeoutMillis</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>1200000</span><p class='ci-property-desc'>Connection Timeout Millis</p></td>
+<tr class='odd'><td><a name='overthere.Host_protocol'></a><span class='ci-property-name'>protocol</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Protocol to use when connecting to this host</p></td>
+<tr class='even'><td><a name='overthere.Host_tmpFileCreationRetries'></a><span class='ci-property-name'>tmpFileCreationRetries</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>1000</span><p class='ci-property-desc'>Tmp File Creation Retries</p></td>
+<tr class='odd'><td><a name='overthere.Host_tmpDeleteOnDisconnect'></a><span class='ci-property-name'>tmpDeleteOnDisconnect</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>Whether to delete the temporary connection directory when the connection is closed</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Control Tasks</th></tr><tr class='even'><td><a name='overthere.Host_checkConnection'></a><span class='ci-property-name'>checkConnection</span><p class='ci-property-desc'>Check connection</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='overthere.HostContainer'></a><h3 class='ci-detail-title'>overthere.HostContainer</h3><p class='ci-description'>null</p>
+<hr class='ci-details-separator'/>
+<a name='overthere.Jumpstation'></a><h3 class='ci-detail-title'>overthere.Jumpstation</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Description unavailable</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='overthere.Jumpstation_address'></a><span class='ci-property-name'>address</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Address of the host</p></td>
+<tr class='odd'><td><a name='overthere.Jumpstation_os'></a><span class='ci-property-name'>os</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>ENUM [WINDOWS, UNIX]</span><p class='ci-property-desc'>Os</p></td>
+<tr class='even'><td><a name='overthere.Jumpstation_port'></a><span class='ci-property-name'>port</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>22</span><p class='ci-property-desc'>Port on which the SSH server runs</p></td>
+<tr class='odd'><td><a name='overthere.Jumpstation_username'></a><span class='ci-property-name'>username</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Username to connect with</p></td>
+<tr class='even'><td><a name='overthere.Jumpstation_passphrase'></a><span class='ci-property-name'>passphrase</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Optional passphrase for the private key in the private key file</p></td>
+<tr class='odd'><td><a name='overthere.Jumpstation_password'></a><span class='ci-property-name'>password</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Password to use for authentication</p></td>
+<tr class='even'><td><a name='overthere.Jumpstation_privateKeyFile'></a><span class='ci-property-name'>privateKeyFile</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Private key file to use for authentication</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='overthere.Jumpstation_connectionType'></a><span class='ci-property-name'>connectionType</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>ENUM [SFTP, SFTP_CYGWIN, SFTP_WINSSHD, SCP, SUDO, INTERACTIVE_SUDO, TUNNEL]</span>&nbsp;=&nbsp;<span class='ci-property-default'>TUNNEL</span><p class='ci-property-desc'>Connection Type</p></td>
+<tr class='odd'><td><a name='overthere.Jumpstation_interactiveKeyboardAuthRegex'></a><span class='ci-property-name'>interactiveKeyboardAuthRegex</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>.*Password:[ ]?</span><p class='ci-property-desc'>Regular expression to look for in keyboard-interactive authentication before sending the password</p></td>
+<tr class='even'><td><a name='overthere.Jumpstation_protocol'></a><span class='ci-property-name'>protocol</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>ssh</span><p class='ci-property-desc'>Protocol</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='overthere.LocalHost'></a><h3 class='ci-detail-title'>overthere.LocalHost</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#overthere.Host'>overthere.Host</a><span> >> </span><span>udm.BaseContainer</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>udm.Container</span><span>, </span><a href='#overthere.HostContainer'>overthere.HostContainer</a></td></tr></table></div><p class='ci-description'>The machine on which the Deployit Server is running on.</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='overthere.LocalHost_os'></a><span class='ci-property-name'>os</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>ENUM [WINDOWS, UNIX]</span><p class='ci-property-desc'>Operating system</p></td>
+<tr class='odd'><td><a name='overthere.LocalHost_jumpstation'></a><span class='ci-property-name'>jumpstation</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;overthere.Jumpstation&gt;</span><p class='ci-property-desc'>Jumpstation</p></td>
+<tr class='even'><td><a name='overthere.LocalHost_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+<tr class='odd'><td><a name='overthere.LocalHost_temporaryDirectoryPath'></a><span class='ci-property-name'>temporaryDirectoryPath</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Directory into which temporary files are stored. Will be cleaned up when the connection is closed.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='overthere.LocalHost_connectionTimeoutMillis'></a><span class='ci-property-name'>connectionTimeoutMillis</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>1200000</span><p class='ci-property-desc'>Connection Timeout Millis</p></td>
+<tr class='odd'><td><a name='overthere.LocalHost_protocol'></a><span class='ci-property-name'>protocol</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>local</span><p class='ci-property-desc'>Protocol</p></td>
+<tr class='even'><td><a name='overthere.LocalHost_tmpFileCreationRetries'></a><span class='ci-property-name'>tmpFileCreationRetries</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>1000</span><p class='ci-property-desc'>Tmp File Creation Retries</p></td>
+<tr class='odd'><td><a name='overthere.LocalHost_tmpDeleteOnDisconnect'></a><span class='ci-property-name'>tmpDeleteOnDisconnect</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>Whether to delete the temporary connection directory when the connection is closed</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Control Tasks</th></tr><tr class='even'><td><a name='overthere.LocalHost_checkConnection'></a><span class='ci-property-name'>checkConnection</span><p class='ci-property-desc'>Check connection</p></td>
+</table>
+<hr class='ci-details-separator'/>
+<a name='overthere.SshHost'></a><h3 class='ci-detail-title'>overthere.SshHost</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#overthere.Host'>overthere.Host</a><span> >> </span><span>udm.BaseContainer</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>udm.Container</span><span>, </span><a href='#overthere.HostContainer'>overthere.HostContainer</a></td></tr></table></div><p class='ci-description'>A machine that can be connected to using ssh.</p>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='overthere.SshHost_address'></a><span class='ci-property-name'>address</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Address of the host</p></td>
+<tr class='odd'><td><a name='overthere.SshHost_connectionType'></a><span class='ci-property-name'>connectionType</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>ENUM [SFTP, SFTP_CYGWIN, SFTP_WINSSHD, SCP, SUDO, INTERACTIVE_SUDO, TUNNEL]</span>&nbsp;=&nbsp;<span class='ci-property-default'>SFTP</span><p class='ci-property-desc'>Type of SSH connection to create</p></td>
+<tr class='even'><td><a name='overthere.SshHost_os'></a><span class='ci-property-name'>os</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>ENUM [WINDOWS, UNIX]</span><p class='ci-property-desc'>Operating system</p></td>
+<tr class='odd'><td><a name='overthere.SshHost_port'></a><span class='ci-property-name'>port</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>22</span><p class='ci-property-desc'>Port on which the SSH server runs</p></td>
+<tr class='even'><td><a name='overthere.SshHost_username'></a><span class='ci-property-name'>username</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Username to connect with</p></td>
+<tr class='odd'><td><a name='overthere.SshHost_jumpstation'></a><span class='ci-property-name'>jumpstation</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;overthere.Jumpstation&gt;</span><p class='ci-property-desc'>Jumpstation</p></td>
+<tr class='even'><td><a name='overthere.SshHost_passphrase'></a><span class='ci-property-name'>passphrase</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Optional passphrase for the private key in the private key file</p></td>
+<tr class='odd'><td><a name='overthere.SshHost_password'></a><span class='ci-property-name'>password</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Password to use for authentication</p></td>
+<tr class='even'><td><a name='overthere.SshHost_privateKeyFile'></a><span class='ci-property-name'>privateKeyFile</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Private key file to use for authentication</p></td>
+<tr class='odd'><td><a name='overthere.SshHost_sudoUsername'></a><span class='ci-property-name'>sudoUsername</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Username to sudo to when accessing files or executing commands</p></td>
+<tr class='even'><td><a name='overthere.SshHost_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
+<tr class='odd'><td><a name='overthere.SshHost_temporaryDirectoryPath'></a><span class='ci-property-name'>temporaryDirectoryPath</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Directory into which temporary files are stored. Will be cleaned up when the connection is closed.</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='overthere.SshHost_connectionTimeoutMillis'></a><span class='ci-property-name'>connectionTimeoutMillis</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>1200000</span><p class='ci-property-desc'>Connection Timeout Millis</p></td>
+<tr class='odd'><td><a name='overthere.SshHost_interactiveKeyboardAuthRegex'></a><span class='ci-property-name'>interactiveKeyboardAuthRegex</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>.*Password:[ ]?</span><p class='ci-property-desc'>Regular expression to look for in keyboard-interactive authentication before sending the password</p></td>
+<tr class='even'><td><a name='overthere.SshHost_protocol'></a><span class='ci-property-name'>protocol</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>ssh</span><p class='ci-property-desc'>Protocol</p></td>
+<tr class='odd'><td><a name='overthere.SshHost_sudoCommandPrefix'></a><span class='ci-property-name'>sudoCommandPrefix</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>sudo -u {0}</span><p class='ci-property-desc'>Sudo command to prefix to the original command. The placeholder {0} is replaced with the sudoUsername</p></td>
+<tr class='even'><td><a name='overthere.SshHost_sudoPasswordPromptRegex'></a><span class='ci-property-name'>sudoPasswordPromptRegex</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>.*[Pp]assword.*:</span><p class='ci-property-desc'>Regular expression to look for in interactive sudo before sending the password</p></td>
+<tr class='odd'><td><a name='overthere.SshHost_tmpFileCreationRetries'></a><span class='ci-property-name'>tmpFileCreationRetries</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>INTEGER</span>&nbsp;=&nbsp;<span class='ci-property-default'>1000</span><p class='ci-property-desc'>Tmp File Creation Retries</p></td>
+<tr class='even'><td><a name='overthere.SshHost_allocateDefaultPty'></a><span class='ci-property-name'>allocateDefaultPty</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>If true, a default pty is allocated when executing a command. All sudo implementations require it for interactive sudo, some even require it for normal sudo. Some SSH server implementations (notably the one on AIX 5.3) crash when it is allocated.</p></td>
+<tr class='odd'><td><a name='overthere.SshHost_sudoOverrideUmask'></a><span class='ci-property-name'>sudoOverrideUmask</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>If true, permissions are explicitly changed with chmod -R go+rX after uploading a file or directory with scp.</p></td>
+<tr class='even'><td><a name='overthere.SshHost_sudoQuoteCommand'></a><span class='ci-property-name'>sudoQuoteCommand</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>false</span><p class='ci-property-desc'>If true, the original command is quoted when it is prefixed with sudoCommandPrefix</p></td>
+<tr class='odd'><td><a name='overthere.SshHost_tmpDeleteOnDisconnect'></a><span class='ci-property-name'>tmpDeleteOnDisconnect</span>&nbsp;:&nbsp;<span class='ci-property-kind'>BOOLEAN</span>&nbsp;=&nbsp;<span class='ci-property-default'>true</span><p class='ci-property-desc'>Whether to delete the temporary connection directory when the connection is closed</p></td>
+</table>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Control Tasks</th></tr><tr class='even'><td><a name='overthere.SshHost_checkConnection'></a><span class='ci-property-name'>checkConnection</span><p class='ci-property-desc'>Check connection</p></td>
+</table>
+<hr class='ci-details-separator'/>
+</div>
+</body></html>

@@ -29,8 +29,11 @@ There is a list of [frequently asked questions](faq) about Deployit that is cont
 * [WMQ plugin 3.6.0](/releases/wmq-plugin-3.6)
 * [WLS plugin 3.6.0](/releases/wls-plugin-3.6)
 * [OSB plugin 3.6.0](/releases/osb-plugin-3.6)
-* [Jboss plugin 3.6.0](/releases/jboss-plugin-3.6)
+* [JBoss plugin 3.6.0](/releases/jboss-plugin-3.6)
 * [Tomcat plugin 3.6.0](/releases/tomcat-plugin-3.6)
+
+##3.7##
+* [JBoss plugin 3.7.0](/releases/jboss-plugin-3.7)
 
 # Maven plugin documentation #
 

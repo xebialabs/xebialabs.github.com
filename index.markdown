@@ -13,10 +13,10 @@ There is a list of [frequently asked questions](faq) about Deployit that is cont
 
 # Latest Deployit documentation #
 
-* [Deployit 3.0](/releases/3.0)
-* [Deployit 3.5](/releases/3.5)
-* [Deployit 3.6](/releases/3.6)
 * [Deployit 3.7](/releases/3.7)
+* [Deployit 3.6](/releases/3.6)
+* [Deployit 3.5](/releases/3.5)
+* [Deployit 3.0](/releases/3.0)
 
 # Latest Plugin documentation #
 
@@ -42,6 +42,6 @@ There is a list of [frequently asked questions](faq) about Deployit that is cont
 
 # Maven plugin documentation #
 
-* [Maven plugin 3.5](http://tech.xebialabs.com/deployit-maven-plugin/3.5.2/)
 * [Maven plugin 3.6](http://tech.xebialabs.com/deployit-maven-plugin/3.6.2/)
+* [Maven plugin 3.5](http://tech.xebialabs.com/deployit-maven-plugin/3.5.2/)
 

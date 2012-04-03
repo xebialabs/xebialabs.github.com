@@ -42,6 +42,7 @@ There is a list of [frequently asked questions](faq) about Deployit that is cont
 
 # Maven plugin documentation #
 
-* [Maven plugin 3.6](http://tech.xebialabs.com/deployit-maven-plugin/3.6.2/)
+* [Maven plugin 3.7](http://tech.xebialabs.com/deployit-maven-plugin/3.7.0/)
+* [Maven plugin 3.6](http://tech.xebialabs.com/deployit-maven-plugin/3.6.4/)
 * [Maven plugin 3.5](http://tech.xebialabs.com/deployit-maven-plugin/3.5.2/)
 

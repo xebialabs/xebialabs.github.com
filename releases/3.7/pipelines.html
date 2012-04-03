@@ -1,0 +1,22 @@
+<html><head><LINK REL=StyleSheet HREF="css/deployit.css" TYPE="text/css" MEDIA=screen>
+<LINK REL=StyleSheet HREF="css/ci-reference-api.css" TYPE="text/css" MEDIA=screen>
+<script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="js/jquery.tableofcontents.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+    $("body").attr('id', 'top-toc');
+    var title = $("<div class='manual-title'/>")
+    title.html("<div class='title'>Pipelines Help</div><div class='version'>Version <span class='version-number'>3.8.0-SNAPSHOT</span></div>");
+    $("body").css('width', '100%');
+    $("body").prepend(title);
+    $("body").prepend($("<ol id='toc'/>"));
+    $("#toc").tableOfContents("body", { topLinks: true, } );
+});
+
+</script>
+<title>Pipelines Help</title>
+</head><body><h1>The Release Dashboard Screen</h1><p>This screen shows the Release Dashboard and selected deployment pipelines. The following is an example of the Release Dashboard screen:</p><p><img src="images/deployment-pipeline.png"  alt="Deployment Pipeline"/></p><p>The screen consists of the following components:</p>
+<ul>
+  <li><strong>Package Browser</strong>. This component is used locate and select the applications and packages for which to show a deployment pipeline.</li>
+  <li><strong>Deployment Pipeline Window</strong>. This window shows all selected deployment pipelines.</li>
+</ul><h2>The Package Browser</h2><p>The Package Browser is used to locate applications and packages in Deployit. It functions in the same way as the Package Browser on the other screens, with the exception that importing, moving CIs and the context menu are not available.</p><h2>The Deployment Pipeline Window</h2><p>In the example Release Dashboard, the environments <em>DEV</em>, <em>TEST</em>, <em>ACC</em> and <em>PROD</em> are configured to be the deployment pipeline for the <em>PetPortal</em> application. This screen shows you which versions of the <em>PetPortal</em> application are currently deployed to each environment in the pipeline.</p><p>Click on other applications to display multiple deployment pipelines side-by-side. Click on the cross in the top-left corner to remove the pipeline.</p><h2>Displaying an application version's deployment pipeline</h2><p>To display the deployment pipeline for a specific application version, click on the application version in the Application Browser or, alternatively, click on the application version number in the application deployment pipeline. The Release Dashboard shows a deployment pipeline for the selected version:</p><p><img src="images/deployment-pipeline-package-detail.png"  alt="Deployment Pipeline Package Detail"/></p><p>Here, you see all environments in the deployment pipeline and which version is deployed where. The focus here is on the selected application version, <em>PetPortal</em> version <em>2.0</em>. Each environment for which the deployment checklist has been completed are outlined in green. A deploy button is shown in environment, indicating a deployment can be started. Environments for which the checklist has not yet been completed are outlined in red.</p><h2>Filling out deployment checklists</h2><p>Before promoting an application version to a new environment, the deployment checklist for this package and environment must be met. Click on the environment name to show the deployment checklist for the application version and environment:</p><p><img src="images/deployment-checklist.png"  alt="Deployment Checklist"/></p><p>Conditions that are not met are marked with a stop sign. Check a checkbox or fill out a string field and click the Save button to satisfy the condition. If all items are satisfied, the environment will turn green, indicating that the application version can be promoted to the target environment.</p><h2>Starting a deployment</h2><p>When the checklist for a particular version and environment has been filled out, a <strong>Deploy</strong> button appears on the environment. Clicking this button will start a new deployment on the Deployment tab. The deployment can be configured and executed in the regular way.</p></body></html>

@@ -6,7 +6,7 @@
 $(document).ready(function(){
     $("body").attr('id', 'top-toc');
     var title = $("<div class='manual-title'/>")
-    title.html("<div class='title'>Customization Manual</div><div class='version'>Version <span class='version-number'>3.7.0-beta-1</span></div>");
+    title.html("<div class='title'>Customization Manual</div><div class='version'>Version <span class='version-number'>3.8.0-SNAPSHOT</span></div>");
     $("body").css('width', '100%');
     $("body").prepend(title);
     $("body").prepend($("<ol id='toc'/>"));
@@ -15,17 +15,17 @@ $(document).ready(function(){
 
 </script>
 <title>Customization Manual</title>
-</head><body><h1>Introduction</h1><p>This manual describes how to customize Deployit for use in your environment.</p><p>Out-of-the-box, Deployit provides deployment capabilities for several middleware platforms. However, at times we need to integrate Deployit with certain environments or deploy to middleware stacks that Deployit does not readily support. Tailoring deployment plans, adding support for new middleware and integrating with other systems are all possible by customizing the Deployit system. This manual describes what customizations are possible and how to adapt Deployit to fit into your environment.</p><p>This manual will first give an overview of the different ways of customizing Deployit. Then, Deployit system architecture is described to show the role of Deployit extensions and plugins in the deployment process. Finally, we show how to add custom Deployit plugins.</p><h1>Customization Overview</h1><p>Deployit is designed with extensibility in mind and provides several different ways to modify its behavior. Depending on the extender's skill set and requirements, one or more of these methods can be used to achieve the desired result.</p><p>There are four ways to customize Deployit.</p>
+</head><body><h1>Introduction</h1><p>This manual describes how to customize Deployit for use in your environment.</p><p>Out-of-the-box, Deployit provides deployment capabilities for several middleware platforms. However, at times Deployit may need to integrate with certain environments or deploy to middleware stacks that it does not currently support. Tailoring deployment plans, adding support for new middleware and integrating with other systems are all possible by customizing the Deployit system. This manual describes what customization options are present and how to adapt Deployit to fit into your environment.</p><p>This manual will first give an overview of the different ways of customizing Deployit. Then, Deployit system architecture is described to show the role of Deployit extensions and plugins in the deployment process. Finally, we show how to add custom Deployit plugins.</p><h1>Customization Overview</h1><p>Deployit is designed with extensibility in mind and provides several different ways to modify its behavior. Depending on the extender's skill set and requirements, one or more of these methods can be used to achieve the desired result.</p><p>Overall, there are four ways to customize Deployit.</p>
 <ol>
-  <li>Adding or modifying configuration items (CIs) by customizing the Deployit type system</li>
-  <li>Adding or modifying CI behavior by customizing one of the plugins provided by XebiaLabs</li>
-  <li>Adding Deployit Server functionality by providing server plugpoint implementations (using Java)</li>
-  <li>Adding custom CIs and deployment functionality by writing a new plugin (using Java)</li>
-</ol><p>Each of these types of customizations are described in the remainder of this document.</p><h1>Customizing the Deployit Type System</h1><p>Today's middleware products are complicated and support lots of configuration options. Deployit plugins represent this middleware to the Deployit system. If a plugin wants to be a direct representation of the options in the middleware, it will quickly grow very large and unwieldy. Deployit provides a better way.</p><p>Given a CI defined in a plugin, an extender can customize this CI by adding new <em>synthetic properties</em> to the Java class, or by using the type system to extend the CI. These additions can either be done using plain Java, or by defining them in an XML file called <em>synthetic.xml</em> which can be added to the Deployit classpath. Changes to the types are loaded when the Deployit server starts and can be used to perform deployments.</p><h2>Modifying Existing CIs</h2><p>Types existing in Deployit can be modified to contain additional <em>synthetic properties</em>. These properties become a part of the CI type and can be specified in the deployment package and shown in the Deployit GUI.</p><p>There are several reasons to modify:</p>
+  <li>Adding or modifying configuration items (CIs) by <strong>customizing the Deployit type system</strong></li>
+  <li>Adding or modifying CI behavior by <strong>customizing a plugin</strong> provided by XebiaLabs</li>
+  <li>Adding Deployit Server functionality by <strong>providing server plugpoint implementations</strong> (requires Java)</li>
+  <li>Adding custom CIs and deployment functionality by <strong>writing a new plugin</strong> (requires Java)</li>
+</ol><p>Each of these types of customizations are described in the remainder of this document.</p><h1>Customizing the Deployit Type System</h1><p>Today's middleware products are complicated and support lots of configuration options. Deployit plugins represent this middleware to the Deployit system. If a plugin wants to be a direct representation of the options in the middleware, it will quickly grow very large and unwieldy. Deployit provides a better way.</p><p>Customizing Deployit is possible by providing new <em>state</em> (modifying existing CIs or defining new CIs) and by providing new <em>behavior</em> (by modifying existing scripts or adding new scripts). This section describes how to modify Deployit state. To learn how to add new behavior to the product, take a look at the manual for the plugin to be modified or the <strong>Generic Model Plugin Manual</strong> to define a new plugin.</p><h2>Synthetic Properties</h2><p>Deployit's type system allows an extender to customize any CI by changing it's definition. Properties can be added, hidden or changed. These new properties are called <em>synthetic properties</em> since they are not defined in a Java class. The properties and changes are defined in an XML file called <em>synthetic.xml</em> which is added to the Deployit classpath. Changes to the types are loaded when the Deployit server starts and can be used to perform deployments.</p><h2>Modifying Existing CIs</h2><p>Types existing in Deployit can be modified to contain additional synthetic properties. These properties become a part of the CI type and can be specified in the deployment package and shown in the Deployit GUI.</p><p>There are several reasons to modify a CI:</p>
 <ul>
   <li>A CI property is always given the same value in your environment. Using synthetic properties, the property can be given a default value and hidden from the user in the GUI.</li>
-  <li>There are additional properties of an existing CI that you want to specify. For example, suppose there is a CI representing a deployed datasource for a specific middleware platform. The middleware platform allows the user to specify a connection pool size and connection timeout and Deployit supports the connection pool size out of the box. In this case, modifying the CI to add a synthetic property allows the user to specify the connection timeout. <strong>Note that this new synthetic property still needs to be communicated to the target middleware platform by the plugin. Consult the plugin manual in question to ensure the new property and its value are passed to the target middleware.</strong></li>
-</ul><p>The following information can be specified when modifying a CI:</p>
+  <li>There are additional properties of an existing CI that you want to specify. For example, suppose there is a CI representing a deployed datasource for a specific middleware platform. The middleware platform allows the user to specify a connection pool size and connection timeout and Deployit supports the connection pool size out of the box. In this case, modifying the CI to add a synthetic property allows the user to specify the connection timeout.</li>
+</ul><p><strong>Note</strong>: to use the newly defined property in a deployment, Deployit's behavior must be modified. To learn how to add new behavior to the product, take a look at the manual for the plugin to be modified or the <strong>Generic Model Plugin Manual</strong> to define a new plugin.</p><p>The following information can be specified when modifying a CI:</p>
 <table class="deployed-matrix">
 	<tr>
 		<th>Property</th>
@@ -52,7 +52,7 @@ $(document).ready(function(){
 	<tr>
 		<td>kind</td>
 		<td>No</td>
-		<td>The type of the property to modify. Possible values are: enum, boolean, integer, string, ci, set_of_ci, set_of_string, map_string_string</td>
+		<td>The type of the property to modify. Possible values are: enum, boolean, integer, string, ci, set_of_ci, set_of_string, map_string_string, list_of_ci, list_of_string</td>
 	</tr>
 	<tr>
 		<td>description</td>
@@ -77,7 +77,7 @@ $(document).ready(function(){
 	<tr>
 		<td>password</td>
 		<td>No</td>
-		<td>Indicates whether the property stores a password. If so, the property value is encrypted in the Deployit GUI and CLI</td>
+		<td>Indicates whether the property stores a password. If so, the property value is masked in the Deployit GUI and CLI</td>
 	</tr>
 	<tr>
 		<td>size</td>
@@ -97,12 +97,12 @@ $(document).ready(function(){
 	<tr>
 		<td>referenced-type</td>
 		<td>No</td>
-		<td><i>Only relevant for properties of kind <b>ci</b> or <b>set_of_ci</b>.</i> The type of the referenced CI.</td>
+		<td><i>Only relevant for properties of kind <b>ci</b>, <b>set_of_ci</b> or <b>list_of_ci</b>.</i> The type of the referenced CI.</td>
 	</tr>
 	<tr>
 		<td>as-containment</td>
 		<td>No</td>
-		<td><i>Only relevant for properties of kind <b>ci</b> or <b>set_of_ci</b>.</i> Indicates whether the property is modeled as containment in the repository. If true, the referenced CI or CIs are stored under the CI</td>
+		<td><i>Only relevant for properties of kind <b>ci</b>, <b>set_of_ci</b> or <b>list_of_ci</b>.</i> Indicates whether the property is modeled as containment in the repository. If true, the referenced CI or CIs are stored under the parent CI</td>
 	</tr>
 	<tr>
 		<td>hidden</td>
@@ -164,7 +164,16 @@ $(document).ready(function(){
 		<td>No</td>
 		<td><i>Only relevant for deployed CIs.</i> The type of deployable CI to be generated. This property is specified as a nested element</td>
 	</tr>
-</table><p>For each defined CI, zero or more properties can be specified. See the section above for more information.</p><p>Here is an example for each of the CI categories.</p><h3>Defining a Deployable CI</h3><p>Usually, deployable CIs are generated by Deployit (see the <code>generate-deployable</code> element above). The following snippet shows an example of defining a deployable manually:</p>
+</table><p>For each defined CI, zero or more properties can be specified. See the section above for more information about how to specify a property.</p><p>Here is an example for each of the CI categories.</p><h3>Defining a Deployable CI</h3><p>Usually, deployable CIs are generated by Deployit (see the <code>generate-deployable</code> element above). The following XML snippet defines a <em>tomcat.DataSource</em> CI and lets Deployit generate the deployable (<em>tomcat.DataSourceSpec</em>) for it:</p>
+<pre><code>&lt;type type=&quot;tomcat.DataSource&quot; extends=&quot;tomcat.JndiContextElement&quot; deployable-type=&quot;jee.DataSourceSpec&quot;
+          description=&quot;DataSource installed to a Tomcat Virtual Host or the Common Context&quot;&gt;
+        &lt;generate-deployable type=&quot;tomcat.DataSourceSpec&quot; extends=&quot;jee.DataSourceSpec&quot;/&gt;
+        &lt;property name=&quot;driverClassName&quot;
+                  description=&quot;The fully qualified Java class name of the JDBC driver to be used.&quot;/&gt;
+        &lt;property name=&quot;url&quot;
+                  description=&quot;The connection URL to be passed to our JDBC driver to establish a connection.&quot;/&gt;
+&lt;/type&gt;
+</code></pre><p>The following snippet shows an example of defining a deployable manually:</p>
 <pre><code>&lt;type type=&quot;acme.CustomWar&quot; extends=&quot;jee.War&quot;&gt;
     &lt;property name=&quot;startApplication&quot; kind=&quot;boolean&quot; required=&quot;true&quot;/&gt;
 &lt;/type&gt;
@@ -179,7 +188,7 @@ $(document).ready(function(){
     &lt;property name=&quot;changeTicketNumber&quot; required=&quot;true&quot;/&gt;
     &lt;property name=&quot;startWeight&quot; default=&quot;1&quot; hidden=&quot;true&quot;/&gt;
 &lt;/type&gt;
-</code></pre><p>The <em>tc.WarModule</em> CI is generated when a <em>tc.War</em> is deployed to a <em>tc.Server</em>. The new CI inherits all properties from the <em>udm.BaseDeployedArtifact</em> CI and adds the required property <code>changeTicketNumber</code>. The <code>startWeight</code> property is hidden from the user with a default value of 1.</p><h2>Defining Synthetic Methods</h2><p>In addition to defining CIs, it is also possible to define <em>methods</em> on CIs. Each method can be executed on an instance of a CI via the GUI or CLI. Methods are used to implement <em>control tasks</em>, actions on CIs to control the middleware. An example is start or stopping of a server. The CI itself is responsible for implementing the specified method. </p><p>This XML snippet shows how to define a control task:</p>
+</code></pre><p>The <em>tc.WarModule</em> CI (a deployed) is generated when a <em>tc.War</em> (a deployable) is deployed to a <em>tc.Server</em> (a container). The new CI inherits all properties from the <em>udm.BaseDeployedArtifact</em> CI and adds the required property <code>changeTicketNumber</code>. The <code>startWeight</code> property is hidden from the user with a default value of 1.</p><h2>Defining Synthetic Methods</h2><p>In addition to defining CIs, it is also possible to define <em>methods</em> on CIs. Each method can be executed on an instance of a CI via the GUI or CLI. Methods are used to implement <em>control tasks</em>, actions on CIs to control the middleware. An example is starting or stopping of a server. The CI itself is responsible for implementing the specified method, either in Java (see the section "Writing a Plugin" below) or synthetically when extending an existing plugin such as the Generic Model Plugin.</p><p>This XML snippet shows how to define a control task:</p>
 <pre><code>&lt;type type=&quot;tc.DeployedDataSource&quot; extends=&quot;generic.ProcessedTemplate&quot; deployable-type=&quot;tc.DataSource&quot;
       container-type=&quot;tc.Server&quot;&gt;
     &lt;generate-deployable type=&quot;tc.DataSource&quot; extends=&quot;generic.Resource&quot;/&gt;
@@ -193,14 +202,14 @@ $(document).ready(function(){
         &lt;rule type=&quot;regex&quot; regex=&quot;^JIRA-[0-9]+$&quot; /&gt;
     &lt;/property&gt;
 &lt;/type&gt;
-</code></pre><p>The validation will throw an error, when the <em>tc.WarModule</em> is being saved in Deployit with a value that is not of the form <code>JIRA-number</code>.</p><h1>Customizing Provided Plugins</h1><p>Using the type system, the Deployit plugins provided by XebiaLabs can be customized. New CI properties or scripts can be added to supplement the functionality delivered by the plugin. More information about this can be found in the respective plugin manuals.</p><h1>Customizing Deployit using Java</h1><p>In addition to customizing Deployit using the XML-based type system, Deployit allows further customization using the Java programming language. By implementing a server <em>plugpoint</em>, certain Deployit server functionality can be changed to adapt the product to your needs. And if you want to use Deployit with new middleware, you can implement a custom <em>plugin</em>. This section describes these two options after diving into the Deployit architecture.</p><h2>Deployit Architecture</h2><p>Deployit features a modular architecture that allows components to be changed and extended while maintaining a consistent system. The following diagram provides a high-level overview of the system architecture:</p><p><img src="images/deployit-architecture.png"  alt="Deployit Architecture"/></p><p>Deployit's central component is referred to as the <em>core</em> and contains the following functionality:</p>
+</code></pre><p>The validation will throw an error, when the <em>tc.WarModule</em> is being saved in Deployit with a value that is not of the form <code>JIRA-[number]</code>.</p><h1>Customizing Provided Plugins</h1><p>Using the type system, the Deployit plugins provided by XebiaLabs can be customized. New CI properties or scripts can be added to supplement the functionality delivered by the plugin. More information about this can be found in the respective plugin manuals. Deployit's Generic Model Plugin can be used as a basis to build a new plugin. See the <strong>Generic Model Plugin Manual</strong> for more information.</p><h1>Customizing Deployit using Java</h1><p>In addition to customizing Deployit using the XML-based type system, Deployit allows further customization using the Java programming language. By implementing a server <em>plugpoint</em>, certain Deployit server functionality can be changed to adapt the product to your needs. And if you want to use Deployit with new middleware, you can implement a custom <em>plugin</em>. This section describes these two options after diving into the Deployit architecture.</p><h2>Deployit Architecture</h2><p>Deployit features a modular architecture that allows components to be changed and extended while maintaining a consistent system. The following diagram provides a high-level overview of the system architecture:</p><p><img src="images/deployit-architecture.png"  alt="Deployit Architecture"/></p><p>Deployit's central component is referred to as the <em>core</em> and contains the following functionality:</p>
 <ul>
   <li>The Unified Deployment Engine which determines what is required to perform a deployment</li>
   <li>Storage and retrieval of deployment packages</li>
   <li>Executing and storing of deployment tasks</li>
   <li>Security</li>
   <li>Reporting</li>
-</ul><p>The Deployit core is accessed using a REST service. The product ships with two clients of the REST service, a graphical user interface (GUI) built in Flex that runs in browsers using Flash, and a command-line interface (CLI) that interprets Jython.</p><p>Support for various middleware platforms is provided in the form of <em>Deployit plugins</em>. Deployit plugins add capabilities to Deployit and may be delivered by XebiaLabs or custom-built by users of Deployit. </p><h2>Deployit and Plugins</h2><p>A Deployit plugin is a component that provides the Deployit server with a way to interact with a specific piece of middleware. It allows the Deployit core to remain independent of the middleware it connects with. At the same time, it allows plugin writers to extend Deployit in a way that seamlessly integrates with the rest of Deployit's functionality. Existing Deployit plugins can be extended to customize Deployit for your environment. It's even possible to write a new Deployit plugin from scratch.</p><p>To integrate with the Deployit core, the plugins adhere to a well-defined interface. This interface specifies the contract between the Deployit plugin and the Deployit core, making it clear what each can expect of the other. The Deployit core is the active party in this collaboration and invokes the plugin whenever needed. For its part, the Deployit plugin replies to requests it is sent. When the Deployit server starts it scans the classpath and loads each Deployit plugin it finds, readying it for interaction with the Deployit core. The Deployit core does not change loaded plugins or load any new plugins after it has started.</p><p>At runtime, multiple plugins will be active at the same time. It is up to the Deployit core to integrate the various plugins and ensure they work together to perform deployments. There is a well-defined process (described below) that invokes all plugins involved in a deployment and turn their contributions into one consistent deployment plan. The execution of the deployment plan is handled by the Deployit core.</p><p>Plugins can define the following items:</p>
+</ul><p>The Deployit core is accessed using a REST service. The product ships with two clients of the REST service, a graphical user interface (GUI) built in Flex that runs in browsers using Flash, and a command-line interface (CLI) that interprets Jython.</p><p>Support for various middleware platforms is provided in the form of Deployit plugins. These plugins add capabilities to Deployit and may be delivered by XebiaLabs or custom-built by users of Deployit.</p><h2>Deployit and Plugins</h2><p>A Deployit plugin is a component that provides the Deployit server with a way to interact with a specific piece of middleware. It allows the Deployit core to remain independent of the middleware it connects with. At the same time, it allows plugin writers to extend Deployit in a way that seamlessly integrates with the rest of Deployit's functionality. Existing Deployit plugins can be extended to customize Deployit for your environment. It's even possible to write a new Deployit plugin from scratch.</p><p>To integrate with the Deployit core, the plugins adhere to a well-defined interface. This interface specifies the contract between the Deployit plugin and the Deployit core, making it clear what each can expect of the other. The Deployit core is the active party in this collaboration and invokes the plugin whenever needed. For its part, the Deployit plugin replies to requests it is sent. When the Deployit server starts, it scans the classpath and loads each Deployit plugin it finds, readying it for interaction with the Deployit core. The Deployit core does not change loaded plugins or load any new plugins after it has started.</p><p>At runtime, multiple plugins will be active at the same time. It is up to the Deployit core to integrate the various plugins and ensure they work together to perform deployments. There is a well-defined process (described below) that invokes all plugins involved in a deployment and turns their contributions into one consistent deployment plan. The execution of the deployment plan is handled by the Deployit core.</p><p>Plugins can define the following items:</p>
 <ul>
   <li><em>Deployable</em> - Configuration Items (CIs) that are part of a package and that can be deployed</li>
   <li><em>Container</em> - CIs that are part of an environment and that can be deployed to</li>
@@ -210,22 +219,22 @@ $(document).ready(function(){
 </ul><p>These concepts are captured in Java interfaces that can be used to write plugins. See the section on "Writing a plugin in Java" below. First we will describe the steps that are involved when doing a deployment in Deployit.</p><h2>Preparing and Performing Deployments in Deployit</h2><p>Performing a deployment in Deployit consists of a number of stages that, together, ensure that the deployment package is deployed and configured on the environment. Some of these activities are performed by the Deployit core, while others are performed by the plugins. </p><p>This is the list of stages:</p>
 <ul>
   <li><em>Specification</em>: This stage creates a <em>deployment specification</em> that defines which deployables (deployment package members) are to be deployed to which containers (environment members) and how they should be configured.</li>
-  <li><em>Delta Analysis</em>: Analyzes the differences between the deployment specification and the current state of the middleware resulting in a <em>delta specification</em>, a list of deltas that describe changes to the middleware state that transform the current situation into the situation described by the deployment specification. The deltas represent operations needed on the deployment's members. There are four defined operations:
+  <li><em>Delta Analysis</em>: Analyzes the differences between the deployment specification and the current state of the middleware resulting in a <em>delta specification</em>, a list of changes to the middleware state that transforms the current situation into the situation described by the deployment specification. The deltas represent operations needed on the deployed items in the deployment. There are four defined operations:
   <ul>
-    <li>CREATE when deploying a member for the first time</li>
-    <li>MODIFY when upgrading a member</li>
-    <li>DESTROY when undeploying a member</li>
+    <li>CREATE when deploying an item for the first time</li>
+    <li>MODIFY when upgrading an item</li>
+    <li>DESTROY when undeploying an item</li>
     <li>NOOP when there is no change</li>
   </ul></li>
-  <li><em>Orchestration</em>: Splits the delta specification into independent subspecifications that can be planned and executed in isolation. Creates a <em>deployment plan</em> containing nested <em>subplans</em>, a combination of a subspecification and a list of <em>steps</em> needed to execute the subspecification.</li>
+  <li><em>Orchestration</em>: Splits the delta specification into independent subspecifications that can be planned and executed in isolation. Creates a <em>deployment plan</em> containing nested <em>subplans</em>.</li>
   <li><em>Planning</em>: Adds <em>steps</em> to each subplan that, when executed, perform the actions needed to execute the actual deployment.</li>
   <li><em>Execution</em>: Executes the complete deployment plan to perform the deployment.</li>
-</ul><h2>Deployments and Plugins</h2><p>The following diagram depicts the way in which a plugin is involved in a deployment:</p><p><img src="images/Deployment-full.png"  alt="Deployment"/></p><p>The transitions that are covered by a puzzle-piece are the ones that interact with the plugins, whereas the deployit-logo indicates that the transition is handled by the Deployit core.</p><p>The following sections describe how plugins are involved in the above mentioned activities. To clarify the description, we will use the sample deployment package PetClinic 1.0, consisting of an EAR file, a datasource and static content, and deploy it to a WebSphere environment.</p><p>The plugin is involved in the Specification and Planning stages, these will be detailed below.</p><h3>Specification</h3><p>In the Specification stage, the deployment to be executed is specified. This includes selecting the deployment package and members to be deployed, as well as mapping each package member to the environment members that they should be deployed to.</p><h4>Specifying CIs</h4><p>The Deployit plugin defines which CIs the Deployit core can use to create deployments. When a plugin is loaded into the Deployit core, Deployit scans the plugin for CIs and adds these to its CI registry. Based on the CI information in the plugin, Deployit will categorize each CI as either a deployable CI (defining the <em>what</em> of the deployment) or a container CI (defining the <em>where</em> of the deployment).</p><h4>Specifying Relationships</h4><p>Where the deployable CI represents the passive resource or artifact, the deployed CI represents the <em>active</em> version of the deployable CI when it has been deployed in a container. By defining deployed CIs, the plugin indicates which combinations of deployable and container are supported.</p><h4>Configuration</h4><p>Each deployed CI represents a combination of a deployable CI and a container CI. It is important to note that one deployable CI can be deployed to multiple container CIs. For instance, an EAR file can be deployed to two application servers. In a deployment, this is modeled as multiple deployed CIs.</p><p>Sometimes it is desirable to configure a deployable CI differently depending on the container CI or environment it is deployed to. This can be done by configuring the properties of the deployed CI differently.</p><p>Configuring the deployed CIs is handled in the Deployit core. Users perform this task either via the GUI or via the CLI. A delpoyit plugin can influence this process by providing default values for its properties.</p><h4>Result</h4><p>The result of the Specification stage is a deployment specification, containing deployed CIs that describe which deployable CIs are mapped to which container CIs with the needed configuration.</p><h3>Planning</h3><p>In the Planning stage, the deployment specification and its subplans that were created in the Orchestration stage are processed.</p><p>During this stage, the Deployit core performs the following procedure:</p>
+</ul><h2>Deployments and Plugins</h2><p>The following diagram depicts the way in which a plugin is involved in a deployment:</p><p><img src="images/Deployment-full.png"  alt="Deployment"/></p><p>The transitions that are covered by a puzzle-piece are the ones that interact with the plugins, whereas the deployit-logo indicates that the transition is handled by the Deployit core.</p><p>The following sections describe how plugins are involved in the above mentioned activities. The plugin is involved in the Specification and Planning stages, these will be detailed below.</p><h3>The Specification Stage</h3><p>In the Specification stage, the deployment to be executed is specified. This includes selecting the deployment package and members to be deployed, as well as mapping each package member to the environment members that they should be deployed to.</p><h4>Specifying CIs</h4><p>The Deployit plugin defines which CIs the Deployit core can use to create deployments. When a plugin is loaded into the Deployit core, Deployit scans the plugin for CIs and adds these to its CI registry. Based on the CI information in the plugin, Deployit will categorize each CI as either a deployable CI (defining the <em>what</em> of the deployment) or a container CI (defining the <em>where</em> of the deployment).</p><h4>Specifying Relationships</h4><p>Where the deployable CI represents the passive resource or artifact, the deployed CI represents the <em>active</em> version of the deployable CI when it has been deployed in a container. By defining deployed CIs, the plugin indicates which combinations of deployable and container are supported.</p><h4>Configuration</h4><p>Each deployed CI represents a combination of a deployable CI and a container CI. It is important to note that one deployable CI can be deployed to multiple container CIs. For instance, an EAR file can be deployed to two application servers. In a deployment, this is modeled as multiple deployed CIs.</p><p>Sometimes it is desirable to configure a deployable CI differently depending on the container CI or environment it is deployed to. This can be done by configuring the properties of the deployed CI differently.</p><p>Configuring the deployed CIs is handled in the Deployit core. Users perform this task either via the GUI or via the CLI. A delpoyit plugin can influence this process by providing default values for its properties.</p><h4>Result</h4><p>The result of the Specification stage is a deployment specification, containing deployed CIs that describe which deployable CIs are mapped to which container CIs with the needed configuration.</p><h3>The Planning Stage</h3><p>In the Planning stage, the deployment specification and its subplans that were created in the Orchestration stage are processed.</p><p>During this stage, the Deployit core performs the following procedure:</p>
 <ul>
   <li>Preprocessing</li>
   <li>Contributor processing</li>
   <li>Postprocessing</li>
-</ul><p>During each part of this procedure, the Deployit plugin is invoked so it can contribute (add) required deployment steps to the subplan.</p><h4>Preprocessing</h4><p>Preprocessing allows the plugin to contribute steps to the very beginning of the plan. During preprocessing, all <em>preprocessors</em> defined in the plugin are invoked in turn. Each preprocessor has full access to the delta specification. As such, the preprocessor can contribute steps based on the entire deployment. Examples of such steps are sending an email before starting the deployment or performing pre-flight checks on CIs in that deployment.</p><h4>Deployed CI processing</h4><p>Dployed CIs contain both the data and the behavior to make a deployment happen. Each of the deployed CIs that is part of the deployment can contribute steps to ensure that they are deployed or configured correctly.</p><p>Steps in a deployment plan must be specified in the correct order for the deployment to succeed. Furthermore, the order of these steps must be coordinated among an unknown number of plugins. To achieve this, Deployit weaves all the separate resulting steps from all the plugins together by looking at their specified ordering.</p><p>For example, suppose we have a container CI representing a WAS application server called WasServer. This CI contains the data describing a WAS server (things like host, application directory, etc.) as well as the behavior to manage it. During a deployment to this WasServer, the WasServer CI contributes steps with order 10 to stop the WasServer. Also, it would contribute steps with order 90 to restart it. In the same deployment, a deployable CI called WasEar (representing the WAS EAR file) contributes steps to install itself with order 40. The resulting plan would weave the install of the EAR file (40) in between the stop (10) and start (90) steps.</p><p>This mechanism allows steps (behavior) to be packaged together with the CIs that contribute them. Also, CIs defined by separate plugins can work together to produce a well-ordered plan.</p><p>Deployit uses the following default orders:</p>
+</ul><p>During each part of this procedure, the Deployit plugin is invoked so it can contribute (add) required deployment steps to the subplan.</p><h4>Preprocessing</h4><p>Preprocessing allows the plugin to contribute steps to the very beginning of the plan. During preprocessing, all <em>preprocessors</em> defined in the plugin are invoked in turn. Each preprocessor has full access to the delta specification. As such, the preprocessor can contribute steps based on the entire deployment. Examples of such steps are sending an email before starting the deployment or performing pre-flight checks on CIs in that deployment.</p><h4>Deployed CI processing</h4><p>Deployed CIs contain both the data and the behavior to make a deployment happen. Each of the deployed CIs that is part of the deployment can contribute steps to ensure that they are deployed or configured correctly.</p><p>Steps in a deployment plan must be specified in the correct order for the deployment to succeed. Furthermore, the order of these steps must be coordinated among an unknown number of plugins. To achieve this, Deployit weaves all the separate resulting steps from all the plugins together by looking at the order property (a number) they specify.</p><p>For example, suppose we have a container CI representing a WAS application server called WasServer. This CI contains the data describing a WAS server (things like host, application directory, etc.) as well as the behavior to manage it. During a deployment to this WasServer, the WasServer CI contributes steps with order 10 to stop the WasServer. Also, it would contribute steps with order 90 to restart it. In the same deployment, a deployable CI called WasEar (representing the WAS EAR file) contributes steps to install itself with order 40. The resulting plan would weave the install of the EAR file (40) in between the stop (10) and start (90) steps.</p><p>This mechanism allows steps (behavior) to be packaged together with the CIs that contribute them. Also, CIs defined by separate plugins can work together to produce a well-ordered plan.</p><p>Deployit uses the following default orders:</p>
 <ul>
   <li>PRE_FLIGHT (<strong>0</strong>)</li>
   <li>STOP_ARTIFACTS (<strong>10</strong>)</li>
@@ -237,7 +246,7 @@ $(document).ready(function(){
   <li>START_CONTAINERS (<strong>80</strong>)</li>
   <li>START_ARTIFACTS (<strong>90</strong>)</li>
   <li>POST_FLIGHT (<strong>100</strong>)</li>
-</ul><h4>Postprocessing</h4><p>Postprocessing is similar to preprocessing, but allows a plugin to add one or more steps to the very end of a plan. A postprocessor could for instance add a step to send a mail once the deployment has been completed.</p><h4>Result</h4><p>The Planning stage results in a deployment plan that contains all steps necessary to perform the deployment. The deployment plan is ready to be executed.</p><p>This concludes the involvement of the plugin in the deployment planning process.</p><h2>Implementing server plugpoints</h2><p>Functionality in the Deployit Server can be customized by using <em>plugpoints</em>. Plugpoints are specified and implemented in Java. On startup, Deployit scans its classpath for implementations of its plugpoints in the <em>com.xebialabs</em> or <em>ext.deployit</em> packages and prepares them for use. There is no additional configuration required.</p><p>The Deployit Server supports the following plugpoints:</p>
+</ul><h4>Postprocessing</h4><p>Postprocessing is similar to preprocessing, but allows a plugin to add one or more steps to the very end of a plan. A postprocessor could for instance add a step to send a mail once the deployment has been completed.</p><h4>Result</h4><p>The Planning stage results in a deployment plan that contains all steps necessary to perform the deployment. The deployment plan is ready to be executed.</p><h2>Implementing server plugpoints</h2><p>Functionality in the Deployit Server can be customized by using <em>plugpoints</em>. Plugpoints are specified and implemented in Java. On startup, Deployit scans its classpath for implementations of its plugpoints in the <em>com.xebialabs</em> or <em>ext.deployit</em> packages and prepares them for use. There is no additional configuration required.</p><p>The Deployit Server supports the following plugpoints:</p>
 <ul>
   <li><em>protocol</em>: specify a new method for connecting to remote hosts</li>
   <li><em>deployment package importer</em>: allow Deployit to import deployment packages in a custom format</li>
@@ -260,8 +269,8 @@ public class DefaultOrchestrator implements Orchestrator {
 <ul>
   <li><em>container by container</em> orchestrator. This orchestrator groups steps that deal with the same container together, enabling deployments across a farm of middleware.</li>
   <li><em>composite package</em> orchestrator. This orchestrator groups steps per contained package together. The order of the member packages in the composite package is preserved.</li>
-  <li><em>group</em> orchestrator (separate plugin). This orchestrator uses the <em>deployment group</em> synthetic property on a container to group steps for all containers with the same deployment group.</li>
-</ul><p>To use a custom orchestrator for a deployment, you must select it when configuring the deployment. This is done by setting it as a deployment-level property on the <em>DeployedApplication</em>. In the GUI, there is a special button that brings up a screen where the orchestrator can be configured. When using the CLI, the orchestrator can be specified directly on the <em>DeployedApplication</em> CI.</p><h2>Writing a plugin</h2><p>Writing a custom plugin is the most powerful way to extend Deployit. It uses Deployit's Java plugin API which is also used by all of the plugins provided by XebiaLabs. The plugin API specifies a contract between Deployit core and a plugin that ensures that a plugin can safely contribute, along with other plugins, to the calculated deployment plan. To understand the plugin API, it is helpful to learn about the Deployit system architecture and how the plugins are involved in performing a deployment. The following sections provide this background information and are followed an explanation of how to build your own plugin.</p><p>The UDM concepts are represented in Java by interfaces:</p>
+  <li><em>deployment group</em> orchestrator (separate plugin). This orchestrator uses the <em>deployment group</em> synthetic property on a container to group steps for all containers with the same deployment group.</li>
+</ul><h2>Writing a plugin</h2><p>Writing a custom plugin is the most powerful way to extend Deployit. It uses Deployit's Java plugin API which is also used by all of the plugins provided by XebiaLabs. The plugin API specifies a contract between Deployit core and a plugin that ensures that a plugin can safely contribute to the calculated deployment plan. To understand the plugin API, it is helpful to learn about the Deployit system architecture and how the plugins are involved in performing a deployment. The following sections assume the read has this background information.</p><h3>UDM and Java</h3><p>The UDM concepts are represented in Java by interfaces:</p>
 <ul>
   <li><em>Deployable</em> classes represent deployable CIs.</li>
   <li><em>Container</em> classes represent container CIs.</li>
@@ -271,7 +280,7 @@ public class DefaultOrchestrator implements Orchestrator {
 package com.xebialabs.deployit.plugin.test.yak.ci;
 
 import com.xebialabs.deployit.plugin.api.annotation.Prefix;
-</code></pre><h3>Specification</h3><p>This section describes Java classes used in defining CIs that are used in the Specification stage.</p><h4>udm.ConfigurationItem and udm.BaseConfigurationItem</h4><p>The udm.BaseConfigurationItem is the base class for all the standard CIs in Deployit. It provides the <em>syntheticProperties</em> map and a default implementation for the name of a CI.</p><h4>udm.Deployable and udm.BaseDeployable</h4><p>The udm.BaseDeployable is the default base class for types that are deployable to <em>udm.Container</em> CIs. It does not add any additional behavior</p><h4>udm.Container and udm.BaseContainer</h4><p>The udm.BaseContainer is the default base class for types that can contain <em>udm.Deployable</em> CIs. It does not add any additional behavior</p><h4>udm.Deployed and udm.BaseDeployed</h4><p>The udm.BaseDeployed is the default base class for types that specify which <em>udm.Deployable</em> CI can be deployed onto which <em>udm.Container</em> CI. </p><h4>Additional UDM concepts</h4><p>Next to these base types, the UDM defines a number of implementations with higher level concepts that facilitate deployments.</p>
+</code></pre><h3>Specification</h3><p>This section describes Java classes used in defining CIs that are used in the Specification stage.</p><h4>udm.ConfigurationItem and udm.BaseConfigurationItem</h4><p>The udm.BaseConfigurationItem is the base class for all the standard CIs in Deployit. It provides the <em>syntheticProperties</em> map and a default implementation for the name of a CI.</p><h4>udm.Deployable and udm.BaseDeployable</h4><p>The udm.BaseDeployable is the default base class for types that are deployable to <em>udm.Container</em> CIs. It does not add any additional behavior</p><h4>udm.Container and udm.BaseContainer</h4><p>The udm.BaseContainer is the default base class for types that can contain <em>udm.Deployable</em> CIs. It does not add any additional behavior</p><h4>udm.Deployed and udm.BaseDeployed</h4><p>The udm.BaseDeployed is the default base class for types that specify which <em>udm.Deployable</em> CI can be deployed onto which <em>udm.Container</em> CI. </p><h4>Additional UDM concepts</h4><p>In addition to these base types, the UDM defines a number of implementations with higher level concepts that facilitate deployments.</p>
 <ul>
   <li><strong>udm.Environment</strong>: The Environment is the target for a deployment in Deployit. It has members of type <em>udm.Container</em></li>
   <li><strong>udm.Application</strong>: The Application is a grouping of multiple <em>udm.DeploymentPackage</em> CIs that can each be the source of a deployment (for example: application = PetClinic; version = 1.0, 2.0, ...)</li>
@@ -323,7 +332,7 @@ public List&lt;Step&gt; start() {
     // Should include actual steps here
     return newArrayList();
 }
-</code></pre><p>A CI representing an Apache webserver could define the above method to start the webserver when invoked.</p><h3>Validation rules</h3><p>Next to defining CIs, new validation rules can also be defined in Java. These can then be used to annotate CIs or their properties so that Deployit can perform validations.</p><p>A simple property validation rule would look like:</p>
+</code></pre><p>A CI representing an Apache webserver could define the above method to start the webserver when invoked.</p><h3>Validation rules</h3><p>Next to defining CIs, new validation rules can also be defined in Java. These can then be used to annotate CIs or their properties so that Deployit can perform validations.</p><p>This is an example of a property validation rule called <em>static-content</em> that validates that a field has a specific fixed value:</p>
 <pre><code>import com.xebialabs.deployit.plugin.api.validation.Rule;
 import com.xebialabs.deployit.plugin.api.validation.ValidationContext;
 
@@ -349,8 +358,8 @@ public @interface StaticContent {
             }
         }
     }
-    }
-</code></pre><p>A validation rule consists of an annotation <em>@StaticContent</em>, which is associated with an implementation of <em>com.xebialabs.deployit.plugin.api.validation.Validator&lt;T&gt;</em>. They are associated using the <em>@com.xebialabs.deployit.plugin.api.validation.Rule</em> annotation. Each method of the annotation needs to be present in the validator as a property with the same name.</p><p>When you've defined this validation rule, you can use it to annotate a CI like such:</p>
+}
+</code></pre><p>A validation rule consists of an annotation, in this case <em>@StaticContent</em>, which is associated with an implementation of <em>com.xebialabs.deployit.plugin.api.validation.Validator&lt;T&gt;</em>. They are associated using the <em>@com.xebialabs.deployit.plugin.api.validation.Rule</em> annotation. Each method of the annotation needs to be present in the validator as a property with the same name, see the <em>content</em> field and property above.</p><p>When you've defined this validation rule, you can use it to annotate a CI like such:</p>
 <pre><code>public class MyLinuxHost extends BaseContainer {
     @Property
     @StaticContent(content = &quot;/tmp&quot;)
@@ -377,118 +386,7 @@ version=3.7.0
 <pre><code>public abstract Version upgradeVersion();
 </code></pre><p>This method returns the version of the upgrade. This is the version the upgrade migrates <em>to</em>. That is, after it has run, Deployit registers that this is the new current version.</p><p>Method</p>
 <pre><code>public abstract boolean doUpgrade(RawRepository repository) throws UpgradeException;
-</code></pre><p>is the workhorse of the upgrade. Here, the class has access to the repository to perform any rewrites necessary.</p><p>When Deployit boots, it scans for upgrades to run. If it detects any, the boot process is stopped to report this fact to the user and to prompt them to make a backup of the repository first in case of problems. The user has the option to stop Deployit at this time if he does not want to perform the upgrade now. Otherwise, Deployit continues to boot and executes all upgrades sequentially.</p><h2>Packaging your plugin</h2><p>Plugins are distributed as standard Java archives (JAR files). Plugin JARs are put in the Deployit server <code>plugins</code> directory, which is added to the Deployit server classpath when it boots. Deployit will scan its classpath for plugin CIs and plugpoint classes and load these into its registry. These classes <strong>must</strong> be in the <em>com.xebialabs</em> or <em>ext.deployit</em> packages. The CIs are used and invoked during a deployment when appropriate.</p><p>Synthetic extension files packaged in the JAR file will be found and read. If there are multiple extension files present, they will be combined and the changes from all files will be combined.</p><h1>Appendices</h1><h2>Synthetic XSD</h2><p>This is the schema of the <em>synthetic.xml</em> file used to contribute types and type changes to Deployit.</p>
-<pre><code>&lt;?xml version=&quot;1.0&quot;?&gt;
-&lt;xs:schema xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot;
-       xmlns=&quot;http://www.xebialabs.com/deployit/synthetic&quot;
-       targetNamespace=&quot;http://www.xebialabs.com/deployit/synthetic&quot;
-       elementFormDefault=&quot;qualified&quot;&gt;
-
-    &lt;xs:element name=&quot;synthetic&quot;&gt;
-        &lt;xs:complexType&gt;
-            &lt;xs:choice maxOccurs=&quot;unbounded&quot;&gt;
-                &lt;xs:element name=&quot;type&quot; type=&quot;SyntheticTypeDefinition&quot;/&gt;
-                &lt;xs:element name=&quot;type-modification&quot; type=&quot;SyntheticTypeModification&quot;/&gt;
-            &lt;/xs:choice&gt;
-        &lt;/xs:complexType&gt;
-    &lt;/xs:element&gt;
-
-    &lt;xs:complexType name=&quot;SyntheticTypeDefinition&quot;&gt;
-        &lt;xs:sequence&gt;
-            &lt;xs:element name=&quot;generate-deployable&quot; type=&quot;SyntheticDeployableGeneration&quot; minOccurs=&quot;0&quot; maxOccurs=&quot;1&quot;/&gt;
-            &lt;xs:element name=&quot;property&quot; type=&quot;SyntheticPropertyDefinition&quot; minOccurs=&quot;0&quot; maxOccurs=&quot;unbounded&quot;/&gt;
-            &lt;xs:element name=&quot;method&quot; type=&quot;SyntheticMethodDefinition&quot; minOccurs=&quot;0&quot; maxOccurs=&quot;unbounded&quot; /&gt;
-            &lt;xs:element name=&quot;rule&quot; type=&quot;SyntheticValidationRule&quot; minOccurs=&quot;0&quot; maxOccurs=&quot;unbounded&quot;/&gt;
-        &lt;/xs:sequence&gt;
-        &lt;xs:attribute name=&quot;type&quot; type=&quot;DeployitTypeName&quot; use=&quot;required&quot;/&gt;
-        &lt;xs:attribute name=&quot;extends&quot; type=&quot;DeployitTypeName&quot; use=&quot;required&quot;/&gt;
-        &lt;xs:attribute name=&quot;description&quot; type=&quot;xs:string&quot;/&gt;
-        &lt;xs:attribute name=&quot;virtual&quot; type=&quot;xs:boolean&quot;/&gt;
-        &lt;xs:attribute name=&quot;deployable-type&quot; type=&quot;DeployitTypeName&quot;/&gt;
-        &lt;xs:attribute name=&quot;container-type&quot; type=&quot;DeployitTypeName&quot;/&gt;
-    &lt;/xs:complexType&gt;
-
-    &lt;xs:complexType name=&quot;SyntheticDeployableGeneration&quot;&gt;
-        &lt;xs:attribute name=&quot;type&quot; type=&quot;DeployitTypeName&quot; use=&quot;required&quot;/&gt;
-        &lt;xs:attribute name=&quot;extends&quot; type=&quot;DeployitTypeName&quot; use=&quot;required&quot;/&gt;
-        &lt;xs:attribute name=&quot;description&quot; type=&quot;xs:string&quot;/&gt;
-    &lt;/xs:complexType&gt;
-
-    &lt;xs:complexType name=&quot;SyntheticTypeModification&quot;&gt;
-        &lt;xs:sequence minOccurs=&quot;0&quot; maxOccurs=&quot;unbounded&quot;&gt;
-            &lt;xs:element name=&quot;property&quot; type=&quot;SyntheticPropertyDefinition&quot; minOccurs=&quot;1&quot; maxOccurs=&quot;unbounded&quot;/&gt;
-            &lt;xs:element name=&quot;method&quot; type=&quot;SyntheticMethodDefinition&quot; minOccurs=&quot;0&quot; maxOccurs=&quot;unbounded&quot; /&gt;
-            &lt;xs:element name=&quot;rule&quot; type=&quot;SyntheticValidationRule&quot; minOccurs=&quot;0&quot; maxOccurs=&quot;unbounded&quot;/&gt;
-        &lt;/xs:sequence&gt;
-        &lt;xs:attribute name=&quot;type&quot; type=&quot;DeployitTypeName&quot; use=&quot;required&quot;/&gt;
-    &lt;/xs:complexType&gt;
-
-    &lt;xs:complexType name=&quot;SyntheticPropertyDefinition&quot;&gt;
-        &lt;xs:sequence&gt;
-           &lt;xs:element name=&quot;rule&quot; type=&quot;SyntheticValidationRule&quot; minOccurs=&quot;0&quot; maxOccurs=&quot;unbounded&quot;/&gt;
-        &lt;/xs:sequence&gt;
-        &lt;xs:attribute name=&quot;name&quot; type=&quot;JavaPropertyName&quot; use=&quot;required&quot;/&gt;
-        &lt;xs:attribute name=&quot;kind&quot; type=&quot;KindType&quot;/&gt;
-        &lt;xs:attribute name=&quot;description&quot; type=&quot;xs:string&quot;/&gt;
-        &lt;xs:attribute name=&quot;category&quot; type=&quot;xs:string&quot;/&gt;
-        &lt;xs:attribute name=&quot;label&quot; type=&quot;xs:string&quot;/&gt;
-        &lt;xs:attribute name=&quot;required&quot; type=&quot;xs:boolean&quot;/&gt;
-        &lt;xs:attribute name=&quot;password&quot; type=&quot;xs:boolean&quot;/&gt;
-        &lt;xs:attribute name=&quot;size&quot; type=&quot;SizeType&quot;/&gt;
-        &lt;xs:attribute name=&quot;default&quot; type=&quot;xs:string&quot;/&gt;
-        &lt;xs:attribute name=&quot;enum-class&quot; type=&quot;xs:string&quot;/&gt;
-        &lt;xs:attribute name=&quot;referenced-type&quot; type=&quot;DeployitTypeName&quot;/&gt;
-        &lt;xs:attribute name=&quot;as-containment&quot; type=&quot;xs:boolean&quot;/&gt;
-        &lt;xs:attribute name=&quot;hidden&quot; type=&quot;xs:boolean&quot;/&gt;
-        &lt;xs:attribute name=&quot;transient&quot; type=&quot;xs:boolean&quot;/&gt;
-    &lt;/xs:complexType&gt;
-
-    &lt;xs:complexType name=&quot;SyntheticMethodDefinition&quot;&gt;
-       &lt;xs:attribute name=&quot;name&quot; type=&quot;JavaPropertyName&quot; use=&quot;required&quot; /&gt;
-       &lt;xs:attribute name=&quot;description&quot; type=&quot;xs:string&quot; /&gt;
-    &lt;/xs:complexType&gt;
-
-    &lt;xs:complexType name=&quot;SyntheticValidationRule&quot;&gt;
-       &lt;xs:attribute name=&quot;type&quot; type=&quot;xs:string&quot; default=&quot;regex&quot; /&gt;
-       &lt;xs:anyAttribute processContents=&quot;lax&quot;/&gt;
-    &lt;/xs:complexType&gt;
-
-    &lt;xs:simpleType name=&quot;JavaPropertyName&quot;&gt;
-        &lt;xs:restriction base=&quot;xs:string&quot;&gt;
-            &lt;xs:pattern value=&quot;[a-zA-Z0-9_]*&quot;/&gt;
-        &lt;/xs:restriction&gt;
-    &lt;/xs:simpleType&gt;
-
-    &lt;xs:simpleType name=&quot;DeployitTypeName&quot;&gt;
-        &lt;xs:restriction base=&quot;xs:string&quot;&gt;
-            &lt;xs:pattern value=&quot;[a-zA-Z0-9-]*\.[a-zA-Z0-9-]*&quot;/&gt;
-        &lt;/xs:restriction&gt;
-    &lt;/xs:simpleType&gt;
-
-    &lt;xs:simpleType name=&quot;KindType&quot;&gt;
-        &lt;xs:restriction base=&quot;xs:string&quot;&gt;
-            &lt;xs:enumeration value=&quot;enum&quot;/&gt;
-            &lt;xs:enumeration value=&quot;boolean&quot;/&gt;
-            &lt;xs:enumeration value=&quot;integer&quot;/&gt;
-            &lt;xs:enumeration value=&quot;string&quot;/&gt;
-            &lt;xs:enumeration value=&quot;ci&quot;/&gt;
-            &lt;xs:enumeration value=&quot;set_of_ci&quot;/&gt;
-            &lt;xs:enumeration value=&quot;set_of_string&quot;/&gt;
-            &lt;xs:enumeration value=&quot;map_string_string&quot; /&gt;
-        &lt;/xs:restriction&gt;
-    &lt;/xs:simpleType&gt;
-
-    &lt;xs:simpleType name=&quot;SizeType&quot;&gt;
-        &lt;xs:restriction base=&quot;xs:string&quot;&gt;
-            &lt;xs:enumeration value=&quot;default&quot;/&gt;
-            &lt;xs:enumeration value=&quot;small&quot;/&gt;
-            &lt;xs:enumeration value=&quot;medium&quot;/&gt;
-            &lt;xs:enumeration value=&quot;large&quot;/&gt;
-        &lt;/xs:restriction&gt;
-    &lt;/xs:simpleType&gt;
-
-&lt;/xs:schema&gt;
-</code></pre><h2>Sample Java Plugin</h2><p>This example describes some classes from a test plugin we use at XebiaLabs, the Yak plugin.</p><p>We'll use the following sample deployment in this example</p>
+</code></pre><p>is the workhorse of the upgrade. Here, the class has access to the repository to perform any rewrites necessary.</p><p>When Deployit boots, it scans for upgrades to run. If it detects any, the boot process is stopped to report this fact to the user and to prompt them to make a backup of the repository first in case of problems. The user has the option to stop Deployit at this time if he does not want to perform the upgrade now. Otherwise, Deployit continues to boot and executes all upgrades sequentially.</p><h2>Packaging your plugin</h2><p>Plugins are distributed as standard Java archives (JAR files). Plugin JARs are put in the Deployit server <code>plugins</code> directory, which is added to the Deployit server classpath when it boots. Deployit will scan its classpath for plugin CIs and plugpoint classes and load these into its registry. These classes <strong>must</strong> be in the <em>com.xebialabs</em> or <em>ext.deployit</em> packages. The CIs are used and invoked during a deployment when appropriate.</p><p>Synthetic extension files packaged in the JAR file will be found and read. If there are multiple extension files present, they will be combined and the changes from all files will be combined.</p><h1>Appendices</h1><h2>Sample Java Plugin</h2><p>This example describes some classes from a test plugin we use at XebiaLabs, the Yak plugin.</p><p>We'll use the following sample deployment in this example</p>
 <ul>
   <li>The YakApp 1.1 deployment package.</li>
   <li>The application contains two deployables: "yakfile1" and "yakfile2". Both are of type <em>YakFile</em>.</li>

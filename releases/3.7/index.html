@@ -6,7 +6,7 @@
 $(document).ready(function(){
     $("body").attr('id', 'top-toc');
     var title = $("<div class='manual-title'/>")
-    title.html("<div class='title'>Start Here</div><div class='version'>Version <span class='version-number'>3.7.0-beta-1</span></div>");
+    title.html("<div class='title'>Start Here</div><div class='version'>Version <span class='version-number'>3.8.0-SNAPSHOT</span></div>");
     $("body").css('width', '100%');
     $("body").prepend(title);
     $("body").prepend($("<ol id='toc'/>"));
@@ -17,32 +17,34 @@ $(document).ready(function(){
 <title>Start Here</title>
 </head><body><h1>Preface</h1><p>Welcome to the Deployit system documentation. This document describes the content of the Deployit documentation and helps you find the information you need.</p><h1>Documentation Contents</h1><p>The Deployit documentation contains all the information needed to install, configure, setup and use Deployit. The documentation consists of the following documents:</p>
 <ul>
-  <li><p><strong>Start Here</strong>. This is the document you are currently reading.</p></li>
-  <li><p><strong><a href="upgrademanual.html">Upgrade Manual</a></strong>. This document describes the procedure to upgrade from a previous version of Deployit.</p></li>
+  <li><strong>Start Here</strong>. This is the document you are currently reading.</li>
+  <li><strong><a href="upgrademanual.html">Upgrade Manual</a></strong>. This document describes the procedure to upgrade from a previous version of Deployit.</li>
   <li><strong><a href="referencemanual.html">Reference Manual</a></strong>. This document describes generic deployment concepts and basic information about Deployit.</li>
-  <li><strong><a href="systemadminmanual.html">System Administration Manual</a></strong>. This document describes how to install Deployit and get it ready for first use.</li>
+  <li><strong><a href="systemadminmanual.html">System Administration Manual</a></strong>. This document describes how to install and maintain Deployit.</li>
+  <li><strong><a href="securitymanual.html">Security Manual</a></strong>. This document describes how Deployits security system works and how to configure it.</li>
   <li><strong><a href="guimanual.html">Graphical User Interface (GUI) Manual</a></strong>. This document describes how to use the Deployit GUI.</li>
   <li><strong><a href="climanual.html">Command Line Interface (CLI) Manual</a></strong>. This document describes how to use the Deployit CLI.</li>
   <li><strong><a href="packagingmanual.html">Packaging Manual</a></strong>. This document describes how to create packages that can be imported into Deployit.</li>
-  <li><strong><a href="customizationmanual.html">Customization Manual</a></strong>. This document describes how to customize Deployit for use in your environment.</li>
+  <li><strong><a href="customizationmanual.html">Customization Manual</a></strong>. This document describes how to customize and extend the out-of-the-box functionality of Deployit.</li>
   <li><strong><a href="releasedashboardmanual.html">Release Dashboard Manual</a></strong>. This document describes how to install, configure and use Deployit's Release Dashboard.</li>
 </ul><p>Deployit comes with several standard plugins, whose documentation is also available:</p>
 <ul>
-  <li><strong><a href="overtherePluginManual.html">Overthere Plugin Manual</a></strong>. This document describes the Overthere plugin.</li>
-  <li><strong><a href="pythonPluginManual.html">Python Plugin Manual</a></strong>. This document describes the Python plugin.</li>
-  <li><strong><a href="jeePluginManual.html">JEE Plugin Manual</a></strong>. This document describes the JEE plugin.</li>
-  <li><strong><a href="commandPluginManual.html">Command Plugin Manual</a></strong>. This document describes the Command plugin.</li>
-  <li><strong><a href="filePluginManual.html">File Plugin Manual</a></strong>. This document describes the File plugin.</li>
-  <li><strong><a href="genericPluginManual.html">Generic Model Plugin Manual</a></strong>. This document describes the Generic Model plugin.</li>
-  <li><strong><a href="webserverPluginManual.html">Webserver Plugin Manual</a></strong>. This document describes the Webserver plugin.</li>
-  <li><strong><a href="databasePluginManual.html">Database Plugin Manual</a></strong>. This document describes the Database plugin.</li>
+  <li><strong><a href="remotingPluginManual.html">Remoting Plugin Manual</a></strong>. This document describes the Remoting plugin which is responsible for communicating with remote systems.</li>
+  <li><strong><a href="pythonPluginManual.html">Python Plugin Manual</a></strong>. This document describes the Python plugin which is responsible for communicating with Python-based middleware.</li>
+  <li><strong><a href="jeePluginManual.html">JEE Plugin Manual</a></strong>. This document describes the JEE plugin which contains basic JEE CIs.</li>
+  <li><strong><a href="commandPluginManual.html">Command Plugin Manual</a></strong>. This document describes the Command plugin which allows packaging and execution of arbitrary commands.</li>
+  <li><strong><a href="filePluginManual.html">File Plugin Manual</a></strong>. This document describes the File plugin which is responsible for deploying files and folders.</li>
+  <li><strong><a href="genericPluginManual.html">Generic Model Plugin Manual</a></strong>. This document describes the Generic Model plugin which is a building block to build new plugins.</li>
+  <li><strong><a href="webserverPluginManual.html">Webserver Plugin Manual</a></strong>. This document describes the Webserver plugin which is responsible for deploying static content to webservers.</li>
+  <li><strong><a href="databasePluginManual.html">Database Plugin Manual</a></strong>. This document describes the Database plugin which is responsible for deploying SQL to databases.</li>
 </ul><h1>Using the Documentation</h1><p>Every document is written as a standalone document and can be read separately. References to other documents are included when relevant. Depending on your role, some documents are more relevant than others. The following list contains a suggested reading order for specific roles:</p>
 <ul>
   <li><strong>System Administrator</strong>: Reference Manual, System Administration Manual, Command Line Interface (CLI) Manual, Customization Manual.</li>
-  <li><strong>Deployer</strong>: Reference Manual, Packaging Manual, Command Line Interface (CLI) Manual.</li>
-  <li><strong>Developer</strong>: Reference Manual, Packaging Manual, Graphical User Interface (GUI) Manual, Customization Manual.</li>
-  <li><strong>Manager</strong>: Reference Manual, Graphical User Interface (GUI) Manual.</li>
-</ul><h1>Online Documentation</h1><p>There is also an online version of the documentation at <a href="http://docs.xebialabs.com">XebiaLabs' documentation site</a>. The documentation site contains the latest and most up-to-date copy of the documentation.</p><h1>Contacting XebiaLabs Technical Support</h1><p>To contact XebiaLabs technical support, use our <a href="http://support.xebialabs.com">support desk</a>. For urgent problems, the XebiaLabs support team can also be reached by phone at <strong>+31610930435</strong> (standard European business hours and workdays only).</p><h1>Quickstart</h1><p>If you're impatient to get started using Deployit, here is a quick rundown of steps you'll need to take and where to find the relevant information:</p>
+  <li><strong>Deployer</strong>: Reference Manual, Graphical User Interface (GUI) Manual, Command Line Interface (CLI) Manual.</li>
+  <li><strong>Senior Deployer</strong>: Reference Manual, Graphical User Interface (GUI) Manual, Command Line Interface (CLI) Manual, Customization Manual.</li>
+  <li><strong>Developer</strong>: Reference Manual, Packaging Manual, Graphical User Interface (GUI) Manual.</li>
+  <li><strong>Manager</strong>: Reference Manual, Graphical User Interface (GUI) Manual, Release Dashboard Manual.</li>
+</ul><h1>Online Documentation</h1><p>There is also an online version of the documentation at our documentation site (http://docs.xebialabs.com). The documentation site contains the latest and most up-to-date copy of the documentation.</p><h1>Contacting XebiaLabs Technical Support</h1><p>To contact XebiaLabs technical support, use our support desk (http://support.xebialabs.com). For urgent problems, the XebiaLabs support team can also be reached by phone at <strong>+31610930435</strong> (standard European business hours and workdays only).</p><h1>Quickstart</h1><p>If you're impatient to get started using Deployit, here is a quick rundown of steps you'll need to take and where to find the relevant information:</p>
 <ul>
   <li><strong>Install Deployit</strong>: see <strong>System Administration Manual</strong>, section <em>Installation Procedure</em>.</li>
   <li><strong>Setup your environment</strong>: see <strong>System Administration Manual</strong>, section <em>Setting up Deployit</em>.</li>

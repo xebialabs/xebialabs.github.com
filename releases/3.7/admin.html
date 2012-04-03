@@ -1,0 +1,28 @@
+<html><head><LINK REL=StyleSheet HREF="css/deployit.css" TYPE="text/css" MEDIA=screen>
+<LINK REL=StyleSheet HREF="css/ci-reference-api.css" TYPE="text/css" MEDIA=screen>
+<script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="js/jquery.tableofcontents.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+    $("body").attr('id', 'top-toc');
+    var title = $("<div class='manual-title'/>")
+    title.html("<div class='title'>Admin Help</div><div class='version'>Version <span class='version-number'>3.8.0-SNAPSHOT</span></div>");
+    $("body").css('width', '100%');
+    $("body").prepend(title);
+    $("body").prepend($("<ol id='toc'/>"));
+    $("#toc").tableOfContents("body", { topLinks: true, } );
+});
+
+</script>
+<title>Admin Help</title>
+</head><body><h1>The Admin Screen</h1><p>The Admin Screen is used to maintain security roles and global permissions in Deployit. For more information about Deployit security, see the <strong>Reference Manual</strong> and <strong>System Administration Manual</strong>.</p><h2>Global permissions</h2><p>The global permissions tab is used to assign global permissions to roles. The following screenshot shows an example of the global permissions tab:</p><p><img src="images/admin-screen-global-permissions.png"  alt="Global Permissions on the Admin screen"/></p><p>The table displays, for each role, which global permissions are assigned to it. If a permission is assigned to the role, a check mark is shown. If the permission is not assigned, a dot is shown. </p><p>To add a role and assign permissions to it, select it from the dropdown list in the bottom-left corner of the table. Click on a dot or check mark to assign or unassign the permission to the role.</p><p>Note that changes made to the global permissions table are not stored until you press the <strong>Save button</strong>.</p><p>The screen contains the following buttons:</p>
+<ul>
+  <li><strong>Save button</strong>: This button is used to save the changes you have made to the table.</li>
+  <li><strong>Reset button</strong>: This button cancels all changes to the table and reloads the table and roles from the server.</li>
+  <li><strong>Refresh button</strong>: This button cancels all changes to the table and reloads the table and roles from the server.</li>
+</ul><h2>Roles</h2><p>The roles tab is used to create and maintain roles in Deployit. The following screenshot shows an example of the roles tab:</p><p><img src="images/admin-screen-roles.png"  alt="Roles on the Admin screen"/></p><p>The table displays, for each role, which <em>principals</em> are a member of the role.</p><p>To create a role, click the <strong>plus</strong> sign on the top-right corner of the table. A new role is added to the table. Enter a role name and press the <strong>Tab</strong> key to move to the principals field. Enter all principals that are a member of the role, separated by <em>commas</em>.</p><p>To remove a role, select it in the table and press the <strong>minus</strong> sign on the top-right corner of the table.</p><p>To rename a role, double-click on the role name, type the new role name and press the <strong>Save button</strong>.</p><p>To edit a role, double-click the principal list, edit the list and press the <strong>Save button</strong>.</p><p>Note that changes made to the role table are not stored until you press the <strong>Save button</strong>.</p><p>The screen contains the following buttons:</p>
+<ul>
+  <li><strong>Save button</strong>: This button is used to save the changes you have made to the table.</li>
+  <li><strong>Reset button</strong>: This button cancels all changes to the table and reloads the table and roles from the server.</li>
+  <li><strong>Refresh button</strong>: This button cancels all changes to the table and reloads the table and roles from the server.</li>
+</ul></body></html>

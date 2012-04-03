@@ -6,7 +6,7 @@
 $(document).ready(function(){
     $("body").attr('id', 'top-toc');
     var title = $("<div class='manual-title'/>")
-    title.html("<div class='title'>Upgrade Manual</div><div class='version'>Version <span class='version-number'>3.7.0-beta-1</span></div>");
+    title.html("<div class='title'>Upgrade Manual</div><div class='version'>Version <span class='version-number'>3.8.0-SNAPSHOT</span></div>");
     $("body").css('width', '100%');
     $("body").prepend(title);
     $("body").prepend($("<ol id='toc'/>"));
@@ -25,7 +25,7 @@ $(document).ready(function(){
   <li>Extract the new Deployit software release into the new installation directory.</li>
   <li>Copy the data from the previous Deployit installation directory into the new installation directory.</li>
   <li>Start the new version of Deployit.</li>
-</ul><h1>Upgrade notes</h1>
+</ul><p>See the section <strong>Performing the Upgrade</strong> below for a detailed explanation of these steps.</p><h1>Upgrade notes</h1>
 <ul>
   <li>It is possible to skip Deployit versions when upgrading. Deployit will sequentially apply any upgrades for the intermediate (skipped) versions. <strong>Please read the specific upgrade instructions for each of the versions carefully.</strong></li>
   <li>The new version of Deployit may not be compatible with the existing version of your plugins. If this is the case, you'll need to download an updated version of your plugin as well. <strong>Please read the specific upgrade instructions for each of the versions carefully.</strong></li>
@@ -40,9 +40,9 @@ $(document).ready(function(){
   <li>Create a directory for the new Deployit server installation, including the new Deployit server version number in the directory name.</li>
   <li>Extract the server archive in this directory.</li>
   <li>Copy the contents of the <strong>conf</strong> directory from the previous installation into the new installation directory.</li>
-  <li>Copy the contents of the <strong>repository</strong> directory from the previous installation into the new installation directory.</li>
+  <li>Copy the entire <strong>repository</strong> directory from the previous installation into the new installation directory.</li>
   <li>Copy the contents of the <strong>importablePackages</strong> directory from the previous installation into the new installation directory.</li>
-  <li>Copy the contents of the <strong>plugins</strong> directory from the previous installation into the new installation directory.</li>
+  <li>Unless new versions of your plugins were provided with the new Deployit version, copy the contents of the <strong>plugins</strong> directory from the previous installation into the new installation directory.</li>
   <li>Copy the contents of the <strong>ext</strong> directory from the previous installation into the new installation directory.</li>
   <li><strong>DO NOT</strong> copy the contents of the <strong>hotfix</strong> directory (unless instructed) because hotfixes are version specific.</li>
   <li>If you have made any changes to the Deployit server startup scripts (<em>server.sh</em> or <em>server.cmd</em>), copy these from the <strong>bin</strong> directory in the previous installation into the new installation directory.</li>
@@ -63,13 +63,58 @@ $(document).ready(function(){
 </ul><h2>Upgrading from Deployit 3.5 or 3.6 to Deployit 3.7</h2>
 <ul>
   <li>Deployit 3.7 contains an updated security implementation. Data from a pre-3.7 repository will automatically be converted to the new security model. See the section below for a complete description of the security upgrade.</li>
-  <li>New versions of the following plugins are needed:</li>
-  <li>WAS</li>
-  <li>WLS</li>
-  <li>Tomcat</li>
-  <li>JBoss</li>
-  <li>more?</li>
-</ul><h3>Security upgrade</h3><p><strong>Permissions and repository</strong></p><p>Starting with Deployit 3.7, Deployit needs to know the admin user's password to access the repository. This must be entered in the <code>deployit.conf</code> file prior to starting the new Deployit server. Note that the password in the configuration file is encrypted by the Deployit server when it starts.</p><p>The main change in the Deployit 3.7 security model is that local security permissions are stored only on root nodes and <em>core.Directory</em> CIs. During the upgrade, Deployit will convert pre-3.7-style permissions to the new permission system and automatically create directories to attach the relevant permissions to. The server log contains a description of the old security information that was found and how this was translated to the new permission system.</p><p>Permissions in Deployit are now assigned to <strong>roles</strong> instead of directly to principals. Deployit itself contains the definitions of roles and the principals they map to. Deployit will create a role for every user it finds during the upgrade.</p><p>It is also no longer possible to globally grant certain permissions. Permissions <em>deploy#initial</em>, <em>deploy#upgrade</em>, <em>deploy#undeploy</em>, <em>import#initial</em>, <em>import#upgrade</em>, <em>task#skip_step</em>, <em>task#move_step</em> can now only be granted on a directory CI. Deployit will convert these global permissions into directory permissions during the upgrade.</p><p>Deployit 3.7 no longer allows <strong>deny</strong> permissions. Instead, permissions should be segregated using the new <strong>core.Directory</strong> grouping CIs. The <strong>deny</strong> permissions are not migrated by Deployit and an equivalent configuration must be created manually.</p><p><strong>LDAP</strong></p><p>Configuration of LDAP security has also changed. The configuration in 3.7 is specified in a file called <em>deployit-security.xml</em>. The 3.6-style LDAP configuration in the <em>jackrabbit-jaas.config</em> file can be migrated easily to the 3.7 format. The following table describes the mapping of the 3.6-style LDAP setup to the new 3.7 setup:</p>
+  <li>New versions of the following plugins are needed:
+  <ul>
+    <li>WAS</li>
+    <li>WLS</li>
+    <li>Tomcat</li>
+    <li>JBoss</li>
+  </ul></li>
+</ul><h3>Security upgrade</h3><p><strong>Permissions and repository</strong></p><p>Starting with Deployit 3.7, Deployit needs to know the admin user's password to access the repository. This must be entered in the <code>deployit.conf</code> file prior to starting the new Deployit server. Note that the password in the configuration file is encrypted by the Deployit server when it starts.</p><p>The main change in the Deployit 3.7 security model is that local security permissions are stored only on root nodes and <em>core.Directory</em> CIs. During the upgrade, Deployit will convert pre-3.7-style permissions to the new permission system and automatically create directories to attach the relevant permissions to. The server log contains a description of the old security information that was found and how this was translated to the new permission system.</p><p>Permissions in Deployit are now assigned to <strong>roles</strong> instead of directly to principals. Deployit itself contains the definitions of roles and the principals they map to. Deployit will create a role for every user it finds during the upgrade.</p><p>It is also no longer possible to globally grant certain permissions. Permissions <em>deploy#initial</em>, <em>deploy#upgrade</em>, <em>deploy#undeploy</em>, <em>import#initial</em>, <em>import#upgrade</em>, <em>task#skip_step</em>, <em>task#move_step</em> can now only be granted on a directory CI. Deployit will convert these global permissions into directory permissions during the upgrade.</p><p>Deployit 3.7 no longer allows <em>deny</em> permissions. Instead, permissions should be segregated using the new <em>core.Directory</em> grouping CIs. The <em>deny</em> permissions are not migrated by Deployit and an equivalent configuration must be created manually.</p><p>Permission <em>repo#edit</em> no longer allows deleting of packages. From 3.7 onwards, new permission <em>import#remove</em> is required to be allowed to delete packages.</p><p>In summary, these are the security changes in Deployit 3.7:</p>
+<table class="deployed-matrix">
+<tr>
+	<th>Feature</th>
+	<th>Pre-3.7</th>
+	<th>3.7</th>
+	<th>Conversion</th>
+</tr>
+<tr>
+	<td>Admin password</td>
+	<td>Deployit did not need the administrator password.</td>
+	<td>Deployit needs the administrator password.</td>
+	<td>The administrator password must be set manually in the deployit.conf file before starting Deployit 3.7.</td>
+</tr>
+<tr>
+	<td>Local permissions defined per CI</td>
+	<td>Local permissions can be defined on any CI, if the permission is applicable.</td>
+	<td>Local permissions can only be defined on <b>root nodes</b> or <b>core.Directory</b> CIs.</td>
+	<td>Deployit automatically migrates permissions from pre-3.7 repositories to 3.7, creating new directory CIs as needed.</td>
+</tr>
+<tr>
+	<td>Permission assignment</td>
+	<td>Permissions are assigned to users (when using the repository as user store) or LDAP principals (users or groups).</td>
+	<td>Permissions are assigned to <b>roles</b> managed within Deployit.</td>
+	<td>Deployit automatically migrates principals from pre-3.7 repositories to 3.7, creating new roles as needed.</td>
+</tr>
+<tr>
+	<td>Permissions that are both global as well as local</td>
+	<td>Several permissions (deploy#initial, deploy#upgrade, deploy#undeploy, import#initial, import#upgrade, task#skip_step, task#move_step) can be assigned both globally as well as locally.</td>
+	<td>These permissions can <b>only</b> be assigned locally on root nodes or directory CIs.</td>
+	<td>Deployit automatically migrates these permissions from pre-3.7 repositories to 3.7.</td>
+</tr>
+<tr>
+	<td><b>deny</b> permissions</td>
+	<td>Permissions can explicitly be denied on any level.</td>
+	<td>Denying permissions is no longer possible.</td>
+	<td>Deployit <b>does not</b> migrate deny permissions. An equivalent security configuration must be created manually after the upgrade.</td>
+</tr>
+<tr>
+	<td>Permission to delete packages</td>
+	<td>repo#edit permission allowed deleting of packages.</td>
+	<td>New permission <b>import#remove</b> is introduced to allow deleting of packages. Permission repo#edit is still required to edit CIs.</td>
+	<td>Deployit automatically assigns import#remove to roles that had repo#edit permission in the pre-3.7 repository.</td>
+</tr>
+</table><p><strong>LDAP</strong></p><p>Configuration of LDAP security has also changed. The configuration in 3.7 is specified in a file called <em>deployit-security.xml</em>. The 3.6-style LDAP configuration in the <em>jackrabbit-jaas.config</em> file can be migrated easily to the 3.7 format. The following table describes the mapping of the 3.6-style LDAP setup to the new 3.7 setup:</p>
 <table class="deployed-matrix">
 <tr>
 	<th>3.6 example</th>
@@ -131,7 +176,7 @@ $(document).ready(function(){
 	<td>n/a</td>
 	<td>This element is no longer required.</td>
 </tr>
-</table><p>See the <strong>System Administration manual</strong> for more details on the available LDAP configuration options.</p><p><strong>Completing the migration</strong></p><p>After the Deployit automated upgrade completes, log in to the Deployit GUI with various credentials to ensure that the security setup was correctly migrated. It is now possible to see the security permissions on <em>directory</em> CIs in the Repository Browser.</p><h3>Additional upgrade steps</h3><p>After completing the upgrade procedure described in <strong>Upgrading the Server</strong> above, perform the following additional steps:</p>
+</table><p>See the <strong>System Administration manual</strong> for more details on the available LDAP configuration options.</p><h3>Additional upgrade steps</h3><p>After completing the upgrade procedure described in <strong>Upgrading the Server</strong> above, perform the following additional steps:</p>
 <ol>
   <li>Edit the <code>deployit.conf</code> file and enter the admin password to property <code>admin.password</code>.</li>
   <li>If you use LDAP, migrate the LDAP configuration to the <em>deployit-security.xml</em> configuration file.</li>
@@ -140,4 +185,4 @@ $(document).ready(function(){
   <li>Log into Deployit as the admin user and inspect the changes to the repository.</li>
   <li>Open the Admin tab to create meaningful role assignments.</li>
   <li>Open the Repository tab to create meaningful directory names.</li>
-</ol></body></html>
+</ol><h3>Completing the migration</h3><p>After the Deployit automated upgrade completes, log in to the Deployit GUI with various credentials to ensure that the security setup was correctly migrated. It is now possible to see the security permissions on <em>directory</em> CIs in the Repository Browser.</p></body></html>

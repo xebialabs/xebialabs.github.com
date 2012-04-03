@@ -6,7 +6,7 @@
 $(document).ready(function(){
     $("body").attr('id', 'top-toc');
     var title = $("<div class='manual-title'/>")
-    title.html("<div class='title'>Webserver Plugin Manual</div><div class='version'>Version <span class='version-number'>3.7.0-beta-4-SNAPSHOT</span></div>");
+    title.html("<div class='title'>Webserver Plugin Manual</div><div class='version'>Version <span class='version-number'>3.7.1-SNAPSHOT</span></div>");
     $("body").css('width', '100%');
     $("body").prepend(title);
     $("body").prepend($("<ol id='toc'/>"));
@@ -245,9 +245,9 @@ CI-port: 8080
 </table>
 <hr class='ci-details-separator'/>
 <a name='www.ApacheVirtualHostSpec'></a><h3 class='ci-detail-title'>www.ApacheVirtualHostSpec</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>generic.Resource</span><span> >> </span><span>udm.BaseDeployable</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.Deployable</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Specification for an Apache virtual host</p>
-<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='www.ApacheVirtualHostSpec_documentRoot'></a><span class='ci-property-name'>documentRoot</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The document root for web content using this virtual host. If left blank, a directory is created in the web server's document root</p></td>
-<tr class='odd'><td><a name='www.ApacheVirtualHostSpec_host'></a><span class='ci-property-name'>host</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The virtual host name. Use '*' to match all hosts</p></td>
-<tr class='even'><td><a name='www.ApacheVirtualHostSpec_port'></a><span class='ci-property-name'>port</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The virtual host port. Use '*' to match all ports</p></td>
+<table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='www.ApacheVirtualHostSpec_documentRoot'></a><span class='ci-property-name'>documentRoot</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The document root for web content using this virtual host. If left blank, a directory is created in the web server's document root (string)</p></td>
+<tr class='odd'><td><a name='www.ApacheVirtualHostSpec_host'></a><span class='ci-property-name'>host</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The virtual host name. Use '*' to match all hosts (string)</p></td>
+<tr class='even'><td><a name='www.ApacheVirtualHostSpec_port'></a><span class='ci-property-name'>port</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>The virtual host port. Use '*' to match all ports (string)</p></td>
 <tr class='odd'><td><a name='www.ApacheVirtualHostSpec_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
 </table>
 <hr class='ci-details-separator'/>

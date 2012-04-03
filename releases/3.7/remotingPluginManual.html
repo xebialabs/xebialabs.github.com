@@ -6,7 +6,7 @@
 $(document).ready(function(){
     $("body").attr('id', 'top-toc');
     var title = $("<div class='manual-title'/>")
-    title.html("<div class='title'>Remoting Plugin Manual</div><div class='version'>Version <span class='version-number'>3.7.0-beta-38-SNAPSHOT</span></div>");
+    title.html("<div class='title'>Remoting Plugin Manual</div><div class='version'>Version <span class='version-number'>3.7.1-SNAPSHOT</span></div>");
     $("body").css('width', '100%');
     $("body").prepend(title);
     $("body").prepend($("<ol id='toc'/>"));
@@ -18,7 +18,7 @@ $(document).ready(function(){
 </head><body><h1>Preface</h1><p>This document describes the functionality provided by the Remoting plugin.</p><p>See the <strong>Deployit Reference Manual</strong> for background information on Deployit and deployment concepts.</p><h1>Overview</h1><p>The Remoting plugin is a Deployit plugin that allows Deployit to manipulate files and execute commands on remote hosts. It does so by using the <strong>Overthere</strong> framework. Overthere is a Java library to manipulate files and execute processes on remote hosts, i.e. do stuff "over there". See the <a href="https://github.com/xebialabs/overthere">Overthere repository</a> for more information.</p><h2>Features</h2>
 <ul>
   <li><p>Define remote host CIs to use as deployment targets.</p></li>
-  <li><p>Define jump stations to connecto to remote hosts.</p></li>
+  <li><p>Define jump stations to connect to remote hosts.</p></li>
 </ul><h1>Requirements</h1>
 <ul>
   <li><strong>Deployit requirements</strong>
@@ -26,7 +26,7 @@ $(document).ready(function(){
     <li><strong>Deployit</strong>: version 3.5+</li>
     <li><strong>Other Deployit Plugins</strong>: None</li>
   </ul></li>
-</ul><div style='width:100%; position:relative'>
+</ul><h1>Examples</h1><h2>Connecting through a tunnel</h2><p>When Deployit cannot reach a Host directly, but that Host can only be reached through an SSH tunnel, you need to create a so-called Jumpstation Host. This can be set up as follows.</p><p>Two Infrastructure items need to be created, ie. the target 'overthere.Host' and the 'overthere.SshJumpstation' that will actually be used to connect to the target machine. Once these are created, they can be hooked up to eachother, by pointing the 'jumpstation' property of the target machine to the created 'overthere.Jumpstation'.</p><p>Once Deployit starts a deployment to the target host, it will see that it needs to connect through the jumpstation, and will first open a connection to that machine, and then setup a dynamic ssh tunnel to the target machine. </p><div style='width:100%; position:relative'>
 <h1 class='ci-toc-category'>CI Reference</h1><h2>Configuration Item Overview</h2><h3 class='ci-toc-category'>Topology Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
 <tr class='even'><td><a href='#overthere.CifsHost'>overthere.CifsHost</a></td><td>A machine that can be connected to using either WinRM or Telnet and can perform file manipulation via the CIFS protocol</td>
 <tr class='odd'><td><a href='#overthere.LocalHost'>overthere.LocalHost</a></td><td>The machine on which the Deployit Server is running on</td>

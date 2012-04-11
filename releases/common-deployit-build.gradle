@@ -7,12 +7,6 @@ configurations {
         bundledPluginsDoc.transitive = false
 }
 
-dependencies {
-        documentation "com.xebialabs.deployit:documentation:${deployitMaintenanceVersion}:documentation@zip"
-        standardPluginsDoc "com.xebialabs.deployit:standard-plugins:${apiVersion}:documentation@zip"
-        bundledPluginsDoc "com.xebialabs.deployit:bundled-plugins:${bundledPluginsVersion}:documentation@zip"
-}
-
 def execute(command) {
     println "Executing: ${command}"
     def proc = command.execute()                 // Call *execute* on the string

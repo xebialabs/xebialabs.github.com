@@ -1,11 +1,17 @@
 // Versions:
 
-apiVersion = '3.7.1-SNAPSHOT'
-bundledPluginsVersion = '3.7.1-SNAPSHOT'
+apiVersion = '3.7.0'
+bundledPluginsVersion = '3.7.0'
 
 // would like to use the following to retrieve the latest documentation zip:
 // deployitMaintenanceVersion = '3.6.x-maintenance'
 deployitMaintenanceVersion = '3.7.1-SNAPSHOT'
 
 apply from: '../common-deployit-build.gradle'
+
+dependencies {
+        documentation "com.xebialabs.deployit:documentation:${deployitMaintenanceVersion}:documentation@zip"
+        standardPluginsDoc "com.xebialabs.deployit:standard-plugins:${apiVersion}:documentation@zip"
+        bundledPluginsDoc "com.xebialabs.deployit:bundled-plugins:${bundledPluginsVersion}:documentation@zip"
+}
 

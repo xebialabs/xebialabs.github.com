@@ -1,0 +1,25 @@
+<html><head><LINK REL=StyleSheet HREF="css/deployit.css" TYPE="text/css" MEDIA=screen>
+<LINK REL=StyleSheet HREF="css/ci-reference-api.css" TYPE="text/css" MEDIA=screen>
+<script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="js/jquery.tableofcontents.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+    $("body").attr('id', 'top-toc');
+    var title = $("<div class='manual-title'/>")
+    title.html("<div class='title'>Groupbased Orchestrator Plugin Manual</div><div class='version'>Version <span class='version-number'>3.7.1-SNAPSHOT</span></div>");
+    $("body").css('width', '100%');
+    $("body").prepend(title);
+    $("body").prepend($("<ol id='toc'/>"));
+    $("#toc").tableOfContents("body", { topLinks: true, } );
+});
+
+</script>
+<title>Groupbased Orchestrator Plugin Manual</title>
+</head><body><h1>Preface</h1><p>This document describes the functionality provided by the Group Orchestrator plugin.</p><p>See the <strong>Deployit Reference Manual</strong> for background information on Deployit and deployment concepts.</p><h1>Description</h1><p>Orchestrators in Deployit define the strategies used to combine the <em>steps</em> for the individual component changes into an overall deployment workflow. The <em>default</em> orchestrator, for instance, “interleaves” all individual component changes by running all steps of a given order for all components.</p><p>The <em>group</em> orchestrator groups steps based on the <em>deployment group</em> synthetic property on a container. All component changes for a given container are put in the same group and all groups are combined into a single deployment workflow. This allows fine-grained control over which containers are deployed to together.</p><h2>Features</h2>
+<ul>
+  <li>Assign containers to a <em>deployment group</em></li>
+  <li>Orchestrate a deployment so all steps dealing with containers in the same <em>deployment group</em> are grouped together</li>
+</ul><h1>Requirements</h1><p>The plugin requires:</p>
+<ul>
+  <li><strong>Deployit</strong>: version 3.7+</li>
+</ul></body></html>

@@ -7,6 +7,21 @@ title: Deployit product documentation by XebiaLabs
 
 Welcome to the Deployit product documentation.
 
+# Search #
+
+Use this search box to search the Deployit product documentation:
+
+<form method="get" action="http://www.google.com/search">
+  <div style="border:1px solid black;padding:4px;width:20em;">
+  <table border="0" cellpadding="0">
+  <tr><td>
+  <input type="hidden" name="sitesearch" value="docs.xebialabs.com"/>
+  <input type="text" name="q" size="25" maxlength="255" value="" />
+  <input type="submit" value="Google Search" /></td></tr>
+  </td></tr></table>
+  </div>
+</form>
+
 # FAQ #
 
 There is a list of [frequently asked questions](faq) about Deployit that is continuously updated and expanded. 

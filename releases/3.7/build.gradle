@@ -9,3 +9,8 @@ deployitMaintenanceVersion = '3.7.1-SNAPSHOT'
 
 apply from: '../common-deployit-build.gradle'
 
+dependencies {
+        documentation "com.xebialabs.deployit:documentation:${deployitMaintenanceVersion}:documentation@zip"
+        standardPluginsDoc "com.xebialabs.deployit:standard-plugins:${apiVersion}:documentation@zip"
+        bundledPluginsDoc "com.xebialabs.deployit:bundled-plugins:${bundledPluginsVersion}:documentation@zip"
+}

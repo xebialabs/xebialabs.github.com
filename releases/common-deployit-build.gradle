@@ -9,8 +9,8 @@ configurations {
 
 dependencies {
         documentation "com.xebialabs.deployit:documentation:${deployitMaintenanceVersion}:documentation@zip"
-        standardPluginsDoc "com.xebialabs.deployit:standard-plugins:${apiVersion}:documentation@zip"
-        bundledPluginsDoc "com.xebialabs.deployit:bundled-plugins:${bundledPluginsVersion}:documentation@zip"
+        standardPluginsDoc "com.xebialabs.deployit:documentation:${apiVersion}:standard-plugins@zip"
+        bundledPluginsDoc "com.xebialabs.deployit:documentation:${bundledPluginsVersion}:bundled-plugins@zip"
 }
 
 def execute(command) {

@@ -45,7 +45,8 @@ $(document).ready(function(){
   <li>Unless new versions of your plugins were provided with the new Deployit version, copy the contents of the <strong>plugins</strong> directory from the previous installation into the new installation directory.</li>
   <li>Copy the contents of the <strong>ext</strong> directory from the previous installation into the new installation directory.</li>
   <li><strong>DO NOT</strong> copy the contents of the <strong>hotfix</strong> directory (unless instructed) because hotfixes are version specific.</li>
-  <li>If you have made any changes to the Deployit server startup scripts (<em>server.sh</em> or <em>server.cmd</em>), copy these from the <strong>bin</strong> directory in the previous installation into the new installation directory.</li>
+  <li>If you added libraries to Deployit's <strong>lib</strong> directory (for instance, database drivers), copy the additional libraries from the previous installation into the new installation directory.</li>
+  <li>If you have made any changes to the Deployit server startup scripts (<em>server.sh</em> or <em>server.cmd</em>), manually re-do these changes in the new installation directory.</li>
 </ol><p><strong>Note</strong>: please make sure that the plugins and extensions in the old Deployit installation are compatible with the new Deployit server version.</p><p>This completes upgrading of the Deployit server.</p><h2>Upgrading the CLI</h2><p>To upgrade an existing Deployit CLI installation, do the following:</p>
 <ol>
   <li>Create a directory for the new Deployit CLI installation, including the new Deployit CLI version number in the directory name.</li>

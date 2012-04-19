@@ -186,3 +186,49 @@ Example :
 2. Create the container under the host you wish to test in the repository editor.
 
 3. Execute the control task.
+
+<a name="placeholder-scanning"/>
+### How do I turn off placeholder scanning? ###
+
+When importing a package, Deployit by default scans the artifacts it contains for placeholders that need to be resolved during a deployment. If you want to turn off placeholder scanning, there are various ways to do this.
+
+**Disabling placeholder scanning for one file extension on a particular artifact type**
+
+Deployit looks for files to scan in artifact CIs based on the file extension. It is possible to exclude certain extensions from this process. To do this, edit the `deployit-defaults.properties` file and set the `excludeFileNamesRegex` property on the artifact CI type you want to exclude. For example:
+
+	file.Archive.excludeFileNamesRegex=.+\.js
+
+Restart the Deployit server for the change to take effect.
+
+**Disabling placeholder scanning for one file extension on all artifacts**
+
+Deployit looks for files to scan in artifact CIs based on the file extension. It is possible to exclude certain extensions from this process. To do this, edit the `deployit-defaults.properties` file and set the `excludeFileNamesRegex` property on the artifact CI type you want to exclude. For example:
+
+	udm.BaseDeployableArchiveArtifact.excludeFileNamesRegex=.+\.js
+
+Restart the Deployit server for the change to take effect.
+
+**Disabling placeholder scanning for one CI instance**
+
+Edit the deployment package manifest and change the `scanPlaceholders` property of the particular artifact:
+
+	Name: sampleArchive.zip
+	CI-Name: sampleArchive
+	CI-Type: file.Archive
+	CI-scanPlaceholders: false
+
+**Disabling placeholder scanning for one CI type**
+
+Edit the `deployit-defaults.properties` file and set the `scanPlaceholders` property for the CI type you want to exclude. For example:
+
+	file.Archive.scanPlaceholders=false
+
+Restart the Deployit server for the change to take effect.
+
+**Disabling placeholder scanning completely**
+
+Edit the `deployit-defaults.properties` file and set the following property:
+
+	udm.BaseDeployableArtifact.scanPlaceholders=false
+
+Restart the Deployit server for the change to take effect.

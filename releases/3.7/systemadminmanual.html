@@ -6,11 +6,10 @@
 $(document).ready(function(){
     $("body").attr('id', 'top-toc');
     var title = $("<div class='manual-title'/>")
-    title.html("<div class='title'>System Administration Manual</div><div class='version'>Version <span class='version-number'>3.7.1-SNAPSHOT</span></div>");
-    $("body").css('width', '100%');
+    title.html("<div class='title'>System Administration Manual</div><div class='version'>Version <span class='version-number'>3.7.2-SNAPSHOT</span></div>");
     $("body").prepend(title);
     $("body").prepend($("<ol id='toc'/>"));
-    $("#toc").tableOfContents("body", { topLinks: true, } );
+    $("#toc").tableOfContents("body", { topLinks: false, } );
 });
 
 </script>
@@ -214,44 +213,70 @@ security.login(&#39;admin&#39;, &#39;newpassword&#39;)
 </code></pre><p>The admin password <strong>must</strong> also be set in the <code>deployit.conf</code> file in the <code>conf</code> directory in the server installation directory so that Deployit can access the repository with administrative permissions. </p><p>After changing the password in the repository, stop the server and edit the <code>deployit.conf</code> file. When the server starts up again, it will read the new administrative password and encrypt it so that it is unreadable in the <code>deployit.conf</code> file.</p><h2>High Availability Setup</h2><p>Deployit can be configured to ensure maximum uptime of the application. In such a high availability setup, two instances of Deployit are running in an <em>active/passive</em> configuration. At any one time, only one Deployit instance is active but as soon as a failure is detected, the passive Deployit instance is activated and the failed instance is taken down for repair. </p><p>To configure Deployit for high availability, the Deployit repository must be used in <em>clustering</em> mode. This means that each Deployit node writes changes to a shared journal in addition to applying the change to it's own repository. See the section <strong>Configuring the Repository</strong> below for more information on setting up clustering.</p><h1>Configuring Deployit</h1><p>This section contains information on the configuration of the Deployit server.</p><h2>Configuring Security</h2><p>See the separate <strong>Security Manual</strong> for more information about how to configure security.</p><h3>Configuring LDAP Security</h3><p>By default, Deployit authenticates users and retrieves authorization information from it's repository. Deployit can also be configured to use an LDAP repository to authenticate users and to retrieve role (group) membership. In this scenario, the LDAP users and groups are used as principals in Deployit and can be mapped to Deployit roles. Role membership and rights assigned to roles are always stored in the JCR repository. </p><p>Deployit treats the LDAP repository as <strong>read-only</strong>. This means that Deployit will use the information from the LDAP repository, but can not make changes to that information.</p><p>To configure Deployit to use an LDAP repository, the security configuration file <em>deployit-security.xml</em> must be modified. This is an example of a working <em>deployit-security.xml</em> file that uses LDAP:</p>
 <pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
-       xmlns:security=&quot;http://www.springframework.org/schema/security&quot;
-       xsi:schemaLocation=&quot;
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
-      &quot;&gt;
+    xmlns:security=&quot;http://www.springframework.org/schema/security&quot;
+    xsi:schemaLocation=&quot;
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
+    &quot;&gt;
 
-    &lt;security:ldap-server id=&quot;ldapServer&quot; url=&quot;ldap://localhost:389/&quot; root=&quot;ou=system&quot;
-       manager-dn=&quot;cn=admin,dc=example,dc=com&quot;   manager-password=&quot;secret&quot;/&gt;
+    &lt;bean id=&quot;ldapServer&quot; class=&quot;org.springframework.security.ldap.DefaultSpringSecurityContextSource&quot;&gt;
+        &lt;constructor-arg value=&quot;LDAP_SERVER_URL&quot; /&gt;
+        &lt;property name=&quot;userDn&quot; value=&quot;MANAGER_DN&quot; /&gt;
+        &lt;property name=&quot;password&quot; value=&quot;MANAGER_PASSWORD&quot; /&gt;
+        &lt;property name=&quot;baseEnvironmentProperties&quot;&gt;
+            &lt;map&gt;
+                &lt;entry key=&quot;java.naming.referral&quot;&gt;
+                    &lt;value&gt;ignore&lt;/value&gt;
+                &lt;/entry&gt;
+            &lt;/map&gt;
+        &lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;bean id=&quot;ldapProvider&quot; class=&quot;org.springframework.security.ldap.authentication.LdapAuthenticationProvider&quot;&gt;
+        &lt;constructor-arg&gt;
+            &lt;bean class=&quot;org.springframework.security.ldap.authentication.BindAuthenticator&quot;&gt;
+                &lt;constructor-arg ref=&quot;ldapServer&quot; /&gt;
+                &lt;property name=&quot;userSearch&quot;&gt;
+                    &lt;bean id=&quot;userSearch&quot; class=&quot;org.springframework.security.ldap.search.FilterBasedLdapUserSearch&quot;&gt;
+                        &lt;constructor-arg index=&quot;0&quot; value=&quot;USER_SEARCH_BASE&quot; /&gt;
+                        &lt;constructor-arg index=&quot;1&quot; value=&quot;USER_SEARCH_FILTER&quot; /&gt;
+                        &lt;constructor-arg index=&quot;2&quot; ref=&quot;ldapServer&quot; /&gt;
+                    &lt;/bean&gt;
+                &lt;/property&gt;
+            &lt;/bean&gt;
+        &lt;/constructor-arg&gt;
+        &lt;constructor-arg&gt;
+            &lt;bean class=&quot;org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator&quot;&gt;
+                &lt;constructor-arg ref=&quot;ldapServer&quot; /&gt;
+                &lt;constructor-arg value=&quot;GROUP_SEARCH_BASE&quot; /&gt;
+                &lt;property name=&quot;groupSearchFilter&quot; value=&quot;GROUP_SEARCH_FILTER&quot; /&gt;
+                &lt;property name=&quot;rolePrefix&quot; value=&quot;&quot; /&gt;
+                &lt;property name=&quot;searchSubtree&quot; value=&quot;true&quot; /&gt;
+                &lt;property name=&quot;convertToUpperCase&quot; value=&quot;false&quot; /&gt;
+            &lt;/bean&gt;
+        &lt;/constructor-arg&gt;
+    &lt;/bean&gt;
+
+    &lt;bean id=&quot;rememberMeAuthenticationProvider&quot; class=&quot;com.xebialabs.deployit.security.authentication.RememberMeAuthenticationProvider&quot;/&gt;
+
+    &lt;bean id=&quot;jcrAuthenticationProvider&quot; class=&quot;com.xebialabs.deployit.security.authentication.JcrAuthenticationProvider&quot;/&gt;
 
     &lt;security:authentication-manager alias=&quot;authenticationManager&quot;&gt;
         &lt;security:authentication-provider ref=&quot;rememberMeAuthenticationProvider&quot; /&gt;
-        &lt;security:ldap-authentication-provider server-ref=&quot;ldapServer&quot; 
-            user-search-filter=&quot;(&amp;amp;(uid={0})(objectClass=inetOrgPerson))&quot; 
-            user-search-base=&quot;dc=example,dc=com&quot;
-            group-search-filter=&quot;(memberUid={0})&quot;
-            group-search-base=&quot;ou=groups,dc=example,dc=com&quot;
-        /&gt;
-       &lt;security:authentication-provider ref=&quot;deployitAuthenticationProvider&quot;/&gt;
+        &lt;security:authentication-provider ref=&quot;ldapProvider&quot; /&gt;
+        &lt;security:authentication-provider ref=&quot;jcrAuthenticationProvider&quot;/&gt;
     &lt;/security:authentication-manager&gt;
 
-    &lt;bean id=&quot;deployitAuthenticationProvider&quot;
-       class=&quot;com.xebialabs.deployit.security.authentication.JcrAuthenticationProvider&quot;/&gt;
-    &lt;bean id=&quot;rememberMeAuthenticationProvider&quot;
-       class=&quot;com.xebialabs.deployit.security.authentication.RememberMeAuthenticationProvider&quot;/&gt;
-
 &lt;/beans&gt;
-</code></pre><p>These options can be specified for the <em>ldap-server</em> element:</p>
+</code></pre><p>The XML fragment above contains placeholders for the following values:</p>
 <ul>
-  <li><strong>url</strong>: The LDAP url to connect to. (example: url="ldap://localhost:389/")</li>
-  <li><strong>root</strong>: The search base in which users and groups are searched. (example: root="ou=system")</li>
-  <li><strong>manager-dn</strong>: The principal to perform the initial bind to the LDAP server. (example: manager-dn="cn=admin,dc=example,dc=com")</li>
-  <li><strong>manager-password</strong>: The credentials to perform the initial bind to the LDAP server. (example: manager-password="secret")</li>
-</ul><p>These options can be specified for the <em>ldap-authentication-provider</em> element:</p>
-<ul>
-  <li><strong>user-search-filter</strong>: The LDAP filter to determine the LDAP dn for the user that's logging in, <code>{0}</code> will be replaced with the username that's logging in (example: user-search-filter="(&amp;(uid={0})(objectClass=inetOrgPerson))")</li>
-  <li><strong>user-search-base</strong>: The LDAP filter that is the base for searching for users (example: user-search-base="dc=example,dc=com")</li>
-  <li><strong>group-search-filter</strong>: The LDAP filter to determine the group memberships for the user, <code>{0}</code> will be replaced with the DN of the user (example: group-search-filter="(memberUid={0})")</li>
-  <li><strong>group-search-base</strong>: The LDAP filter that is the base for searching for groups (example: groupSearchBase="ou=groups,dc=example,dc=com")</li>
+  <li><strong>LDAP_SERVER_URL</strong>: The LDAP url to connect to. (example: "ldap://localhost:389/")</li>
+  <li><strong>MANAGER_DN</strong>: The principal to perform the initial bind to the LDAP server. (example: "cn=admin,dc=example,dc=com")</li>
+  <li><strong>MANAGER_PASSWORD</strong>: The credentials to perform the initial bind to the LDAP server. (example: "secret")</li>
+  <li><strong>USER_SEARCH_FILTER</strong>: The LDAP filter to determine the LDAP dn for the user that's logging in, <code>{0}</code> will be replaced with the username that's logging in (example: "(&amp;(uid={0})(objectClass=inetOrgPerson))")</li>
+  <li><strong>USER_SEARCH_BASE</strong>: The LDAP filter that is the base for searching for users (example: "dc=example,dc=com")</li>
+  <li><strong>GROUP_SEARCH_FILTER</strong>: The LDAP filter to determine the group memberships for the user, <code>{0}</code> will be replaced with the DN of the user (example: "(memberUid={0})")</li>
+  <li><strong>GROUP_SEARCH_BASE</strong>: The LDAP filter that is the base for searching for groups (example: "ou=groups,dc=example,dc=com")</li>
 </ul><p>Deployit server will need to be restarted after you have configured LDAP access.</p><h2>Configuring the Repository</h2><p>Deployit uses a repository to store all of it's data such as CIs, deployment packages, logging, etc. Deployit can use the filesystem or a database for binary artifacts (deployment packages) and CIs and CI history.</p><p>Out of the box, Deployit uses the filesystem to store all data in the repository.</p><h3>Using a Database</h3><p>Deployit can also use a database to store its repository. The built-in Jackrabit JCR implementation must be configured to make this possible. </p><p>There are several configuration options when setting up a database repository: * Store <strong>only binary artifacts</strong> in a database. This requires configuring the <em>DataStore</em> property. * Store <strong>only CIs and CI history</strong> in a database. This requires configuring the <em>PersistenceManager</em> and <em>FileSystem</em> properties. * Store <strong>all data</strong> (binary artifacts and CIs and CI history) in a database. This requires configuring the <em>DataStore</em>, <em>PersistenceManager</em> and <em>FileSystem</em> must be configured.</p><p>Here are some examples of configuring Deployit to use a database for various database vendors. The XML snippets below must be put into the <code>conf/jackrabbit-repository.xml</code> file.</p><p><strong>Note:</strong> Deployit <strong>must</strong> initialize the repository before it can be used. Run Deployit's setup wizard and initialize the repository after making any changes to the repository configuration.</p><p>For more information about using a database with Jackrabbit, see it's <a href="http://wiki.apache.org/jackrabbit/PersistenceManagerFAQ">PersistenceManager FAQ</a> and <a href="http://wiki.apache.org/jackrabbit/DataStore">DataStore FAQ</a>.</p><p><strong>Using Deployit with <a href="http://www.mysql.com/">MySQL</a></strong></p>
 <pre><code>&lt;DataStore class=&quot;org.apache.jackrabbit.core.data.db.DbDataStore&quot;&gt;
     &lt;param name=&quot;driver&quot; value=&quot;com.mysql.jdbc.Driver&quot;/&gt;

@@ -6,11 +6,10 @@
 $(document).ready(function(){
     $("body").attr('id', 'top-toc');
     var title = $("<div class='manual-title'/>")
-    title.html("<div class='title'>Reports Help</div><div class='version'>Version <span class='version-number'>3.7.1-SNAPSHOT</span></div>");
-    $("body").css('width', '100%');
+    title.html("<div class='title'>Reports Help</div><div class='version'>Version <span class='version-number'>3.7.2-SNAPSHOT</span></div>");
     $("body").prepend(title);
     $("body").prepend($("<ol id='toc'/>"));
-    $("#toc").tableOfContents("body", { topLinks: true, } );
+    $("#toc").tableOfContents("body", { topLinks: false, } );
 });
 
 </script>

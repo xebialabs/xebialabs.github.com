@@ -6,11 +6,10 @@
 $(document).ready(function(){
     $("body").attr('id', 'top-toc');
     var title = $("<div class='manual-title'/>")
-    title.html("<div class='title'>Security Manual</div><div class='version'>Version <span class='version-number'>3.7.1-SNAPSHOT</span></div>");
-    $("body").css('width', '100%');
+    title.html("<div class='title'>Security Manual</div><div class='version'>Version <span class='version-number'>3.7.2-SNAPSHOT</span></div>");
     $("body").prepend(title);
     $("body").prepend($("<ol id='toc'/>"));
-    $("#toc").tableOfContents("body", { topLinks: true, } );
+    $("#toc").tableOfContents("body", { topLinks: false, } );
 });
 
 </script>
@@ -102,7 +101,7 @@ $(document).ready(function(){
 </code></pre><p><strong>Creating Roles and Assigning Principals to Roles</strong></p><p>Roles are managed with the following command:</p>
 <pre><code>security.assignRole(&quot;developers&quot;, [&quot;john&quot;])
 </code></pre><p>This assigns principal <em>john</em> to the <em>developers</em> role. If the role does not exist yet, it is created.</p><p><strong>Granting Permissions</strong></p><p>To grant a particular permission to a role, use a statement such as the following:</p>
-<pre><code>security.grant(&quot;import#initial&quot;, &quot;developers&quot;)
+<pre><code>security.grant(&quot;import#initial&quot;, &quot;developers&quot;, [&#39;Applications&#39;])
 </code></pre><p>To grant a particular permission to a role within a directory, use a statement such as the following:</p>
 <pre><code>security.grant(&quot;deploy#initial&quot;, &quot;developers&quot;, [&#39;Environments/DevelopmentDirectory&#39;])
 </code></pre><p>See the <strong>Graphical User Interface Manual</strong> for more information on configuring security via the GUI.</p><p><strong>Revoking Permissions</strong></p><p>To revoke a particular permission from a role, use a statement such as the following:</p>

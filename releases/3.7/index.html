@@ -6,11 +6,10 @@
 $(document).ready(function(){
     $("body").attr('id', 'top-toc');
     var title = $("<div class='manual-title'/>")
-    title.html("<div class='title'>Start Here</div><div class='version'>Version <span class='version-number'>3.7.1-SNAPSHOT</span></div>");
-    $("body").css('width', '100%');
+    title.html("<div class='title'>Start Here</div><div class='version'>Version <span class='version-number'>3.7.2-SNAPSHOT</span></div>");
     $("body").prepend(title);
     $("body").prepend($("<ol id='toc'/>"));
-    $("#toc").tableOfContents("body", { topLinks: true, } );
+    $("#toc").tableOfContents("body", { topLinks: false, } );
 });
 
 </script>
@@ -37,6 +36,7 @@ $(document).ready(function(){
   <li><strong><a href="genericPluginManual.html">Generic Model Plugin Manual</a></strong>. This document describes the Generic Model plugin which is a building block to build new plugins.</li>
   <li><strong><a href="webserverPluginManual.html">Webserver Plugin Manual</a></strong>. This document describes the Webserver plugin which is responsible for deploying static content to webservers.</li>
   <li><strong><a href="databasePluginManual.html">Database Plugin Manual</a></strong>. This document describes the Database plugin which is responsible for deploying SQL to databases.</li>
+  <li><strong><a href="groupOrchestratorPluginManual.html">Deployment Group Orchestrator Plugin Manual</a></strong>. This document describes the Deployment Group Orchestrator plugin which allows fine-grained control over deployment plan orchestration.</li>
 </ul><h1>Using the Documentation</h1><p>Every document is written as a standalone document and can be read separately. References to other documents are included when relevant. Depending on your role, some documents are more relevant than others. The following list contains a suggested reading order for specific roles:</p>
 <ul>
   <li><strong>System Administrator</strong>: Reference Manual, System Administration Manual, Command Line Interface (CLI) Manual, Customization Manual.</li>

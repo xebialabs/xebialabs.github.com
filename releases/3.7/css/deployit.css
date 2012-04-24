@@ -1,11 +1,9 @@
 body {
-    font-family: Helvetica, Arial,sans-serif;
-	width: 48em;
+    font-family: Arial,sans-serif;
 	margin: 5px 15px 5px 15px;
-	padding: 20px 0;
+	padding: 5em;
 	color: #3A3A3A;
-	margin-left: auto;
-	margin-right: auto;
+	width: 1024px;
 }
 
 body p {
@@ -77,24 +75,33 @@ pre code {
 }
 
 .manual-title .version {
-    font-size:20px;
-}
-
-.manual-title .version-number {
-    font-size:20px;
+    font-size: 20px;
+    font-weight: normal;
+	margin-top: 0.5em
 }
 
 #toc {
+	float: right;
+	width: 20em;
+	margin-right: -25em;
 	background: #EEE;
 	border: 1px solid lightgray;
-	float: right;
 	font-size: 10pt;
-	margin-right: -20em;
 	padding-right: 1em;
 	padding-top: 1em;
 	padding-bottom: 1em;
-	margin-left: 3em;
 }
+
+@media print {
+	body {
+		color: black;
+	}
+
+	#toc {
+		visibility: hidden;
+	}
+}
+
 
 .deployed-matrix
 {

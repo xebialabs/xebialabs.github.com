@@ -41,7 +41,7 @@ $(document).ready(function(){
   &lt;property name=&quot;requiresChangeTicketNumber&quot; description=&quot;Change ticket number authorizing deployment is required&quot;
             kind=&quot;boolean&quot; required=&quot;false&quot; category=&quot;Deployment Checklist&quot; /&gt;
 &lt;/type-modification&gt;
-</code></pre><p>Note that the type of each property is <code>boolean</code> (meaning it is a checkbox that is checked (condition applies) or unchecked (condition does not apply)). All properties are also optional. The properties <strong>must</strong> also be put in the <code>Deployment Checklist</code> category so that they are grouped together.</p><p>In addition to extending the environment we also customize the <code>udm.DeploymentPackage</code>:</p>
+</code></pre><p>Note that the type of each property is <code>boolean</code> (meaning it is a checkbox that is checked (condition applies) or unchecked (condition does not apply)). All properties are also optional. It's recommended to group these properties into one or more categories. (Note: in Deployit 3.7.0 and 3.7.1, the properties <strong>must</strong> be put in the <code>Deployment Checklist</code> category)</p><p>In addition to extending the environment we also customize the <code>udm.DeploymentPackage</code>:</p>
 <pre><code>&lt;type-modification type=&quot;udm.DeploymentPackage&quot;&gt;
   &lt;property name=&quot;satisfiesReleaseNotes&quot; description=&quot;Indicates the package contains release notes&quot; 
             kind=&quot;boolean&quot; required=&quot;false&quot; category=&quot;Deployment Checklist&quot;/&gt;

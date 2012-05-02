@@ -41,16 +41,18 @@ $(document).ready(function(){
   &lt;property name=&quot;requiresChangeTicketNumber&quot; description=&quot;Change ticket number authorizing deployment is required&quot;
             kind=&quot;boolean&quot; required=&quot;false&quot; category=&quot;Deployment Checklist&quot; /&gt;
 &lt;/type-modification&gt;
-</code></pre><p>Note that the type of each property is <code>boolean</code> (meaning it is a checkbox that is checked (condition applies) or unchecked (condition does not apply)). All properties are also optional. It's recommended to group these properties into one or more categories. (Note: in Deployit 3.7.0 and 3.7.1, the properties <strong>must</strong> be put in the <code>Deployment Checklist</code> category)</p><p>In addition to extending the environment we also customize the <code>udm.DeploymentPackage</code>:</p>
-<pre><code>&lt;type-modification type=&quot;udm.DeploymentPackage&quot;&gt;
+</code></pre><p>Note that the type of each property is <code>boolean</code> (meaning it is a checkbox that is checked (condition applies) or unchecked (condition does not apply)). All properties are also optional. It's recommended to group these properties into one or more categories. (Note: in Deployit 3.7.0 and 3.7.1, the properties <strong>must</strong> be put in the <code>Deployment Checklist</code> category)</p><p>In addition to extending the environment we also customize the <code>udm.Version</code>. (<code>udm.Version</code> encompasses both <code>udm.DeploymentPackage</code> and <code>udm.CompositePackage</code>)</p>
+<pre><code>&lt;type-modification type=&quot;udm.Version&quot;&gt;
   &lt;property name=&quot;satisfiesReleaseNotes&quot; description=&quot;Indicates the package contains release notes&quot; 
             kind=&quot;boolean&quot; required=&quot;false&quot; category=&quot;Deployment Checklist&quot;/&gt;
   &lt;property name=&quot;satisfiesPerformanceTested&quot; description=&quot;Indicates the package has been performance tested&quot; 
             kind=&quot;boolean&quot; required=&quot;false&quot; category=&quot;Deployment Checklist&quot;/&gt;
   &lt;property name=&quot;satisfiesChangeTicketNumber&quot; description=&quot;Indicates the change ticket number authorizing deployment to production&quot; 
-            kind=&quot;string&quot; required=&quot;false&quot; category=&quot;Deployment Checklist&quot;/&gt;
+            kind=&quot;string&quot; required=&quot;false&quot; category=&quot;Deployment Checklist&quot;&gt;
+    &lt;rule type=&quot;regex&quot; pattern=&quot;^[a-zA-Z]+-[0-9]+$&quot; message=&quot;Ticket number should be of the form JIRA-[number]&quot; /&gt;
+  &lt;/property&gt;
 &lt;/type-modification&gt;
-</code></pre><p><strong>Note</strong>: the property names on the <code>udm.Environment</code> must use the <em>requires</em> prefix and properties on the <code>udm.DeploymentPackage</code> must use the <em>satisfies</em> prefix.</p><h2>Complete synthetic.xml example</h2><p>This is an example of a complete <code>synthetic.xml</code> configuration for a Release Dashboard:</p>
+</code></pre><p><strong>Important:</strong> Property names on the <code>udm.Environment</code> must use the <em>requires</em> prefix and properties on the <code>udm.Version</code> must use the <em>satisfies</em> prefix.</p><p>The 'requires' properties on an <code>udm.Environment</code> always have to be of type boolean. Because here it means "Is this check enabled for this Environment?". After adding a 'requires' property on the <code>udm.Environment</code> in the synthetic.xml, you can use the UI to turn the checks on or off.</p><p>In contrast, 'satisfies' properties on <code>udm.Version</code> can be of type boolean, int or string. Usually it will be a boolean, but for example in the case of a ticket number it will be a string, so you can enter the ID of the ticket. Deployit will just check if some value was entered. If that's the case, the requirement is satisfied.</p><h2>Complete synthetic.xml example</h2><p>This is an example of a complete <code>synthetic.xml</code> configuration for a Release Dashboard:</p>
 <pre><code>&lt;synthetic xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
            xmlns=&quot;http://www.xebialabs.com/deployit/synthetic&quot;
            xsi:schemaLocation=&quot;http://www.xebialabs.com/deployit/synthetic synthetic.xsd&quot;&gt;
@@ -64,13 +66,15 @@ $(document).ready(function(){
                     kind=&quot;boolean&quot; required=&quot;false&quot; category=&quot;Deployment Checklist&quot; /&gt;
         &lt;/type-modification&gt;
 
-       &lt;type-modification type=&quot;udm.DeploymentPackage&quot;&gt;
+       &lt;type-modification type=&quot;udm.Version&quot;&gt;
          &lt;property name=&quot;satisfiesReleaseNotes&quot; description=&quot;Indicates the package contains release notes&quot; 
                    kind=&quot;boolean&quot; required=&quot;false&quot; category=&quot;Deployment Checklist&quot;/&gt;
          &lt;property name=&quot;satisfiesPerformanceTested&quot; description=&quot;Indicates the package has been performance tested&quot; 
                    kind=&quot;boolean&quot; required=&quot;false&quot; category=&quot;Deployment Checklist&quot;/&gt;
-         &lt;property name=&quot;satisfiesChangeTicketNumber&quot; description=&quot;Indicates the change ticket number authorizing deployment to production&quot; 
-                   kind=&quot;string&quot; required=&quot;false&quot; category=&quot;Deployment Checklist&quot;/&gt;
+          &lt;property name=&quot;satisfiesChangeTicketNumber&quot; description=&quot;Indicates the change ticket number authorizing deployment to production&quot; 
+                    kind=&quot;string&quot; required=&quot;false&quot; category=&quot;Deployment Checklist&quot;&gt;
+            &lt;rule type=&quot;regex&quot; pattern=&quot;^[a-zA-Z]+-[0-9]+$&quot; message=&quot;Ticket number should be of the form JIRA-[number]&quot; /&gt;
+          &lt;/property&gt;
        &lt;/type-modification&gt;
 
 &lt;/synthetic&gt;

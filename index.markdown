@@ -18,8 +18,8 @@ Use this search box to search the Deployit product documentation:
 <input type="text" name="q" size="25" maxlength="255" value="" />
 </td><td><input type="submit" value="Google Search" /></td></tr>
 <tr><td align="left" style="font-size:75%">
-<input type="radio" name="sitesearch" value="docs.xebialabs.com/releases/3.7" checked /> version 3.7<br />
-<input type="radio" name="sitesearch" value="docs.xebialabs.com"/> all versions<br />
+<input type="radio" name="sitesearch" value="docs.xebialabs.com/releases/3.7" checked /> Deployit 3.7<br />
+<input type="radio" name="sitesearch" value="docs.xebialabs.com"/> All versions<br />
 </td><td align="right">
 </td></tr>
 </table>

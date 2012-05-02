@@ -13,14 +13,18 @@ Use this search box to search the Deployit product documentation:
 
 <form method="get" action="http://www.google.com/search">
   <div style="border:1px solid black;padding:4px;width:20em;">
-  <table border="0" cellpadding="0">
-  <tr><td>
-  <input type="text" name="q" size="25" maxlength="255" value="" />
-  <input type="submit" value="Google Search" /></td></tr>
-  <tr><td align="center" style="font-size:75%">
-  <input type="radio" name="sitesearch" value="docs.xebialabs.com/releases/3.7" checked /> latest version<br />
-  <input type="radio" name="sitesearch" value="docs.xebialabs.com"/> all versions<br />
-  </td></tr></table>
+    <table border="0" cellpadding="0">
+      <tr><td>
+        <input type="text" name="q" size="25" maxlength="255" value="" />
+      </td></tr>
+      <tr><td align="left" style="font-size:75%">
+        <input type="radio" name="sitesearch" value="docs.xebialabs.com/releases/3.7" checked /> latest version<br />
+        <input type="radio" name="sitesearch" value="docs.xebialabs.com"/> all versions<br />
+      </td></tr>
+      <tr><td align="right">
+        <input type="submit" value="Google Search" /></td></tr>
+      </td></tr>
+    </table>
   </div>
 </form>
 

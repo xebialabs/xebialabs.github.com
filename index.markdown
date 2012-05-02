@@ -22,7 +22,7 @@ Use this search box to search the Deployit product documentation:
         <input type="radio" name="sitesearch" value="docs.xebialabs.com"/> all versions<br />
       </td></tr>
       <tr><td align="right">
-        <input type="submit" value="Google Search" /></td></tr>
+        <input type="submit" value="Google Search" />
       </td></tr>
     </table>
   </div>

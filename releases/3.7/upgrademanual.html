@@ -176,17 +176,7 @@ $(document).ready(function(){
 	<td>n/a</td>
 	<td>This element is no longer required.</td>
 </tr>
-</table><p>See the <strong>System Administration manual</strong> for more details on the available LDAP configuration options.</p><p>If you used Deployit 3.6 with LDAP, you will have modified the <strong>conf/jackrabbit-repository.xml</strong> file. For 3.7, the <em>Security</em> snippet must be:</p>
-<pre><code>&lt;Security appName=&quot;Jackrabbit&quot;&gt;
-        &lt;SecurityManager class=&quot;org.apache.jackrabbit.core.DefaultSecurityManager&quot; workspaceName=&quot;security&quot; /&gt;
-        &lt;AccessManager class=&quot;org.apache.jackrabbit.core.security.DefaultAccessManager&quot; /&gt;
-
-        &lt;LoginModule class=&quot;org.apache.jackrabbit.core.security.authentication.DefaultLoginModule&quot;&gt;
-                &lt;param name=&quot;anonymousId&quot; value=&quot;anonymous&quot; /&gt;
-                &lt;param name=&quot;adminId&quot; value=&quot;admin&quot; /&gt;
-        &lt;/LoginModule&gt;
-&lt;/Security&gt;
-</code></pre><h3>Additional upgrade steps</h3><p>After completing the upgrade procedure described in <strong>Upgrading the Server</strong> above, perform the following additional steps:</p>
+</table><p>See the <strong>System Administration manual</strong> for more details on the available LDAP configuration options.</p><h3>Additional upgrade steps</h3><p>After completing the upgrade procedure described in <strong>Upgrading the Server</strong> above, perform the following additional steps:</p>
 <ol>
   <li>Edit the <code>deployit.conf</code> file and enter the admin password to property <code>admin.password</code>.</li>
   <li>If you use LDAP, migrate the LDAP configuration to the <em>deployit-security.xml</em> configuration file.</li>

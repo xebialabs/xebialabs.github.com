@@ -8,7 +8,6 @@ body {
 	margin-left: auto;
 	margin-right: auto;
 	font-size: 13pt;
-	line-height: 150%;
 }
 
 @media print {
@@ -17,6 +16,10 @@ body {
 		font-size: 12pt;
 		padding-right: 5em;
 	}
+}
+
+body p {
+	line-height: 150%;
 }
 
 /* Make sure images don't run out of the body column. */
@@ -67,29 +70,9 @@ pre {
     position: relative; 
 }
 
-@media screen {
-	pre {
-		overflow-x: auto;
-	}
-}
-
 pre code {
 	margin: 0 0 0 10px;  /*--Left Margin--*/
 	display: block;
-}
-
-table {
-	line-height: 150%;
-}
-
-th {
-    font-weight: bold;
-    text-align: left;
-    vertical-align: bottom;
-}
-
-td {
-	vertical-align: top;
 }
 
 .manual-title {
@@ -131,7 +114,8 @@ td {
 }
 
 
-.deployed-matrix {
+.deployed-matrix
+{
   padding: 0;
   margin: 0;
   border-collapse: collapse;
@@ -156,7 +140,8 @@ td {
 }
 
 
-.deployed-matrix th {
+.deployed-matrix th
+{
   background-color: #006600;
   color: #fff;
   border: 1px solid #000;
@@ -165,7 +150,8 @@ td {
   font-size: 1em;
 }
 
-.deployed-matrix td {
+.deployed-matrix td
+{
   border: 1px dotted #666;
   padding: 0.8em;
   font-size: 0.9em;
@@ -173,19 +159,22 @@ td {
   vertical-align: top;
 }
 
-.deployed-matrix th[scope=col] {
+.deployed-matrix th[scope=col]
+{
   color: #000;
   text-transform: uppercase;
   border-bottom: 1px solid #333;
   border-right: 1px solid #333;
 }
 
-.deployed-matrix th+th[scope=col] {
+.deployed-matrix th+th[scope=col]
+{
   color: #fff;
   border-right: 1px dotted #666;
 }
 
-.deployed-matrix th[scope=row] {
+.deployed-matrix th[scope=row]
+{
   border-right: 1px solid #333;
 }
 

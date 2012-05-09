@@ -81,7 +81,7 @@ CI-password: {{DB_PASSWORD}}
 </code></pre><p>Deployit also supports an alternative way of using dictionary values for CI properties. If the dictionary contains keys of the form <em>deployedtype.property</em>, these properties are automatically filled with values from the dictionary (provided they are not specified in the deployable). This makes it possible to use dictionaries without specifying placeholders. For example, the above could also have been achieved by specifying the following keys in the dictionary:</p>
 <pre><code>was.OracleDatasource.username
 was.OracleDatasource.password
-</code></pre><h2>Scanning for placeholders in Artifacts</h2><p>By default Deployit will try to scan files inside packages for the presence of placeholders. These will be added to the <em>placeholders</em> field in the artifact, so that they can be replaced upon deployment of said package. However there are scenarios when you want to disable this behavior. This is triggered by setting the <em>scanPlaceholders</em> flag on an artifact.</p>
+</code></pre><h2>Scanning for placeholders in Artifacts</h2><p>By default Deployit will try to scan files of Artifacts for the presence of placeholders. These will be added to the <em>placeholders</em> field in the artifact, so that they can be replaced upon deployment of said package. However there are scenarios when you want to disable this behavior. This is triggered by setting the <em>scanPlaceholders</em> flag on an artifact.</p>
 <pre><code>Name: sample.txt
 CI-Type: file.File
 CI-Name: sample
@@ -89,7 +89,7 @@ CI-scanPlaceholders: false
 </code></pre><p>To avoid scanning of binary files, only files with the following extensions are scanned:</p>
 <pre><code>cfg, conf, config, ini, properties, props, txt, asp, aspx, 
 htm, html, jsf, jsp, xht, xhtml, sql, xml, xsd, xsl, xslt
-</code></pre><p>You can change this list by setting the <em>textFileNamesRegex</em> property on the artifact. Not that it takes a regular expression.</p><p>If you want to enable placeholder scanning, but the package contains several files that should <strong>not</strong> be scanned, use the <em>excludeFileNamesRegex</em> property on the artifact:</p>
+</code></pre><p>You can change this list by setting the <em>textFileNamesRegex</em> property on thge artifact. Not that it takes a regular expression.</p><p>If you want to enable placeholder scanning, but the package contains several files that should <strong>not</strong> be scanned, use the <em>excludeFileNamesRegex</em> property on the artifact:</p>
 <pre><code>Name: petclinic-1.0.ear
 CI-Type: jee.War
 CI-Name: petclinic

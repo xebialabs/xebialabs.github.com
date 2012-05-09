@@ -19,18 +19,18 @@ $(document).ready(function(){
   <li><p>Unix platforms : <code>export DEPLOYIT_CLI_OPTIONS=&quot;-Xms512m -Xmx2g&quot;</code></p></li>
   <li><p>Windows platforms : <code>set DEPLOYIT_CLI_OPTIONS=&quot;-Xms512m -Xmx2g&quot;</code></p></li>
 </ul><p>If not set, the CLI startup scripts provide sensible defaults.</p><h2>Starting the Deployit CLI</h2><p>To access the Deployit CLI, open a terminal window or command shell and change to the <code>DEPLOYIT_CLI_HOME/bin</code> directory.</p><p>The Deployit CLI can be started by entering the command <code>./cli.sh</code> on Unix, or <code>cli.cmd</code> on Windows.</p><p>When the CLI starts, it will prompt the user for a <code>username</code> and <code>password</code> combination and once these have been entered, it will attempt to connect to the Deployit Server on <code>localhost</code> running on Deployit's standard port of <code>4516</code>.</p><p>Once connected to the Deployit Server, you canstart sending comnabds. Note the that access restrictions may apply, see the section on security below.</p><h2>Starting up with different settings</h2><p>By starting the CLI with the <code>-h</code> flag, the following message is shown which lists all possible options that may be used when starting up the CLI. Whenever <code>./cli.sh</code> is mentioned, it's understood to be read as <code>cli.cmd</code> on Windows platforms:</p>
-<pre><code>./cli.sh [options] [[--] arguments]
+<pre><code>    ./cli.sh [options] [[--] arguments]
 
-options:
+    options:
 
- -configuration VAL : Specify the location of the configuration file
- -context VAL       : The context Deployit is running at
- -f (-source) VAL   : Execute a specified python source file
- -host VAL          : Connect to a specified host, defaults to 127.0.0.1
- -port N            : Connect to a specified port, defaults to 4516
- -secure            : Use https to connect to the Deployit Server
- -username VAL      : Connect as the specified user
- -password VAL      : Connect with the specified password
+        -configuration VAL : Specify the location of the configuration file
+        -context VAL       : The context Deployit is running at
+        -f (-source) VAL   : Execute a specified python source file
+        -host VAL          : Connect to a specified host, defaults to 127.0.0.1
+        -port N            : Connect to a specified port, defaults to 4516
+        -secure            : Use https to connect to the Deployit Server
+        -username VAL      : Connect as the specified user
+        -password VAL      : Connect with the specified password
 </code></pre><p>Following is a short explanation on how to use the available options:</p>
 <ul>
   <li><p><code>-configuration config_file</code></p><p>This option is used to pass the location of the Deployit CLI configuration file. This properties file supports the following options: * <code>cli.username</code> - Connect as the specified user * <code>cli.password</code> - Connect with the specified password.</p></li>
@@ -43,37 +43,37 @@ options:
   <li><p><code>-username myusername</code></p><p>Specifies the username to be used for login. If the username is not specified, the CLI will enter interactive mode and prompt the user.</p></li>
   <li><p><code>-password mypassword</code></p><p>Specifies the password to be used for login. If the password is not specified, the CLI will enter interactive mode and prompt the user.</p></li>
 </ul><p>One example of using options might be:</p>
-<pre><code>./cli.sh -username User -host deployit.local 
+<pre><code>    ./cli.sh -username User -host deployit.local 
 </code></pre><p>This will connect the CLI as 'User' with password 'UserPassword' to the Deployit Server running on the host <code>deployit.local</code> and listening on port 4516.</p><h3>Passing arguments to CLI commands or script</h3><p>After the options it's also possible to pass arguments from the command line to the CLI. It's not mandatory to specify any options in order to pass arguments. </p><p>Here's an example of passing arguments, without specifying options:</p>
-<pre><code>./cli.sh these are four arguments
+<pre><code>    ./cli.sh these are four arguments
 </code></pre><p>and with options:</p>
-<pre><code>./cli.sh -username User -port 8443 -secure again with four arguments
+<pre><code>    ./cli.sh -username User -port 8443 -secure again with four arguments
 </code></pre><p>It is possible to begin an argument with the character &#39;<code>-</code>&#39;. In order for the CLI not to try to interpret it as an option instead of an argument, use the &#39;<code>--</code>&#39; seperator between the option list and the argument list:</p>
-<pre><code>./cli.sh -username User -- -some-argument there are six arguments -one
+<pre><code>    ./cli.sh -username User -- -some-argument there are six arguments -one
 </code></pre><p>This seperator only needs to be used in case one or more of the arguments begin with &#39;<code>-</code>&#39;.</p><p>The arguments may now be used in commands given on the CLI or be used in a script passed with the <code>-f</code> option, by using the <code>sys.argv[index]</code> method, whereby the index runs from 0 to the number of arguments. Index 0 of the array contains the name of the passed script, or is empty when the CLI was started in interactive mode. The first argument has index 1, the second argument index 2, and so forth. Given the command line in the first example presented above, the commands</p>
-<pre><code>import sys
-print sys.argv
+<pre><code>    import sys
+    print sys.argv
 </code></pre><p>would yield as a result:</p>
-<pre><code>[&#39;&#39;, &#39;-some-argument&#39;, &#39;there&#39;, &#39;are&#39;, &#39;six&#39;, &#39;arguments&#39;, &#39;-one&#39;]
+<pre><code>    [&#39;&#39;, &#39;-some-argument&#39;, &#39;there&#39;, &#39;are&#39;, &#39;six&#39;, &#39;arguments&#39;, &#39;-one&#39;]
 </code></pre><h2>Logging in and Logging out</h2><p>The CLI will attempt to connect to the Deployit Server with the provided credentials and conneciton settings. If a successful connection can not be established, an error message will be displayed and the CLI will terminate.</p><p>If a successful connection with the Deployit Server is established, a welcome message will be printed and the CLI is ready to accept commands.</p><p>In interactive mode, the Deployit CLI can be ended by typing <code>quit</code> at the prompt. This will log out the user and terminate the CLI process. In batch mode (when a script is provided), the CLI terminates automatically after finishing the script.</p><h2>CLI extensions</h2><p>It is possible to install CLI extensions - 'extensions' for short - which are loaded during CLI startup. Extensions are Python scripts, for example with Python class definitions, that will be available in commands or scripts run from the CLI. This feature can be combined with arguments given on the command line when starting up the CLI.</p><p>To install CLI extensions follow these steps:</p>
 <ol>
   <li><strong>Create a directory called <code>ext</code></strong> This directory should be created in the same directory from which you will start the CLI - during startup the current directory will be searched for the existence of the <code>ext</code> directory.</li>
   <li><strong>Copy Python scripts into the <code>ext</code> directory</strong></li>
   <li><strong>(Re)Start the CLI</strong> During startup, the CLI will search for, load and execute all scripts with the <code>py</code> or <code>cli</code> suffix found in the extension directory.</li>
 </ol><p>Please note that the order in which scripts from the ext directory are executed is not guaranteed.</p><h1>Deployit Objects in the CLI</h1><p>This chapter describes the various objects available on the CLI for scripting. The Deployit CLI provides five objects to interact with the Deployit Server: <code>deployit</code>, <code>deployment</code>, <code>repository</code>, <code>factory</code> and <code>security</code>.</p><p>It's also possible to define custom helper objects. A brief description of these four objects and how to define custom helper objects is given below. The next chapters will present examples on how to use these objects for scripting purposes.</p><h2>The deployit object</h2><p>The <code>deployit</code> object provides access to the main functions of Deployit itself. It allows the user to import a package, work with tasks and executing discovery.</p><h2>The deployment object</h2><p>The <code>deployment</code> object provides access to the deployment engine of Deployit. Using this object it is possible to create a task for an initial deployment or upgrade. The created tasks can be executed by using the <code>deployit</code> object.</p><h2>The repository object</h2><p>The <code>repository</code> object allows the user to access Deployit's repository. It provides Create, Read, Update and Delete (CRUD) operations on Configuration Items (CI) in the repository. It can also export task overviews to a local XML file.</p><h2>The factory object</h2><p>The <code>factory</code> object facilitates the creation of new Configuration Items (CI) and artifacts (files and packages), to be saved in Deployit's repository. </p><h2>The security object</h2><p>The <code>security</code> object facilitates the logging in or out of Deployit and the creation or deletion of users in the Deployit repository. Users of Deployit may also be administered using another credentials store like a LDAP directory, but creation and deletion of users on these specific stores is not within Deployit's scope.</p><p>Users with administrative permissions my also grant, deny or revoke security permissions to other users, even those users that are not administered in Deployit's repository but in some other credentials store. By default, users with administrative permissions own <strong>all</strong> permissions available in Deployit.</p><h2>Help with CLI objects when logged in</h2><p>When you log in, a welcome message is shown. The message looks like this:</p>
-<pre><code>Welcome to the Deployit Jython CLI!
-Type &#39;help&#39; to learn about the objects you can use to interact with Deployit.
+<pre><code>    Welcome to the Deployit Jython CLI!
+    Type &#39;help&#39; to learn about the objects you can use to interact with Deployit.
 
-Deployit Objects available on the CLI
+    Deployit Objects available on the CLI
 
-deployit: The main gateway to interfacing with Deployit.
-deployment: Access to the deployment engine of Deployit.
-factory: Helper that can construct Configuration Items (CI) and artifacts.
-repository: Gateway to doing CRUD operations on all types of CIs.
-security: Access to the security settings of Deployit.
+    deployit: The main gateway to interfacing with Deployit.
+    deployment: Access to the deployment engine of Deployit.
+    factory: Helper that can construct Configuration Items (CI) and artifacts.
+    repository: Gateway to doing CRUD operations on all types of CIs.
+    security: Access to the security settings of Deployit.
 
-To know more about a specific object, type &lt;objectname&gt;.help()
-To get to know more about a specific method of an object, type &lt;objectname&gt;.help(&quot;&lt;methodname&gt;&quot;)
+    To know more about a specific object, type &lt;objectname&gt;.help()
+    To get to know more about a specific method of an object, type &lt;objectname&gt;.help(&quot;&lt;methodname&gt;&quot;)
 </code></pre><p>To have this message shown again, just type <code>help</code> on the CLI command prompt, followed by <code>&lt;enter&gt;</code>.</p><p>It's easy to obtain information about a specific Deployit object by invoking the <code>help()</code> function. This will list all methods on the object that are available for scripting:</p>
 <pre><code>deployit&gt; factory.help()
 
@@ -85,7 +85,7 @@ The methods available are:
 * factory.configurationItem(String id, String ciType, Map values) : ConfigurationItemDto
 * factory.types() : void
 </code></pre><p>Extensive help about the usage of a specific method can be obtained by issuing a command like:</p>
-<pre><code>deployit&gt; security.help(&#39;getPermissions&#39;)
+<pre><code>    deployit&gt; security.help(&#39;getPermissions&#39;)
 </code></pre><p>on the object in question. Notice that the name of the method is given enclosed in quote marks and without parentheses.</p><h1>Setting up security</h1><p>See the <em>Deployit Security Manual</em> for more information about how to setup security.</p><h1>Discovering middleware</h1><p>In order to do effective deployments, you need to have an accurate model of your infrastructure in Deployit. This can be done automatically by Deployit by using the <em>discovery</em> feature. Using discovery, Deployit will populate your infrastructure repository by scanning your middleware environment and creating Configuration Items in the repository. </p><p>The CIs discovered during discovery will help you in setting up your infrastructure. However, they need not be complete: some CIs contain properties that can not be automatically discovered, like passwords. These kind of properties will still need to be entered manually.</p><p>Discovery is part of the Deployit plugin suite, and the exact discovery functionality available varies depending on the middleware platforms present in your environment. Please refer to the appropiate plugin manual for more detailed information about discovery on a certain middleware platform, including examples.</p><p>The following steps comprise discovery:</p>
 <ol>
   <li>Create a CI representing the starting point for discovery (often a <em>Host</em> CI).</li>
@@ -94,86 +94,85 @@ The methods available are:
   <li>Complete the discovered CIs by providing missing properties manually if needed.</li>
   <li>Add the discovered CIs to an environment.</li>
 </ol><p>The last step of discovery is optional. The discovered CIs will be stored under the <code>Infrastructure</code> root node in the repository and may be added to an environment at some later time.</p><h2>Create a starting point</h2><p>The first step taken in discovery is to create a starting point. The starting point is a a Configuration Item that discovery process needs to get going. This is usually a server host. Depending on the middleware you are trying to discover, additional parameters may be needed.</p><p>Following is an example of how to perform discovery based on the demo-plugin, an example plugin that is part of XebiaLabs community-plugins repository. First a CI is created for localhost. Then we create a CI for the demo server we want to discover. This CI will be the starting point for discovery.</p>
-<pre><code># Create the host CI
-deployit&gt; host = factory.configurationItem(&#39;Infrastructure/demoHost&#39;, &#39;overthere.LocalHost&#39;)
-deployit&gt; host.os = &#39;UNIX&#39;
-deployit&gt; repository.create(host)
+<pre><code>    # Create the host CI
+    deployit&gt; host = factory.configurationItem(&#39;Infrastructure/demoHost&#39;, &#39;overthere.LocalHost&#39;)
+    deployit&gt; host.os = &#39;UNIX&#39;
+    deployit&gt; repository.create(host)
 
-deployit&gt; server = factory.configurationItem(&#39;Infrastructure/demoHost/demoServer&#39;, &#39;demo.Server&#39;)
-deployit&gt; server.host = host.id
+    deployit&gt; server = factory.configurationItem(&#39;Infrastructure/demoHost/demoServer&#39;, &#39;demo.Server&#39;)
+    deployit&gt; server.host = host.id
 </code></pre><h2>Start discovery</h2><p>Now discovery can be started. The discovery process runs synchronously, which means that the CLI will wait until the process has finished.</p><p>The process of discovery works like a regular task in that it executes a number of steps behind the scenes. Whenever one of these steps fails, the entire discovery fails and aborts. It is not possible to continue an interrupted discovery process.</p><p>The command to start discovery is:</p>
-<pre><code>deployit&gt; discoveredCIs = deployit.discover(server)
+<pre><code>    deployit&gt; discoveredCIs = deployit.discover(server)
 </code></pre><p>(Note there are no single- or double quotes around <code>server</code>, because it's an object and not a string.)</p><p>The result of this command will be an object containing a list of discovered CIs.</p><h2>Store the discovered CIs</h2><p>Deployit returns a list of discovered middleware CIs. Note that these are not yet persisted. To store them in the repository, use the following code:</p>
-<pre><code>deployit&gt; repository.create(discoveredCIs)
+<pre><code>    deployit&gt; repository.create(discoveredCIs)
 </code></pre><h2>Complete discovered middleware CIs</h2><p>The easiest way to find out which of the discovered CIs require additional information is by printing them. Any CI that contains passwords (displayed as '********') will need to be completed. To print the stored CIs, the following code can be used:</p>
-<pre><code>deployit&gt; for ci in discoveredCIs.objects: deployit.print(repository.read(ci.id));
+<pre><code>    deployit&gt; for ci in discoveredCIs.objects: deployit.print(repository.read(ci.id));
 </code></pre><p>Note: the created CIs can also be edited in the GUI using the Repository Browser if they have been stored in the repository.</p><h2>Adding CIs to Environments</h2><p>Middleware that is used as a deployment target must be grouped together in an environment. Environments are CIs of type <code>udm.Environment</code> and, like all CIs, can be created from the CLI by using the factory object. The following command can be used for this:</p>
-<pre><code>deployit&gt; env = factory.configurationItem(&#39;Environments/DiscoveredEnv&#39;, &#39;udm.Environment&#39;)
+<pre><code>    deployit&gt; env = factory.configurationItem(&#39;Environments/DiscoveredEnv&#39;, &#39;udm.Environment&#39;)
 </code></pre><p>Add the discovered CIs to the environment:</p>
-<pre><code>deployit&gt; env.values[&#39;members&#39;] = [ci.id for ci in discoveredCIs.objects]
+<pre><code>    deployit&gt; env.values[&#39;members&#39;] = [ci.id for ci in discoveredCIs.objects]
 </code></pre><p>Note that not all of the discovered CIs should necessarily be stored in an environment. For example, in the case of WAS, some nested CIs may be discovered of which only the top-level one must be stored.</p><p>Don't forget to stopre the new environment in the repository:</p>
-<pre><code>deployit&gt; repository.create(env)
+<pre><code>    deployit&gt; repository.create(env)
 </code></pre><p>The newly created environment can now be used as a deployment target.</p><p>Note: the user needs specific permission to store CIs in the database. See the <em>Deployit System Administration Manual</em>.</p><h1>Performing deployments</h1><p>You can also do a deployment from the Deployit CLI. Here is an example of how to perform a simple deployment.</p>
-<pre><code># Import package
-deployit&gt; package = deployit.importPackage(&#39;demo-application/1.0&#39;)
+<pre><code>    # Import package
+    deployit&gt; package = deployit.importPackage(&#39;demo-application/1.0&#39;)
 
-# Load environment
-deployit&gt; environment = repository.read(&#39;Environments/DiscoveredEnv&#39;)
+    # Load environment
+    deployit&gt; environment = repository.read(&#39;Environments/DiscoveredEnv&#39;)
 
-# Start deployment
-deployit&gt; deploymentRef = deployment.prepareInitial(package.id, environment.id)
-deployit&gt; deploymentRef = deployment.generateAllDeployeds(deploymentRef)
-deployit&gt; taskID = deployment.deploy(deploymentRef).id
-deployit&gt; deployit.startTaskAndWait(taskID)
+    # Start deployment
+    deployit&gt; deploymentRef = deployment.prepareInitial(package.id, environment.id)
+    deployit&gt; deploymentRef = deployment.generateAllDeployeds(deploymentRef)
+    deployit&gt; taskID = deployment.deploy(deploymentRef).id
+    deployit&gt; deployit.startTaskAndWait(taskID)
 </code></pre><p>Undeployment follows the same general flow:</p>
-<pre><code>deployit&gt; taskID = deployment.undeploy(&#39;Environments/DiscoveredEnv/demo-application&#39;).id
-deployit&gt; deployit.startTaskAndWait(taskID)
+<pre><code>    deployit&gt; taskID = deployment.undeploy(&#39;Environments/DiscoveredEnv/demo-application&#39;).id
+    deployit&gt; deployit.startTaskAndWait(taskID)
 </code></pre><h1>Working with Tasks</h1><p>Deployit can perform many deployments at the same time. Each of these deployments is called a <em>task</em>. Users can ask Deployit to start a task, stop a task or cancel a task.</p><p>Once a task is completed or canceled, it is moved to the <em>task archive</em>. This is where Deployit stores it's task history. You can query it for tasks and examine the tasks steps and logs or export the task archive to an XML file.</p><p>Acitive tasks are stored in the Deployit <em>task registry</em> which is periodically backed up to a file. If the Deployit Server is stopped abruptly, the tasks in the registry are persisted and can be continued when the server is restarted. </p><h2>Starting, stopping and canceling</h2><p>Whenever you start a deployment or undeployment in Deployit, the Deployit CLI returns a <em>Steps</em> object. This object describes the steps Deployit will take to execute your request, but it doesn't yet start execution. Instead, Deployit creates a task for the request and returns its id as the <em>taskId</em> field in the <em>Steps</em> object. Using the taskId, you can start, stop or cancel the task.</p><p>There are two ways to start a task in the Deployit CLI: <em>startTaskAndWait</em> and <em>startTask</em>. In the deployment example above we used startTaskAndWait. This method starts the tasks and waits for it to complete. The <em>startTask</em> method starts the task in Deployit and returns immediately. The task is run in the backgorund in ths case. Both methods can also be used to restart a failed task. </p><p>If a task is running and you want to to stop it, use the <em>stopTask</em> method. This attempts to interrupt the currently running task.</p><p>The <em>cancelTask</em> method is used to cancel a task. That is, abandon execution of the task and move it to the archive.</p><h2>Listing tasks</h2><p>Before you can work with any of the tasks, you'll need to list them:</p>
-<pre><code>deployit&gt; print deployit.listUnfinishedTasks()
+<pre><code>    deployit&gt; print deployit.listUnfinishedTasks()
 </code></pre><p>This retrieves and shows a list of unfinished tasks that are assigned to the current user. The method returns an array of <em>TaskInfo</em> objects which you can actually print:</p>
-<pre><code>deployit&gt; for t in deployit.listUnfinishedTasks(): print &quot;Task id &quot; + t.id + &quot; is assigned to user &quot; + 
-t.username
+<pre><code>    deployit&gt; for t in deployit.listUnfinishedTasks(): print &quot;Task id &quot; + t.id + &quot; is assigned to user &quot; + t.username
 </code></pre><p>If you have <em>admin</em> permission, you can also list all tasks in Deployit:</p>
-<pre><code>deployit&gt; print deployit.listAllUnfinishedTasks()
+<pre><code>    deployit&gt; print deployit.listAllUnfinishedTasks()
 </code></pre><h2>Assigning tasks</h2><p>Tasks in Deployit are assigned to the user that started them. This means that they will appear in the Deployit GUI whenever this user logs out and back in again. </p><p>Deployit also supports reassigning tasks. If you have <em>task#assign</em> permission, you are allowed to assign a task currently assigned to you to another principal. If you have the <em>admin</em> permission, you can assign any task in the system to another principal.</p><p>This is how you assign a task in the CLI:</p>
-<pre><code># Import package
-deployit&gt; package = repository.read(&#39;Applications/demo-application/1.0&#39;)
+<pre><code>    # Import package
+    deployit&gt; package = repository.read(&#39;Applications/demo-application/1.0&#39;)
 
-# Load environment
-deployit&gt; environment = repository.read(&#39;Environments/DiscoveredEnv&#39;)
+    # Load environment
+    deployit&gt; environment = repository.read(&#39;Environments/DiscoveredEnv&#39;)
 
-# Start deployment
-deployit&gt; deploymentRef = deployment.prepareInitial(package.id, environment.id)
-deployit&gt; deploymentRef = deployment.generateAllDeployeds(deploymentRef)
-deployit&gt; taskID = deployment.deploy(deploymentRef).id
+    # Start deployment
+    deployit&gt; deploymentRef = deployment.prepareInitial(package.id, environment.id)
+    deployit&gt; deploymentRef = deployment.generateAllDeployeds(deploymentRef)
+    deployit&gt; taskID = deployment.deploy(deploymentRef).id
 
-deployit&gt; deployit.assignTask(taskID, &#39;admin&#39;)
+    deployit&gt; deployit.assignTask(taskID, &#39;admin&#39;)
 
-# perform some operations on the task
+    # perform some operations on the task
 
-deployit&gt; deployit.cancelTask(taskID)
+    deployit&gt; deployit.cancelTask(taskID)
 </code></pre><p><strong>Note</strong>: Deployit does not validate the principal you enter as the recipient of the task.</p><h2>Retrieving archived tasks from the repository</h2><p>The <code>repository</code> object has facilities to retrieve an overview of all archived tasks, or a number of tasks within a specified date range.</p><p>The command to export all tasks is:</p>
-<pre><code>deployit&gt; archivedTasks = repository.getArchivedTasks()
+<pre><code>    deployit&gt; archivedTasks = repository.getArchivedTasks()
 </code></pre><p>This command will return an object that contains all tasks, and tasks in turn contain all of their steps. For instance, to get the number of tasks retrieved, execute:</p>
-<pre><code>deployit&gt; print repository.getArchivedTasks().size()
+<pre><code>    deployit&gt; print repository.getArchivedTasks().size()
 </code></pre><p>or, when you've assigned the object to a variable named <code>archivedTasks</code>:</p>
-<pre><code>deployit&gt; print archivedTasks.size()
+<pre><code>    deployit&gt; print archivedTasks.size()
 </code></pre><p>To obtain the first retrieved Task from the object, yield:</p>
-<pre><code>deployit&gt; firstTask = archivedTasks.getTasks().get(0)
+<pre><code>    deployit&gt; firstTask = archivedTasks.getTasks().get(0)
 </code></pre><p>The task count starts at 0 to size() exclusive. This call will give you a <code>TaskInfo</code> object on which you may call all normally available methods. To obtain the first step from the acquired task, execute:</p>
-<pre><code>deployit&gt; firstStep = firstTask.getSteps().get(0)
+<pre><code>    deployit&gt; firstStep = firstTask.getSteps().get(0)
 </code></pre><p>Again, the count of steps starts at 0 to getSteps().size() exclusive. This will give you a <code>StepInfo</code> object on which all regular methods may be called.</p><p>Once you've obtained a <code>TaskInfo</code> or <code>StepInfo</code> object, you can query it for all relevant information, like, for instance in the case of a step, it's state:</p>
-<pre><code>deployit&gt; firstStep.getState()
+<pre><code>    deployit&gt; firstStep.getState()
 </code></pre><p>or it's step number:</p>
-<pre><code>deployit&gt; firstStep.getNr()
+<pre><code>    deployit&gt; firstStep.getNr()
 </code></pre><p>Next to all tasks, one may also just export all tasks within a given date range executing the following command:</p>
-<pre><code>deployit&gt; repository.getArchivedTasks(&#39;01/01/2010&#39;, &#39;01/01/2011&#39;)
+<pre><code>    deployit&gt; repository.getArchivedTasks(&#39;01/01/2010&#39;, &#39;01/01/2011&#39;)
 </code></pre><p>Both date parameters in the method signature should be specified in the following format <strong>mm/dd/yyyy</strong>, with <strong>m</strong> a month digit, <strong>d</strong> a day digit and <strong>y</strong> a year digit. The above method call will return an object that simply wraps the requested tasks, analogous to the getArchivedTasks() method call.</p><h3>Exporting archived tasks from the repository to a local XML file</h3><p>It's also possible to store the contents of the task repository to a local XML file. In order to store the complete task repository to a local XML file, use the following command:</p>
-<pre><code>deployit&gt; repository.exportArchivedTasks(&#39;/tmp/task-export.xml&#39;)
+<pre><code>    deployit&gt; repository.exportArchivedTasks(&#39;/tmp/task-export.xml&#39;)
 </code></pre><p>Note that you can use forward slashes in the path, even on Windows systems. </p><p>It is also possible to export a number of tasks in a certain date range from the task repository to a local XML file using the following command:</p>
-<pre><code>deployit&gt; repository.exportArchivedTasks(&#39;/tmp/task-export.xml&#39;, &#39;01/01/2010&#39;, &#39;01/01/2011&#39;)
+<pre><code>    deployit&gt; repository.exportArchivedTasks(&#39;/tmp/task-export.xml&#39;, &#39;01/01/2010&#39;, &#39;01/01/2011&#39;)
 </code></pre><h1>Performing Common Tasks</h1><p>This section describes common tasks that may be performed using the CLI. Its main purpose is to present examples of how to combine commands to perform the desired tasks.</p><h2>Working with Configuration Items</h2><p>This section shows some examples of how to work with CIs. The two main objects involved are the <code>factory</code> object and the <code>repository</code> object. The <code>factory</code> object is used to actually create the CI itself, while with the <code>repository</code> object it is possible to store the CI in the repository.</p><h3>Finding out types of available CIs and their properties</h3><p>The available CIs and their respective type need to be known before being able to create one. Using the command</p>
-<pre><code>deployit&gt; factory.types()
+<pre><code>    deployit&gt; factory.types()
 </code></pre><p>an overview will be shown on standard output of all the available types that are shipped with Deployit. If at some point more plugins are added to Deployit, types defined therein will be added to Deployit's type registry and will then also be available in addition to the types initially shipped with Deployit. The new types should also show up in the output of this command.</p><p>In order to obtain some more details of a specific type, for instance its required properties, execute the <code>describe</code> method on the <code>deployit</code> object with the fully qualified type name as its parameter:</p>
 <pre><code>deployit&gt; deployit.describe(&#39;udm.Dictionary&#39;)
 </code></pre><p>The output of this command will show something like:</p>
@@ -186,44 +185,44 @@ Properties:
 Properties marked with a &#39;!&#39; are required for discovery.
 Properties marked with a &#39;*&#39; are required.
 </code></pre><h3>Creating common UDM CIs</h3><p>The following snippet shows examples of creating common UDM CIs.</p>
-<pre><code># Create a host
-deployit&gt; sampleHost = factory.configurationItem(&#39;Infrastructure/sampleHost&#39;, &#39;overthere.SshHost&#39;,
-    { &#39;os&#39;: &#39;UNIX&#39;, &#39;address&#39;: &#39;localhost&#39;, &#39;username&#39;: &#39;scott&#39; })
-deployit&gt; repository.create(sampleHost)
-deployit&gt; deployit.print(sampleHost)
+<pre><code>    # Create a host
+    deployit&gt; sampleHost = factory.configurationItem(&#39;Infrastructure/sampleHost&#39;, &#39;overthere.SshHost&#39;,
+       { &#39;os&#39;: &#39;UNIX&#39;, &#39;address&#39;: &#39;localhost&#39;, &#39;username&#39;: &#39;scott&#39; })
+    deployit&gt; repository.create(sampleHost)
+    deployit&gt; deployit.print(sampleHost)
 
-# Create a dictionary
-deployit&gt; sampleDict = factory.configurationItem(&#39;Environments/myDict&#39;, &#39;udm.Dictionary&#39;)
-deployit&gt; sampleDict.entries = { &#39;a&#39;: &#39;1&#39;, &#39;b&#39;: &#39;2&#39; }
-deployit&gt; repository.create(sampleDict)
-deployit&gt; deployit.print(sampleDict)
+    # Create a dictionary
+    deployit&gt; sampleDict = factory.configurationItem(&#39;Environments/myDict&#39;, &#39;udm.Dictionary&#39;)
+    deployit&gt; sampleDict.entries = { &#39;a&#39;: &#39;1&#39;, &#39;b&#39;: &#39;2&#39; }
+    deployit&gt; repository.create(sampleDict)
+    deployit&gt; deployit.print(sampleDict)
 
-# Create an environment
-deployit&gt; sampleEnv = factory.configurationItem(&#39;Environments/sampleEnv&#39;, &#39;udm.Environment&#39;)
-deployit&gt; sampleEnv.dictionaries = [ sampleDict.id ]
-deployit&gt; sampleEnv.members = [ sampleHost.id ]
-deployit&gt; repository.create(sampleEnv)
-deployit&gt; deployit.print(sampleEnv)
+    # Create an environment
+    deployit&gt; sampleEnv = factory.configurationItem(&#39;Environments/sampleEnv&#39;, &#39;udm.Environment&#39;)
+    deployit&gt; sampleEnv.dictionaries = [ sampleDict.id ]
+    deployit&gt; sampleEnv.members = [ sampleHost.id ]
+    deployit&gt; repository.create(sampleEnv)
+    deployit&gt; deployit.print(sampleEnv)
 </code></pre><h3>Moving and Renaming CIs</h3><p>The repository allows you to move or rename CIs as well. Note that a CI can only be moved within the root node it was created in. That is, a CI under the <em>Application</em> root node can only be moved to another place in this tree.</p><p>The following snippet shows examples of moving and renaming CIs:</p>
-<pre><code># Create a directory to store environments
-deployit&gt; directory = factory.configurationItem(&#39;Environments/ciGroup&#39;, &#39;core.Directory&#39;)
-deployit&gt; repository.create(directory)
+<pre><code>    # Create a directory to store environments
+    deployit&gt; directory = factory.configurationItem(&#39;Environments/ciGroup&#39;, &#39;core.Directory&#39;)
+    deployit&gt; repository.create(directory)
 
-# Move the sample environment in the new directory
-deployit&gt; repository.move(sampleEnv, directory.id + &#39;/sampleEnv&#39;)
-deployit&gt; sampleEnv = repository.read(&#39;Environments/ciGroup/sampleEnv&#39;)
+    # Move the sample environment in the new directory
+    deployit&gt; repository.move(sampleEnv, directory.id + &#39;/sampleEnv&#39;)
+    deployit&gt; sampleEnv = repository.read(&#39;Environments/ciGroup/sampleEnv&#39;)
 
-# Rename the directory
-deployit&gt; repository.rename(directory, &#39;renamedCiGroup&#39;)
-deployit&gt; sampleEnv = repository.read(&#39;Environments/renamedCiGroup/sampleEnv&#39;)
+    # Rename the directory
+    deployit&gt; repository.rename(directory, &#39;renamedCiGroup&#39;)
+    deployit&gt; sampleEnv = repository.read(&#39;Environments/renamedCiGroup/sampleEnv&#39;)
 
-# References to renamed or moved CIs are kept up-to-date
-deployit&gt; repository.rename(sampleHost, &#39;renamedSampleHost&#39;)
-deployit&gt; sampleEnv = repository.read(&#39;Environments/renamedCiGroup/sampleEnv&#39;)
-deployit&gt; sampleHost = repository.read(sampleEnv.members[0])
+    # References to renamed or moved CIs are kept up-to-date
+    deployit&gt; repository.rename(sampleHost, &#39;renamedSampleHost&#39;)
+    deployit&gt; sampleEnv = repository.read(&#39;Environments/renamedCiGroup/sampleEnv&#39;)
+    deployit&gt; sampleHost = repository.read(sampleEnv.members[0])
 </code></pre><p><strong>Note</strong>: moving or renaming CIs when deployments are in progress or when the CIs concerned are used by Deployit clients (GUI or CLI) is discouraged.</p><h2>Executing a Control Task</h2><p>Control tasks can be executed from the CLI. Take, for example, the <em>start</em> control task on a Glassfish server in the glassfish-plugin (available as a community plugin, see the introduction of this manual). It can be executed as follows:</p>
-<pre><code>deployit&gt; server = repository.read(&#39;Infrastructure/demoHost/demoServer&#39;)
-deployit&gt; deployit.executeControlTask(&#39;start&#39;, server)
+<pre><code>    deployit&gt; server = repository.read(&#39;Infrastructure/demoHost/demoServer&#39;)
+    deployit&gt; deployit.executeControlTask(&#39;start&#39;, server)
 </code></pre><h2>Shutting down the Server</h2><p>The CLI can also be used to shutdown the Deployit Server as follows:</p>
-<pre><code>deployit.shutdown()
+<pre><code>    deployit.shutdown()
 </code></pre><p>Note that you must have administrative permissions for this.</p></body></html>

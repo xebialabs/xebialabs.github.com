@@ -34,7 +34,8 @@ $(document).ready(function(){
 </table>
 <h3 class='ci-toc-category'>Virtual Topology Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
 <tr class='even'><td><a href='#overthere.Host'>overthere.Host</a></td><td>A machine that runs middleware, on which scripts can be executed, etc</td>
-<tr class='odd'><td><a href='#overthere.Jumpstation'>overthere.Jumpstation</a></td><td>Base class for jumpstations</td>
+<tr class='odd'><td><a href='#overthere.HostContainer'>overthere.HostContainer</a></td><td></td>
+<tr class='even'><td><a href='#overthere.Jumpstation'>overthere.Jumpstation</a></td><td>Base class for jumpstations</td>
 </table>
 <h2 class='ci-details-title'>Configuration Item Details</h2><a name='overthere.CifsHost'></a><h3 class='ci-detail-title'>overthere.CifsHost</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#overthere.Host'>overthere.Host</a><span> >> </span><span>udm.BaseContainer</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>udm.Container</span><span>, </span><a href='#overthere.HostContainer'>overthere.HostContainer</a></td></tr></table></div><p class='ci-description'>A machine that can be connected to using either WinRM or Telnet and can perform file manipulation via the CIFS protocol.</p>
 <table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='overthere.CifsHost_address'></a><span class='ci-property-name'>address</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span><p class='ci-property-desc'>Address of the host</p></td>
@@ -73,6 +74,8 @@ $(document).ready(function(){
 </table>
 <table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Control Tasks</th></tr><tr class='even'><td><a name='overthere.Host_checkConnection'></a><span class='ci-property-name'>checkConnection</span><p class='ci-property-desc'>Check connection</p></td>
 </table>
+<hr class='ci-details-separator'/>
+<a name='overthere.HostContainer'></a><h3 class='ci-detail-title'>overthere.HostContainer</h3><p class='ci-description'>null</p>
 <hr class='ci-details-separator'/>
 <a name='overthere.Jumpstation'></a><h3 class='ci-detail-title'>overthere.Jumpstation</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#overthere.Host'>overthere.Host</a><span> >> </span><span>udm.BaseContainer</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>udm.Container</span><span>, </span><a href='#overthere.HostContainer'>overthere.HostContainer</a></td></tr></table></div><p class='ci-description'>Base class for jumpstations</p>
 <table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='overthere.Jumpstation_jumpstation'></a><span class='ci-property-name'>jumpstation</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;overthere.Jumpstation&gt;</span><p class='ci-property-desc'>If this host is not directly reachable, specify a jumpstation here which can be used to reach this host.</p></td>

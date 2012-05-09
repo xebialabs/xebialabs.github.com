@@ -287,8 +287,10 @@ echo INSPECTED:boolField=true
 </table>
 <h3 class='ci-toc-category'>Virtual Topology Configuration Items</h3><table class='ci-toc nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-toc-header'><th>CI</th><th>Description</th></tr>
 <tr class='even'><td><a href='#generic.Container'>generic.Container</a></td><td>A container to which generic CIs can be deployed</td>
-<tr class='odd'><td><a href='#generic.NestedContainer'>generic.NestedContainer</a></td><td>A container that is nested with another container</td>
-<tr class='even'><td><a href='#overthere.Host'>overthere.Host</a></td><td>A machine that runs middleware, on which scripts can be executed, etc</td>
+<tr class='odd'><td><a href='#generic.GenericContainer'>generic.GenericContainer</a></td><td></td>
+<tr class='even'><td><a href='#generic.NestedContainer'>generic.NestedContainer</a></td><td>A container that is nested with another container</td>
+<tr class='odd'><td><a href='#overthere.Host'>overthere.Host</a></td><td>A machine that runs middleware, on which scripts can be executed, etc</td>
+<tr class='even'><td><a href='#overthere.HostContainer'>overthere.HostContainer</a></td><td></td>
 <tr class='odd'><td><a href='#overthere.Jumpstation'>overthere.Jumpstation</a></td><td>Base class for jumpstations</td>
 </table>
 <h2 class='ci-details-title'>Configuration Item Details</h2><a name='generic.AbstractDeployed'></a><h3 class='ci-detail-title'>generic.AbstractDeployed</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>udm.BaseDeployed</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Deployed</span><span>, </span><span>udm.ConfigurationItem</span></td></tr></table></div><p class='ci-description'>Abstract deployed that can target any deployable to a generic container</p>
@@ -485,6 +487,8 @@ echo INSPECTED:boolField=true
 <table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Hidden Properties</th></tr><tr class='even'><td><a name='generic.Folder_textFileNamesRegex'></a><span class='ci-property-name'>textFileNamesRegex</span><span class='required'>&nbsp;</span>&nbsp;:&nbsp;<span class='ci-property-kind'>STRING</span>&nbsp;=&nbsp;<span class='ci-property-default'>.+\.(cfg | conf | config | ini | properties | props | txt | asp | aspx | htm | html | jsf | jsp | xht | xhtml | sql | xml | xsd | xsl | xslt)</span><p class='ci-property-desc'>Regular expression that matches file names of text files</p></td>
 </table>
 <hr class='ci-details-separator'/>
+<a name='generic.GenericContainer'></a><h3 class='ci-detail-title'>generic.GenericContainer</h3><p class='ci-description'>null</p>
+<hr class='ci-details-separator'/>
 <a name='generic.NestedContainer'></a><h3 class='ci-detail-title'>generic.NestedContainer</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><span>udm.BaseContainer</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>udm.Container</span><span>, </span><a href='#generic.GenericContainer'>generic.GenericContainer</a><span>, </span><a href='#overthere.HostContainer'>overthere.HostContainer</a></td></tr></table></div><p class='ci-description'>A container that is nested with another container</p>
 <table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='generic.NestedContainer_envVars'></a><span class='ci-property-name'>envVars</span>&nbsp;:&nbsp;<span class='ci-property-kind'>MAP_STRING_STRING</span><p class='ci-property-desc'>Environment variables for container</p></td>
 <tr class='odd'><td><a name='generic.NestedContainer_tags'></a><span class='ci-property-name'>tags</span>&nbsp;:&nbsp;<span class='ci-property-kind'>SET_OF_STRING</span><p class='ci-property-desc'>The tags to map deployables to containers.</p></td>
@@ -559,6 +563,8 @@ echo INSPECTED:boolField=true
 </table>
 <table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Control Tasks</th></tr><tr class='even'><td><a name='overthere.Host_checkConnection'></a><span class='ci-property-name'>checkConnection</span><p class='ci-property-desc'>Check connection</p></td>
 </table>
+<hr class='ci-details-separator'/>
+<a name='overthere.HostContainer'></a><h3 class='ci-detail-title'>overthere.HostContainer</h3><p class='ci-description'>null</p>
 <hr class='ci-details-separator'/>
 <a name='overthere.Jumpstation'></a><h3 class='ci-detail-title'>overthere.Jumpstation</h3><div><table class='ci-relations-table'><tr><th>Hierarchy</th><td><a href='#overthere.Host'>overthere.Host</a><span> >> </span><span>udm.BaseContainer</span><span> >> </span><span>udm.BaseConfigurationItem</span></td></tr><tr><th>Interfaces</th><td><span>udm.Taggable</span><span>, </span><span>udm.ConfigurationItem</span><span>, </span><span>udm.Container</span><span>, </span><a href='#overthere.HostContainer'>overthere.HostContainer</a></td></tr></table></div><p class='ci-description'>Base class for jumpstations</p>
 <table class='ci-properties nobreak'  cellspacing='0' cellpadding='3'><tr class='odd ci-prop-header'><th>Public Properties</th></tr><tr class='even'><td><a name='overthere.Jumpstation_jumpstation'></a><span class='ci-property-name'>jumpstation</span>&nbsp;:&nbsp;<span class='ci-property-kind'>CI&lt;overthere.Jumpstation&gt;</span><p class='ci-property-desc'>If this host is not directly reachable, specify a jumpstation here which can be used to reach this host.</p></td>
